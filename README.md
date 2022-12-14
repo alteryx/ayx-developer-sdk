@@ -30,7 +30,7 @@ In a terminal change directories to the `tools\win32\misc` and run `./setup-sdk.
 > :information_source: You will need to close and re-open your terminal after running this script.
 
 ## Additional Reading
-Additional reading can be found within the [Documentation](./docs/index.md).
+Additional reading can be found within the `docs` directory found within [releases](https://github.com/alteryx/ayx-developer-sdk/releases).
 
 ## License
 [LICENSE](LICENSE.txt)
