@@ -1,8 +1,8 @@
 # Creating a tool with an API hit
-In this guide, we will use the [Alteryx Python SDK](https://pypi.org/ayx-python-sdk)[fix link to pypi] to create a tool that pulls information from an API and find the mean, min, and max of the data.
+In this guide, we will use the [Alteryx Python SDK](https://pypi.org/ayx-python-sdk)[fix link to pypi] to create a tool that pulls information from an API and find the mean, min, and max of the data. asdf
 
 ## Creating a workspace
-The very first step to creating a plugin is to make a plugin workspace. We initialize a plugin workspace in an empty directory with the `sdk-workspace-init` command. Run the command and fill out the prompts, which will then start the workspace initialization process. 
+The very first step to creating a plugin is to make a plugin workspace. We initialize a plugin workspace in an empty directory with the `sdk-workspace-init` command. Run the command and fill out the prompts, which will then start the workspace initialization process. asdf
 
 ```
 $ ayx_plugin_cli sdk-workspace-init
