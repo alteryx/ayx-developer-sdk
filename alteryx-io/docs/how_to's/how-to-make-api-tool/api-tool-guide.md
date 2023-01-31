@@ -39,12 +39,12 @@ The next step is to add a plugin to the workspace. We do this using the `create-
 
 ```
 $ ayx_plugin_cli create-ayx-plugin
-Tool Name: api tool
+Tool Name: API tool
 Tool Type (input, multiple-inputs, multiple-outputs, optional, output, single-input-single-output, multi-connection-input-anchor) [single-input-single-output]: input
 Description []: My API Tool
 Tool Version [1.0]: 1.0
 DCM Namespace []:
-Creating input plugin: api tool
+Creating input plugin: API tool
 [Create plugin] started
 [Create plugin] Downloading UI components via git
 [Create plugin] Cloning into '.ayx_cli.cache\ui_tool_template'...
@@ -52,25 +52,57 @@ Creating input plugin: api tool
 [Create plugin] Installing UI components via npm
 [Create plugin] Creating Alteryx Plugin...
 [Create plugin] Copying example tool to ~\sdk-api-tool\backend\ayx_plugins...
-[Create plugin] Added new tool to package directory: ~\sdk-api-tool\backend\ayx_plugins\apitool.py
+[Create plugin] Added new tool to package directory: ~\sdk-api-tool\backend\ayx_plugins\a_p_i_tool.py
 [Create plugin] finished
 [Generating config files] started
 [Generating config files] .  generate_config_files:generate_config_xml
 [Generating config files] Generating top level config XML file...
 [Generating config files] .  generate_config_files:generate_tool_config_xml
 [Generating config files] Generating tool configuration XMLs...
-[Generating config files] Generating apitool XML...
+[Generating config files] Generating APItool XML...
 [Generating config files] Done!
 [Generating config files] .  generate_config_files:generate_manifest_jsons
-[Generating config files] Generating manifest.json for apitool...
+[Generating config files] Generating manifest.json for APItool...
 [Generating config files] Done!
 [Generating config files] finished
-[Generating test files for apitool] started
-[Generating test files for apitool] .  Generate tests
-[Generating test files for apitool] finished
+[Generating test files for APItool] started
+[Generating test files for APItool] .  Generate tests
+[Generating test files for APItool] finished
 ```
 
-After this command finishes, you will see a file named `apitool.py` under `~/backend/ayx_plugins/` with the boilerplate code.
+After this command finishes, you will see a file named `apitool.py` under `~/backend/ayx_plugins/` with the boilerplate code. Upon opening the file, you should see something like
+
+```python
+class APITool(PluginV2):
+    """Concrete implementation of an AyxPlugin."""
+
+    def __init__(self, provider: AMPProviderV2) -> None:
+        self.provider = provider
+        # truncated init code
+
+    def on_incoming_connection_complete(self, anchor: namedtuple) -> None:
+        # on_incoming_connection_complete code
+
+    def on_record_batch(self, batch: "Table", anchor: namedtuple) -> None:
+        # input tool doesn't get batches
+
+    def on_complete(self) -> None:
+        import pandas as pd
+        import pyarrow as pa
+
+        df = pd.DataFrame(
+            {
+                "x": [1, 2, 3],
+                "y": ["hello", "world", "from ayx_python_sdk!"],
+                "z": [self.config_value, self.config_value, self.config_value],
+            }
+        )
+
+        packet = pa.Table.from_pandas(df)
+
+        self.provider.write_to_anchor("Output", packet)
+        self.provider.io.info("APITool tool done.")
+```
 
 ## Writing an API request
-We will use the [requests](https://requests.readthedocs.io/en/latest/) library to make calls to an open source API. 
+Now you are ready to begin modifying this plugin code to pull data from an API and tell the plugin to output it! We will use the [requests](https://requests.readthedocs.io/en/latest/) library to do this.
