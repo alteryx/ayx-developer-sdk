@@ -1,9 +1,21 @@
 # Alteryx Developer SDK
 
 ## Downloads
-The latest SDK versions can be downloaded from the [Alteryx Developer SDK GitHub Repo](https://github.com/alteryx/ayx-developer-sdk).
+The latest SDK versions can be downloaded from the [Alteryx Developer SDK GitHub Repo](https://github.com/alteryx/ayx-developer-sdk) in the [Releases](https://github.com/alteryx/ayx-developer-sdk/releases) section.
 ## Installation
 To install, extract the SDK archive to a directory of your choice, install required [dependencies](#dependencies), and finally, proceed to any platform specific [post installation steps](#post-installation) below.
+
+### Windows Installation Example
+
+**Via PowerShell**
+```powershell
+# Download the latest release
+# This is an example! Update the URL to the correct archive!
+Invoke-Webrequest -URL https://github.com/alteryx/ayx-developer-sdk/releases/download/v2022.12.0/ayx-sdk-cli-v2022.12.0-x86_64-pc-windows-msvc.zip -Outfile latest-sdk.zip
+
+# Extract somewhere
+Expand-Archive -Path latest-sdk.zip -DestinationPath C:\SDKs\Alteryx\
+```
 
 ## Dependencies
 Python version 3.8.5 is currently required to use `ayx-sdk-cli.exe plugin run`. It is recommended to install this in a [Miniconda environment](#creating-a-miniconda-python-environment).
