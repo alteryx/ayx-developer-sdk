@@ -112,16 +112,17 @@ Now you are ready to begin modifying this plugin code to pull data from an API a
 ### 1. Making the request
 For this example, we will be fetching data from the [BALLDONTLIE API](https://app.balldontlie.io/) for NBA player Lebron James' stats in the 2016 NBA Playoffs. 
 
-First, we want to get rid of the existing boilerplate code in the `on_complete` function, and leave only the `import pyarrow as pa` line. Your code should look like this:
+First, we want to get rid of the existing boilerplate code in the `on_complete` function, and leave only the `import pyarrow as pa` line. Your code should now look like this:
 
 ```python
     def on_complete(self) -> None:
         import pyarrow as pa
+        import pyarrow.compute as pc # add this line in, it will be used later
 ```
 
-Next, we will write a function to call the API:
+Next, we will write a function to make a GET request to the API, passing in Lebron James' `player_id` and `season`:
 ```python
-    def get_postseason_stats(player_id, season):
+    def get_postseason_stats(player_id=237, season=2016):
         resp = requests.get(
             "https://www.balldontlie.io/api/v1/stats",
             params={
@@ -132,8 +133,111 @@ Next, we will write a function to call the API:
         )
         return resp.json()["data"]
 ```
-
-After returning the JSON data, we're able to use pyarrows to read that into a [`pyarrow.Table`](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html)
+From calling this function with `player_id=237` and `season=2016`, you will get back the data as a JSON.
+After returning the JSON data, we're able to read that into a [`pyarrow.Table`](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html)
 
 ## 2. Creating a `pyarrow.Table`
-Since we read and write data in the [Apache Arrow](https://arrow.apache.org/) data format
+Since we read and write data in the [Apache Arrow](https://arrow.apache.org/) data format, we will now convert this JSON to `pyarrow.Table` format with the following function:
+
+```python
+    def get_pyarrow_table_from_stats(stats_json):
+        stats_schema = pa.schema([
+            pa.field("pts", pa.int64()),
+            pa.field("reb", pa.int64()),
+            pa.field("ast", pa.int64()),
+            pa.field("stl", pa.int64()),
+            pa.field("blk", pa.int64()),
+            pa.field("min", pa.duration('s')),
+            pa.field("fga", pa.int64()),
+            pa.field("fgm", pa.int64()),
+            pa.field("fg3", pa.int64()),
+            pa.field("fta", pa.int64()),
+            pa.field("ftm", pa.int64()),
+            pa.field("turnovers", pa.int64()),
+        ])
+        assists = []
+        blocks = []
+        rebounds = []
+        minutes = []
+        points = []
+        steals = []
+        fga = []
+        fgm = []
+        fg3 = []
+        fta = []
+        ftm = []
+        tos = []
+        for stat in stats_json:
+            assists.append(stat["ast"])
+            blocks.append(stat["blk"])
+            rebounds.append(stat["reb"])
+            mins, secs = stat["min"].split(":")
+            mins_in_secs = int(mins)*60 + int(secs)
+            minutes.append(mins_in_secs)
+            points.append(stat["pts"])
+            steals.append(stat["stl"])
+            fga.append(stat["fga"])
+            fgm.append(stat["fgm"])
+            fg3.append(stat["fg3m"])
+            fta.append(stat["fta"])
+            ftm.append(stat["ftm"])
+            tos.append(stat["turnover"])
+        
+        table = pa.table(
+            [points, rebounds, assists, steals, blocks, minutes, fga, fgm, fg3, fta, ftm, tos],
+            schema=stats_chema
+        )
+        return table
+```
+This function iterates over the returned JSON from step 1 and pulls the relevant fields into an array of arrays, which conforms to the [`pa.schema`](https://arrow.apache.org/docs/python/generated/pyarrow.Schema.html) that we defined in the beginning of the function.
+
+> Other times the data comes in a better format and you can convert to Apache Arrow format more easily with the [built-in helper function](https://arrow.apache.org/docs/python/json.html) 
+## 3. Getting the min, max, and mean 
+Now that we have a `pyarrow.Table` representation of the JSON data, we can use the built-in [compute functions](https://arrow.apache.org/docs/python/compute.html) to calculate the min, max, and mean of each of our statistical categories with the following function:
+
+```python
+    def compute_aggregate_output(table):
+        mins = []
+        maxs = []
+        means = []
+        cat = []
+        for stat, col_name in zip(table, table.column_names):
+            if stat.type == pa.duration('s'):
+                stat = stat.cast(pa.int64())
+            min_max = pc.min_max(stat)
+            mins.append(min_max[0].as_py())
+            maxs.append(min_max[1].as_py())
+            means.append(pc.mean(stat).as_py())
+            cat.append(col_name)
+        
+        aggregate_tables = [cat, means, mins, maxs]
+
+        return pa.table(aggregate_tables, names = ["category", "mean", "min", "max", ])
+```
+
+This function will call the compute function `pc.min_max()` on each statistical category of our `pa.Table` that we created in step 2. It then aggregates all of these into a new table and returns it.
+
+## 4. Conclusion
+Finally, we'll combine everything we did in steps 1-3 into the `on_complete` function and write the results to the output anchor. It should look like this:
+
+```python
+    def on_complete(self) -> None:
+        """
+        In this method, a Plugin designer should perform any cleanup for their plugin.
+        However, if the plugin is an input-type tool (it has no incoming connections),
+        processing (record generation) should occur here.
+        """
+        import pyarrow as pa
+        import pyarrow.compute as pc
+
+        LEBRON_JAMES_PLAYER_ID = 237
+        NBA_SEASON = 2016
+        lbj_stats = get_postseason_stats(LEBRON_JAMES_PLAYER_ID, NBA_SEASON)
+        table = get_pyarrow_table_from_stats(lbj_stats)
+        output_table = compute_aggregate_output(table)
+        self.provider.write_to_anchor("Output", output_table)
+        self.provider.io.info("APITool tool done.")
+```
+
+And now you're done! Building and running this tool in Designer should have the following output:
+
