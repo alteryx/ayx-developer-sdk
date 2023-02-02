@@ -239,5 +239,8 @@ Finally, we'll combine everything we did in steps 1-3 into the `on_complete` fun
         self.provider.io.info("APITool tool done.")
 ```
 
-And now you're done! Building and running this tool in Designer should have the following output:
+And now you're done with writing the code! Building and running this tool in Designer should yield the following output:
 
+![Designer Output](./assets/designer-output.png)
+
+We can see that Lebron James has averaged 32.8 points, 9.1 rebounds, and 7.9 assists in the 2016 Playoffs.
