@@ -109,7 +109,7 @@ Now you are ready to begin modifying this plugin code to pull data from an API a
 
 > Since this is an input tool, we will only focus on the `on_complete` function. For additional reading on the lifecycle of a plugin, refer to the [Ayx Python SDK documentation](https://alteryx.github.io/ayx-python-sdk/plugin_lifecycle.html)
 
-### Making the request
+### 1. Making the request
 For this example, we will be fetching data from the [BALLDONTLIE API](https://app.balldontlie.io/) for NBA player Lebron James' stats in the 2016 NBA Playoffs. 
 
 First, we want to get rid of the existing boilerplate code in the `on_complete` function, and leave only the `import pyarrow as pa` line. Your code should look like this:
@@ -135,3 +135,5 @@ Next, we will write a function to call the API:
 
 After returning the JSON data, we're able to use pyarrows to read that into a [`pyarrow.Table`](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html)
 
+## 2. Creating a `pyarrow.Table`
+Since we read and write data in the [Apache Arrow](https://arrow.apache.org/) data format
