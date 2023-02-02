@@ -1,7 +1,10 @@
 # Creating a tool with an API hit
 In this guide, we will use the [Alteryx Python SDK](https://pypi.org/project/ayx-python-sdk/) and [Alteryx Plugin CLI](https://pypi.org/project/ayx-plugin-cli/) to create a tool that pulls information from an API and find the mean, min, and max of the data.
 
-## Creating a workspace
+---
+## Workspace Setup
+---
+### 1. Creating a workspace
 The very first step to creating a plugin is to make a plugin workspace. We initialize a plugin workspace in an empty directory with the `sdk-workspace-init` command. Run the command and fill out the prompts, which will then start the workspace initialization process.
 
 ```
@@ -34,7 +37,7 @@ Workspace settings can be modified in: ayx_workspace.json
 [Generating config files] finished
 ```
 
-## Creating a plugin
+### 2. Creating a plugin
 The next step is to add a plugin to the workspace. We do this using the `create-ayx-plugin` command. Fill out the prompts and then you will have the template code for your SDK Plugin. For this tool, we are choosing the `Input` tool type.
 
 ```
@@ -103,8 +106,9 @@ After this command finishes, you will see a file named `apitool.py` under `~/bac
             self.provider.write_to_anchor("Output", packet)
             self.provider.io.info("APITool tool done.")
 ```
-
-## Writing an API request
+---
+## Writing our API request tool
+---
 Now you are ready to begin modifying this plugin code to pull data from an API and tell the plugin to output it! We will use the [requests](https://requests.readthedocs.io/en/latest/) library to do this.
 
 > Since this is an input tool, we will only focus on the `on_complete` function. For additional reading on the lifecycle of a plugin, refer to the [Ayx Python SDK documentation](https://alteryx.github.io/ayx-python-sdk/plugin_lifecycle.html)
@@ -243,4 +247,4 @@ And now you're done with writing the code! Building and running this tool in Des
 
 ![Designer Output](./assets/designer-output.png)
 
-We can see that Lebron James has averaged 32.8 points, 9.1 rebounds, and 7.9 assists in the 2016 Playoffs.
+We can see from the output here that Lebron James averaged 32.8 points, 9.1 rebounds, and 7.9 assists in the 2016 Playoffs.
