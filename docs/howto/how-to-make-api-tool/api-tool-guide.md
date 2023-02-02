@@ -140,7 +140,7 @@ Next, we will write a function to make a GET request to the API, passing in Lebr
 From calling this function with `player_id=237` and `season=2016`, you will get back the data as a JSON.
 After returning the JSON data, we're able to read that into a [`pyarrow.Table`](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html)
 
-## 2. Creating a `pyarrow.Table`
+### 2. Creating a `pyarrow.Table`
 Since we read and write data in the [Apache Arrow](https://arrow.apache.org/) data format, we will now convert this JSON to `pyarrow.Table` format with the following function:
 
 ```python
@@ -195,8 +195,8 @@ Since we read and write data in the [Apache Arrow](https://arrow.apache.org/) da
 ```
 This function iterates over the returned JSON from step 1 and pulls the relevant fields into an array of arrays, which conforms to the [`pa.schema`](https://arrow.apache.org/docs/python/generated/pyarrow.Schema.html) that we defined in the beginning of the function.
 
-> Other times the data comes in a better format and you can convert to Apache Arrow format more easily with the [built-in helper function](https://arrow.apache.org/docs/python/json.html) 
-## 3. Getting the min, max, and mean 
+> Other times, the data comes in a better format and you can convert to Apache Arrow format more easily with the [built-in helper function](https://arrow.apache.org/docs/python/json.html) 
+### 3. Getting the min, max, and mean 
 Now that we have a `pyarrow.Table` representation of the JSON data, we can use the built-in [compute functions](https://arrow.apache.org/docs/python/compute.html) to calculate the min, max, and mean of each of our statistical categories with the following function:
 
 ```python
@@ -219,9 +219,9 @@ Now that we have a `pyarrow.Table` representation of the JSON data, we can use t
         return pa.table(aggregate_tables, names = ["category", "mean", "min", "max", ])
 ```
 
-This function will call the compute function `pc.min_max()` on each statistical category of our `pa.Table` that we created in step 2. It then aggregates all of these into a new table and returns it.
+This function will call the compute function `pc.min_max()` and `pc.mean()` on each statistical category of our `pa.Table` that we created in step 2. It then aggregates all of these into a new table and returns it.
 
-## 4. Conclusion
+### 4. Conclusion
 Finally, we'll combine everything we did in steps 1-3 into the `on_complete` function and write the results to the output anchor. It should look like this:
 
 ```python
