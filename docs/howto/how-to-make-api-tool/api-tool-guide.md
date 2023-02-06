@@ -1,16 +1,27 @@
-# Creating a tool with an API hit
-In this guide, we will use the [Alteryx Python SDK](https://pypi.org/project/ayx-python-sdk/) and [Alteryx Plugin CLI](https://pypi.org/project/ayx-plugin-cli/) to create a tool that pulls information from an API and find the mean, min, and max of the data.
+# Create a Tool with an API Hit
+In this guide, we use the [Alteryx Python SDK](https://pypi.org/project/ayx-python-sdk/) and [Alteryx Plugin CLI](https://pypi.org/project/ayx-plugin-cli/) to create a tool that pulls information from an API and find the mean, min, and max values of the data.
 
----
+Table of Contents:
+- [Workspace Setup](#workspace-setup) 
+    - [Creating a workspace](#1-creating-a-workspace)
+    - [Creating a plugin](#2-creating-a-plugin)
+- [Writing our API request tool](#writing-our-api-request-tool)
+    - [Making the request](#1-making-the-request)
+    - [Creating a `pyarrow.Table`](#2-creating-a-pyarrowtable)
+    - [Getting the min, max, and mean](#3-getting-the-min-max-and-mean)
+    - [Putting it all together](#4-putting-it-all-together)
+- [Packaging into a YXI](#packaging-into-a-yxi)
+- [Installing into Designer](#installing-and-runnning-in-designer)
+
 ## Workspace Setup
 ---
-### 1. Creating a workspace
+### 1. Creating a Workspace
 The very first step to creating a plugin is to make a plugin workspace. We initialize a plugin workspace in an empty directory with the `sdk-workspace-init` command. Run the command and fill out the prompts, which will then start the workspace initialization process.
 
-```
+```powershell
 $ ayx_plugin_cli sdk-workspace-init
 Package Name: API Tool
-Tool Category [Python SDK Examples]: 
+Tool Category [Python SDK Examples]: Python SDK Examples
 Description []: API Tool
 Author []: Alteryx
 Company []: Alteryx
@@ -40,7 +51,7 @@ Workspace settings can be modified in: ayx_workspace.json
 ### 2. Creating a plugin
 The next step is to add a plugin to the workspace. We do this using the `create-ayx-plugin` command. Fill out the prompts and then you will have the template code for your SDK Plugin. For this tool, we are choosing the `Input` tool type.
 
-```
+```powershell
 $ ayx_plugin_cli create-ayx-plugin
 Tool Name: API tool
 Tool Type (input, multiple-inputs, multiple-outputs, optional, output, single-input-single-output, multi-connection-input-anchor) [single-input-single-output]: input
@@ -106,12 +117,11 @@ After this command finishes, you will see a file named `apitool.py` under `~/bac
             self.provider.write_to_anchor("Output", packet)
             self.provider.io.info("APITool tool done.")
 ```
----
 ## Writing our API request tool
 ---
 Now you are ready to begin modifying this plugin code to pull data from an API and tell the plugin to output it! We will use the [requests](https://requests.readthedocs.io/en/latest/) library to do this.
 
-> Since this is an input tool, we will only focus on the `on_complete` function. For additional reading on the lifecycle of a plugin, refer to the [Ayx Python SDK documentation](https://alteryx.github.io/ayx-python-sdk/plugin_lifecycle.html)
+> :information_source: Since this is an input tool, we will only focus on the `on_complete` function. For additional reading on the lifecycle of a plugin, refer to the [Ayx Python SDK documentation](https://alteryx.github.io/ayx-python-sdk/plugin_lifecycle.html)
 
 ### 1. Making the request
 For this example, we will be fetching data from the [BALLDONTLIE API](https://app.balldontlie.io/) for NBA player Lebron James' stats in the 2016 NBA Playoffs. 
@@ -221,7 +231,7 @@ Now that we have a `pyarrow.Table` representation of the JSON data, we can use t
 
 This function will call the compute function `pc.min_max()` and `pc.mean()` on each statistical category of our `pa.Table` that we created in step 2. It then aggregates all of these into a new table and returns it.
 
-### 4. Conclusion
+### 4. Putting it all together
 Finally, we'll combine everything we did in steps 1-3 into the `on_complete` function and write the results to the output anchor. It should look like this:
 
 ```python
@@ -243,8 +253,75 @@ Finally, we'll combine everything we did in steps 1-3 into the `on_complete` fun
         self.provider.io.info("APITool tool done.")
 ```
 
-And now you're done with writing the code! Building and running this tool in Designer should yield the following output:
+And now you're done with writing the code!
+
+## Packaging into a YXI 
+---
+Back in our plugin workspace, run the `ayx_plugin_cli create-yxi` command which bundles all the plugins in the workspace into a `.yxi` archive. It should look something like this:
+```powershell
+$ ayx_plugin_cli create-yxi
+[Creating YXI] started
+[Creating YXI] -- generate_config_files:generate_config_xml
+[Creating YXI] -- generate_config_files:generate_tool_config_xml
+[Creating YXI] .  generate_config_files:generate_manifest_jsons
+[Creating YXI] Generating manifest.json for APItool...
+[Creating YXI] Done!
+[Creating YXI] .  generate_artifact:build_artifacts
+[Creating YXI] Creating APItool.yxi...
+[Creating YXI] Creating shiv artifact...
+[Creating YXI] [Installing local dependencies]: python -m pip install -r requirements-local.txt --upgrade --target ~\sdk-api-tool\.ayx_cli.cache\dist
+[Creating YXI] [Compiling shiv artifact]: shiv --compile-pyc --reproducible --extend-pythonpath --site-packages ~\sdk-api-tool\.ayx_cli.cache\dist -o ~\sdk-api-tool\main.pyz -e ayx_python_sdk.providers.amp_provider.__main__:main
+[Creating YXI] Created shiv artifact at: ~\sdk-api-tool\main.pyz
+[Creating YXI] .  create_yxi:create_yxi
+[Creating YXI] finished
+```
+
+## Installing and runnning in Designer
+---
+In this section we will go over the two ways to install the plugin into Designer.
+### Method 1
+After you've finished creating a `.yxi`, you can install it into Designer by double-clicking on the `.yxi`, which will open Designer and prompt you to install the package in a new dialog box. It will look something like:
+
+![YXI Install Dialog](./assets/install-yxi-dialog.png)
+
+Once it finishes installing, the plugin can be found under the `Python SDK Examples` tab for you to drag onto the canvas![^1]
+
+
+
+### Method 2
+We can also create the yxi _**and**_ install it all at once(yay!) by running the `ayx_plugin_cli designer-install` command. Choose the install option that matches your Designer install. Typically, this will be the `user` install option. 
+
+```powershell
+$ ayx_plugin_cli designer-install
+Install Type (user, admin) [user]: user
+[Creating YXI] started
+[Creating YXI] -- generate_config_files:generate_config_xml
+[Creating YXI] -- generate_config_files:generate_tool_config_xml
+[Creating YXI] .  generate_config_files:generate_manifest_jsons
+[Creating YXI] Generating manifest.json for APItool...
+[Creating YXI] Done! 
+[Creating YXI] .  generate_artifact:build_artifacts
+[Creating YXI] Creating APItool.yxi...   # <-- .yxi generated here
+[Creating YXI] Creating shiv artifact...
+[Creating YXI] [Installing local dependencies]: python -m pip install -r requirements-local.txt --upgrade --target ~\sdk-api-tool\.ayx_cli.cache\dist
+[Creating YXI] [Compiling shiv artifact]: shiv --compile-pyc --reproducible --extend-pythonpath --site-packages ~\sdk-api-tool\.ayx_cli.cache\dist -o ~\sdk-api-tool\main.pyz -e ayx_python_sdk.providers.amp_provider.__main__:main
+[Creating YXI] Created shiv artifact at: ~\sdk-api-tool\main.pyz
+[Creating YXI] .  create_yxi:create_yxi
+[Creating YXI] finished
+[Installing yxi ~\sdk-api-tool\build\yxi\APItool.yxi into designer] started
+[Installing yxi ~\sdk-api-tool\build\yxi\APItool.yxi into designer] .  install_yxi
+[Installing yxi ~\sdk-api-tool\build\yxi\APItool.yxi into designer] finished
+If this is your first time installing these tools, or you have made modifications to your ayx_workspace.json file, please restart Designer for these changes to take effect. # <-- Done installing into Designer!
+```
+
+Once the command finishes you can open Designer and find your tool under the `Python SDK Examples` tab![^1]
+
+> [^1]: :information_source: If you created the plugin workspace with a non-default `Tool Category` (from the [Creating a workspace](#1-creating-a-workspace) section), then the plugin will show up in the tab that corresponds to the input that was passed to `Tool Category`
+
+Running this tool in Designer should yield the following output:
 
 ![Designer Output](./assets/designer-output.png)
 
 We can see from the output here that Lebron James averaged 32.8 points, 9.1 rebounds, and 7.9 assists in the 2016 Playoffs.
+
+Thanks for reading!
