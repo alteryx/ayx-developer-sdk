@@ -19,7 +19,7 @@ Table of Contents:
 ---
 A plugin workspace is the project folder that houses all of your SDK plugins and metadata, managed by a `ayx_workspace.json` file.
 ### 1. Create a Workspace
-The very first step to creating a plugin is to make a plugin workspace. We initialize a plugin workspace in an empty directory with the `sdk-workspace-init` command. Run the command and fill out the prompts, which will then start the workspace initialization process.
+The first step of plugin creation is to make a plugin workspace. We initialize a plugin workspace in an empty directory with the `sdk-workspace-init` command. Run the command and fill out the prompts, which will then start the workspace initialization process.
 
 ```powershell
 $ ayx_plugin_cli sdk-workspace-init
@@ -52,7 +52,7 @@ Workspace settings can be modified in: ayx_workspace.json
 ```
 
 ### 2. Create a Plugin
-The next step is to add a plugin to the workspace. We do this using the `create-ayx-plugin` command. Fill out the prompts and then you will have the template code for your SDK Plugin. For this tool, we are choosing the `Input` tool type.
+The next step is to add a plugin to the workspace. To do so, use the `create-ayx-plugin` command. Reply to the prompts and then you will have the template code for your SDK Plugin. For this tool, we use the `Input` tool type.
 
 ```powershell
 $ ayx_plugin_cli create-ayx-plugin
@@ -87,7 +87,7 @@ Creating input plugin: API tool
 [Generating test files for APItool] finished
 ```
 
-After this command finishes, you will see a file named `a_p_i_tool.py` under `~/backend/ayx_plugins/` with the boilerplate code. Upon opening the file, you should see something like
+After this command finishes, you will see a file named `a_p_i_tool.py` under `~/backend/ayx_plugins/` with the boilerplate code. When you open the file, you should see something like this:
 
 ```python
     class APITool(PluginV2):
@@ -122,14 +122,14 @@ After this command finishes, you will see a file named `a_p_i_tool.py` under `~/
 ```
 ## Write API Request Tool
 ---
-Now you are ready to begin modifying this plugin code to pull data from an API and tell the plugin to output it! We will use the [requests](https://requests.readthedocs.io/en/latest/) library to do this.
+Now you are ready to modify this plugin code to pull data from an API and tell the plugin to output it! In our example, we use the [requests](https://requests.readthedocs.io/en/latest/) library to do this.
 
-> :information_source: Since this is an input tool, we will only focus on the `on_complete` function. For additional reading on the lifecycle of a plugin, refer to the [Ayx Python SDK documentation](https://alteryx.github.io/ayx-python-sdk/plugin_lifecycle.html)
+> :information_source: Since this is an input tool, we only focus on the `on_complete` function. For additional information on the lifecycle of a plugin, refer to the [AYX Python SDK documentation](https://alteryx.github.io/ayx-python-sdk/plugin_lifecycle.html)
 
 ### 1. Make the Request
 In this example, we fetch 2016 NBA playoff statistics data for Lebron James from the [BALLDONTLIE API](https://app.balldontlie.io)
 
-First, we want to get rid of the existing boilerplate code in the `on_complete` function, and leave only the `import pyarrow as pa` line. Your code should now look like this:
+First, we want to remove the existing boilerplate code in the `on_complete` function, and leave only the `import pyarrow as pa` line. Your code should now look like this:
 
 ```python
     def on_complete(self) -> None:
@@ -137,7 +137,7 @@ First, we want to get rid of the existing boilerplate code in the `on_complete` 
         import pyarrow.compute as pc # add this line in, it will be used later
 ```
 
-Next, we will write a function to make a GET request to the API, passing in Lebron James' `player_id` and `season`:
+Next, we write a function to make a GET request to the API. We pass in Lebron James' `player_id` and `season`:
 ```python
     def get_postseason_stats(player_id=237, season=2016):
         resp = requests.get(
@@ -150,11 +150,11 @@ Next, we will write a function to make a GET request to the API, passing in Lebr
         )
         return resp.json()["data"]
 ```
-From calling this function with `player_id=237` and `season=2016`, you will get back the data as a JSON.
-After returning the JSON data, we're able to read that into a [`pyarrow.Table`](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html)
+When we call this function with `player_id=237` and `season=2016`, we get back the data as a JSON.
+After we return the JSON data, we can read that into a [`pyarrow.Table`](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html)
 
 ### 2. Create a `pyarrow.Table`
-Since we read and write data in the [Apache Arrow](https://arrow.apache.org/) data format, we will now convert this JSON to `pyarrow.Table` format with the following function:
+Since we read and write data in the [Apache Arrow](https://arrow.apache.org/) data format, we need to convert this JSON to `pyarrow.Table` format with this function:
 
 ```python
     def get_pyarrow_table_from_stats(stats_json):
@@ -210,7 +210,7 @@ This function iterates over the returned JSON from step 1 and pulls the relevant
 
 > Other times, the data comes in a better format and you can convert to Apache Arrow format more easily with the [built-in helper function](https://arrow.apache.org/docs/python/json.html) 
 ### 3. Get the Min, Max, and Mean 
-Now that we have a `pyarrow.Table` representation of the JSON data, we can use the built-in [compute functions](https://arrow.apache.org/docs/python/compute.html) to calculate the min, max, and mean of each of our statistical categories with the following function:
+Now that we have a `pyarrow.Table` representation of the JSON data, we can use the built-in [compute functions](https://arrow.apache.org/docs/python/compute.html) to calculate the min, max, and mean of each of our statistical categories with this function:
 
 ```python
     def compute_aggregate_output(table):
@@ -232,10 +232,10 @@ Now that we have a `pyarrow.Table` representation of the JSON data, we can use t
         return pa.table(aggregate_tables, names = ["category", "mean", "min", "max", ])
 ```
 
-This function will call the compute function `pc.min_max()` and `pc.mean()` on each statistical category of our `pa.Table` that we created in step 2. It then aggregates all of these into a new table and returns it.
+This function calls the compute function `pc.min_max()` and `pc.mean()` on each statistical category of the `pa.Table` that we created in step 2. It then aggregates all of these into a new table and returns that table.
 
 ### 4. Putting it all together
-Finally, we'll combine everything we did in steps 1-3 into the `on_complete` function and write the results to the output anchor. It should look like this:
+Finally, we combine everything we did in steps 1-3 into the `on_complete` function and write the results to the output anchor. It should look like this:
 
 ```python
     def on_complete(self) -> None:
