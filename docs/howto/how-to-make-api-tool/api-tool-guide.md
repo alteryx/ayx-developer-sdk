@@ -2,20 +2,23 @@
 In this guide, we use the [Alteryx Python SDK](https://pypi.org/project/ayx-python-sdk/) and [Alteryx Plugin CLI](https://pypi.org/project/ayx-plugin-cli/) to create a tool that pulls information from an API and find the mean, min, and max values of the data.
 
 Table of Contents:
-- [Workspace Setup](#workspace-setup) 
-    - [Creating a workspace](#1-creating-a-workspace)
-    - [Creating a plugin](#2-creating-a-plugin)
-- [Writing our API request tool](#writing-our-api-request-tool)
-    - [Making the request](#1-making-the-request)
-    - [Creating a `pyarrow.Table`](#2-creating-a-pyarrowtable)
-    - [Getting the min, max, and mean](#3-getting-the-min-max-and-mean)
-    - [Putting it all together](#4-putting-it-all-together)
-- [Packaging into a YXI](#packaging-into-a-yxi)
-- [Installing into Designer](#installing-and-runnning-in-designer)
-
+- [Workspace Setup](#workspace-setup)
+    - [Create a Workspace](#1-create-a-workspace)
+    - [Create a Plugin](#2-create-a-plugin)
+- [Write API Request Tool](#write-api-request-tool)
+    - [Make the Request](#1-make-the-request)
+    - [Create a `pyarrow.Table`](#2-create-a-pyarrowtable)
+    - [Get the Min, Max, and Mean](#3-get-the-min-max-and-mean)
+    - [Put it all together](#4-put-it-all-together)
+- [Package into a YXI](#package-into-a-yxi)
+- [Run Against Test Client](#run-against-test-client)
+- [Install into Designer](#install-and-runnning-in-designer)
+    - [Method 1](#method-1)
+    - [Method 2](#method-2)
 ## Workspace Setup
 ---
-### 1. Creating a Workspace
+A plugin workspace is the project folder that houses all of your SDK plugins and metadata, managed by a `ayx_workspace.json` file.
+### 1. Create a Workspace
 The very first step to creating a plugin is to make a plugin workspace. We initialize a plugin workspace in an empty directory with the `sdk-workspace-init` command. Run the command and fill out the prompts, which will then start the workspace initialization process.
 
 ```powershell
@@ -48,7 +51,7 @@ Workspace settings can be modified in: ayx_workspace.json
 [Generating config files] finished
 ```
 
-### 2. Creating a plugin
+### 2. Create a Plugin
 The next step is to add a plugin to the workspace. We do this using the `create-ayx-plugin` command. Fill out the prompts and then you will have the template code for your SDK Plugin. For this tool, we are choosing the `Input` tool type.
 
 ```powershell
@@ -84,7 +87,7 @@ Creating input plugin: API tool
 [Generating test files for APItool] finished
 ```
 
-After this command finishes, you will see a file named `apitool.py` under `~/backend/ayx_plugins/` with the boilerplate code. Upon opening the file, you should see something like
+After this command finishes, you will see a file named `a_p_i_tool.py` under `~/backend/ayx_plugins/` with the boilerplate code. Upon opening the file, you should see something like
 
 ```python
     class APITool(PluginV2):
@@ -117,14 +120,14 @@ After this command finishes, you will see a file named `apitool.py` under `~/bac
             self.provider.write_to_anchor("Output", packet)
             self.provider.io.info("APITool tool done.")
 ```
-## Writing our API request tool
+## Write API Request Tool
 ---
 Now you are ready to begin modifying this plugin code to pull data from an API and tell the plugin to output it! We will use the [requests](https://requests.readthedocs.io/en/latest/) library to do this.
 
 > :information_source: Since this is an input tool, we will only focus on the `on_complete` function. For additional reading on the lifecycle of a plugin, refer to the [Ayx Python SDK documentation](https://alteryx.github.io/ayx-python-sdk/plugin_lifecycle.html)
 
-### 1. Making the request
-For this example, we will be fetching data from the [BALLDONTLIE API](https://app.balldontlie.io/) for NBA player Lebron James' stats in the 2016 NBA Playoffs. 
+### 1. Make the Request
+In this example, we fetch 2016 NBA playoff statistics data for Lebron James from the [BALLDONTLIE API](https://app.balldontlie.io)
 
 First, we want to get rid of the existing boilerplate code in the `on_complete` function, and leave only the `import pyarrow as pa` line. Your code should now look like this:
 
@@ -150,7 +153,7 @@ Next, we will write a function to make a GET request to the API, passing in Lebr
 From calling this function with `player_id=237` and `season=2016`, you will get back the data as a JSON.
 After returning the JSON data, we're able to read that into a [`pyarrow.Table`](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html)
 
-### 2. Creating a `pyarrow.Table`
+### 2. Create a `pyarrow.Table`
 Since we read and write data in the [Apache Arrow](https://arrow.apache.org/) data format, we will now convert this JSON to `pyarrow.Table` format with the following function:
 
 ```python
@@ -206,7 +209,7 @@ Since we read and write data in the [Apache Arrow](https://arrow.apache.org/) da
 This function iterates over the returned JSON from step 1 and pulls the relevant fields into an array of arrays, which conforms to the [`pa.schema`](https://arrow.apache.org/docs/python/generated/pyarrow.Schema.html) that we defined in the beginning of the function.
 
 > Other times, the data comes in a better format and you can convert to Apache Arrow format more easily with the [built-in helper function](https://arrow.apache.org/docs/python/json.html) 
-### 3. Getting the min, max, and mean 
+### 3. Get the Min, Max, and Mean 
 Now that we have a `pyarrow.Table` representation of the JSON data, we can use the built-in [compute functions](https://arrow.apache.org/docs/python/compute.html) to calculate the min, max, and mean of each of our statistical categories with the following function:
 
 ```python
@@ -254,8 +257,7 @@ Finally, we'll combine everything we did in steps 1-3 into the `on_complete` fun
 ```
 
 And now you're done with writing the code!
-
-## Packaging into a YXI 
+## Package into a YXI 
 ---
 Back in our plugin workspace, run the `ayx_plugin_cli create-yxi` command which bundles all the plugins in the workspace into a `.yxi` archive. It should look something like this:
 ```powershell
@@ -275,8 +277,20 @@ $ ayx_plugin_cli create-yxi
 [Creating YXI] .  create_yxi:create_yxi
 [Creating YXI] finished
 ```
+## Run Against Test Client
+---
+After creating the `.yxi` and before installing into Designer, we can first run our plugin against the Test Client to make sure there are no errors and that our plugin will run as expected. 
+Doing so speeds up development time, since we don't have to package and install the `.yxi` into Designer and create a new workflow everytime we make changes to our plugin code. 
 
-## Installing and runnning in Designer
+Run the `.yxi` against the Test Client using the command:
+
+```powershell
+$ ayx-sdk-cli.exe plugin run APITool -o output.json
+```
+
+This will output the results to a file called `output.json`.[^1] 
+
+## Installing and Runnning in Designer
 ---
 In this section we will go over the two ways to install the plugin into Designer.
 ### Method 1
@@ -284,12 +298,10 @@ After you've finished creating a `.yxi`, you can install it into Designer by dou
 
 ![YXI Install Dialog](./assets/install-yxi-dialog.png)
 
-Once it finishes installing, the plugin can be found under the `Python SDK Examples` tab for you to drag onto the canvas![^1]
-
-
+Once it finishes installing, the plugin can be found under the `Python SDK Examples` tab.[^2]
 
 ### Method 2
-We can also create the yxi _**and**_ install it all at once(yay!) by running the `ayx_plugin_cli designer-install` command. Choose the install option that matches your Designer install. Typically, this will be the `user` install option. 
+We can also create the yxi _**and**_ install it all at once by running the `ayx_plugin_cli designer-install` command. Choose the install option that matches your Designer install. Typically, this will be the `user` install option. 
 
 ```powershell
 $ ayx_plugin_cli designer-install
@@ -314,14 +326,16 @@ Install Type (user, admin) [user]: user
 If this is your first time installing these tools, or you have made modifications to your ayx_workspace.json file, please restart Designer for these changes to take effect. # <-- Done installing into Designer!
 ```
 
-Once the command finishes you can open Designer and find your tool under the `Python SDK Examples` tab![^1]
+Once the command finishes you can open Designer and find your tool under the `Python SDK Examples` tab.[^2] 
 
-> [^1]: :information_source: If you created the plugin workspace with a non-default `Tool Category` (from the [Creating a workspace](#1-creating-a-workspace) section), then the plugin will show up in the tab that corresponds to the input that was passed to `Tool Category`
-
-Running this tool in Designer should yield the following output:
+Running this tool in Designer yields the following output:
 
 ![Designer Output](./assets/designer-output.png)
 
 We can see from the output here that Lebron James averaged 32.8 points, 9.1 rebounds, and 7.9 assists in the 2016 Playoffs.
 
 Thanks for reading!
+
+> [^1]: :information_source: You can also specify a `.csv` extension for the output format by passing `output.csv` to the `-o` flag.
+
+> [^2]: :warning: If you created the plugin workspace with a non-default `Tool Category` (from the [Creating a workspace](#1-creating-a-workspace) section), then the plugin will show up in the tab that corresponds to the input that was passed to `Tool Category`
