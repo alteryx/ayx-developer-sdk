@@ -38,7 +38,7 @@ When you encounter a "…Failed to read port assignment…" (below) error messag
 
 Another cause might be incorrect plugin code. You can diagnose the issue [here](#can-i-run-plugins-outside-of-designer).
 
-## _"How can I update tool config?" Or, "update_tool_config" is not saving"_
+## _"How can I update tool config?" Or, "update_tool_config is not saving"_
 
 You can now call `save_tool_config()` to save configuration.
 
