@@ -46,4 +46,4 @@ You should think carefully before you attempt this, as it introduces complexity.
 
 If you're considering a second process/thread, a better option is to write a new tool and chain it together in the workflow. The AMP engine thread pool scheduler attempts to keep various plugins running as necessary. Furthermore, certain languages are only concurrent, not parallel. If you use Python, CPython is likely in use and has the Global Interpreter Lock (GIL).
 
-If you intend to deplay an "all-in-one" tool, Designer offers [Macro](https://help.alteryx.com/20223/designer/macros) functionality.
+If you intend to deploy an "all-in-one" tool, Designer offers [Macro](https://help.alteryx.com/20223/designer/macros) functionality.
