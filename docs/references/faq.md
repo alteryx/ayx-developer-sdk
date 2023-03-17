@@ -21,9 +21,9 @@ Check that the AMP engine is enabled. In Designer's Workflow Configuration windo
 
 ![Toggle AMP](assets/use_amp.png)
  
-If you still encounter the error with the correct configuration, make sure you are using a plugin produced with the SDK V2 and up.
+If you still encounter the error with the correct configuration, make sure the plugin was produced with version 2+ of the SDK.
 
-:information_source: The version of Python SDK that the tool will be using can be found at `requirements-thirdparty.txt`.
+:information_source: The version of Python SDK that the tool uses is located in `requirements-thirdparty.txt`.
 
 ```
 ayx_python_sdk==2.1.2
