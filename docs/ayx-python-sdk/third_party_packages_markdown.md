@@ -13,7 +13,7 @@ There are 2 options:
 1.  Manually add dependencies. If you use this approach, make sure to
     include all dependencies (including any sub-dependencies).
 
-2\. Use `pip freeze > requirements.txt` to generate a new
+2. Use `pip freeze > requirements.txt` to generate a new
 requirements.txt file in the workspace. You will need to prune this file
 to remove any dependencies that aren\'t explicitly imported or required
 by your plugin. Do this before you copy or overwrite the contents to the
@@ -35,7 +35,7 @@ needed. See the example below for an Input-type tool that uses pandas to
 generate its data (note that pandas is imported in the `on_complete`
 method):
 
-``` {.sourceCode .python}
+```python
 class ExampleInput(Plugin):
     """Concrete implementation of an AyxPlugin."""
 

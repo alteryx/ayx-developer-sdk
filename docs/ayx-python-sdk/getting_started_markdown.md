@@ -59,8 +59,8 @@ To create a new tool, use the `create-ayx-plugin` command.
 
 The `create-ayx-plugin` command takes these parameters:
 
-> -   `--tool-name`: (Required) The name of the new Plugin tool
-> -   `--tool-type`: The type of tool to create.
+ -   `--tool-name`: (Required) The name of the new Plugin tool
+ -   `--tool-type`: The type of tool to create.
 
 For this example we\'ll name our new tool `MyFirstTool`. We\'ll use the
 tool-type `single-input-single-output` parameter to create the new tool

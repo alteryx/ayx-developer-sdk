@@ -33,7 +33,7 @@ class variable in the init method. The init is also the point when
 anchors are set from the provider.
 
 The on\_incoming\_connection\_complete Method
-\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~\~
+---------------------------------------------
 
 The `on_incoming_connection_complete` method is called to handle any
 additional work for a completed anchor. The method is called when there
