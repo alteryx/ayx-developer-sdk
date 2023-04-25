@@ -436,7 +436,7 @@ The above command will run our plugin and produce `danceable.csv`. You may run `
 
 Given the command above, our output should look something like this (I am using [Rich CLI](https://github.com/Textualize/rich-cli) to preview):
 
-![danceable.csv](danceable-csv.png)
+![danceable.csv](./assets/danceable-csv.png)
 
 # Install and Run in Designer
 In this section we will go over the two ways to install the plugin into Designer.
@@ -444,7 +444,7 @@ In this section we will go over the two ways to install the plugin into Designer
 ## Method 1
 After you create a .yxi, you can double-click the .yxi to install it into Designer. This opens Designer and prompts you to install the package in a new dialog box. It looks something like this:
 
-![Designer Install Prompt](designer-install-prompt.png)
+![Designer Install Prompt](./assets/designer-install-prompt.png)
 
 Once it installs, you can find the plugin under the `Python SDK Examples` tool tab.[^2]
 
@@ -473,7 +473,7 @@ Once the command finishes you can open Designer and find your tool under the `Py
 # Run in Designer
 When you run this tool in Designer it yields the following output:
 
-![Designer Output](designer-output.png)
+![Designer Output](./assets/designer-output.png)
 
 You can see that our top danceable track with the input lyrics provided is ["Track 10" by The Procussions](https://open.spotify.com/track/1xZJKDCFXuCRUr82qzaRDp)!
 
