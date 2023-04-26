@@ -1,5 +1,5 @@
 # Create a Plugin
-After you [create a Workspace](./create-a-workspace.md), you can add a Plugin. To do so, use the create-ayx-plugin command. Reply to the prompts and then you will have the template code for your SDK Plugin. For this tool, we use the Input tool type.
+After you [create a Workspace](./create-a-workspace.md), you can add a Plugin. To do so, use the `ayx_plugin_cli create-ayx-plugin` command. Reply to the prompts and then you will have the template code for your SDK Plugin. For this tool, we use the Input tool type.
 
 ```bash
 ~/MyWorkspace$ ayx_plugin_cli create-ayx-plugin
