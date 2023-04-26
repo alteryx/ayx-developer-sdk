@@ -13,7 +13,7 @@ Processing](https://help.alteryx.com/20223/designer/alteryx-amp-engine) or AMP).
 -   **type**: The internal AMP Designer type.
 -   **size**: The size of the data, in bytes.
 -   **scale**: Scale is used only for 1 type:
-    `fixeddecimal`{renderer-mark="true"}.
+    `fixeddecimal`.
 -   **source**: This is a string that describes the origin of the data
     (for example, if data is read from a file in Designer, this is set
     to the file path of this input file).
@@ -79,9 +79,9 @@ exported to Designer for a precise data schema.
 ### Define a Schema at \_\_init\_\_
 
 In this example, we specify type `int16` for
-column `volts`{renderer-mark="true"} and type
-`string`{renderer-mark="true"} for column
-`device`{renderer-mark="true"}.
+column `volts` and type
+`string` for column
+`device`.
 
     def __init__(self, provider: AMPProviderV2):
         provider.push_outgoing_metadata("Output", create_schema({
@@ -249,7 +249,7 @@ If only the type is specified at schema creation, the other metadata
 fields are automatically filled (`"size"`,
 `"scale"`, and `"source"`).
 
-The maximum size specified by `"size"`{renderer-mark="true"} is set to
+The maximum size specified by `"size"` is set to
 the biggest when using string types but you can manually specify a size
 for string types. For example, if you set 4 as the size for a string,
 all strings in the corresponding column are truncated to 4 characters.
