@@ -1,7 +1,23 @@
 # Danceable Lyrics
 In this guide, we use the [Alteryx Python SDK](https://pypi.org/project/ayx-python-sdk/) and [Alteryx Plugin CLI](https://pypi.org/project/ayx-plugin-cli/) to create a tool that connects directly to a set of data files and determines the most "danceable" songs that contain a set of lyrics. We use [Polars](https://www.pola.rs/) for fast data processing.
 
-# Download Input Data
+## Table of Contents
+* [Download Input Data](#download-input-data)
+* [Basic Plugin Setup](#basic-plugin-setup)
+* [Write a Plugin](#write-a-plugin)
+    * [Dependencies](#1-dependencies)
+    * [Imports](#2-imports)
+    * [Initialization](#3-initialization)
+    * [Data Processing](#4-data-processing)
+    * [Putting It All Together](#5-putting-it-all-together)
+* [Packaging into a YXI](#package-into-a-yxi)
+* [Run the Test Client](#run-the-test-client)
+* [Install in Designer](#install-and-run-in-designer)
+    * [Method 1](#method-1)
+    * [Method 2](#method-2)
+* [Run in Designer](#run-in-designer)
+
+## Download Input Data
 Download and extract the required dataset files. You will reference them later in this guide. We provide 2 datasets—the full dataset and a smaller, truncated version.
 
 * The full version expands to around 11 GB of data. You can [download it here](https://drop.alteryx.com/public/file/SAlShV5VqkOI5_Jyx1me3w/Danceable_Lyrics_demo_data-Inspire-2023.7z).
@@ -9,7 +25,7 @@ Download and extract the required dataset files. You will reference them later i
 
 Go to the `README.md` files within the respective archives for source information.
 
-# Basic Plugin Setup
+## Basic Plugin Setup
 Before you proceed, please ensure you have this basic setup:
 
 1. [Create a Workspace](create-a-workspace.md) to house your plugin.
@@ -51,21 +67,21 @@ class DanceableLyrics(PluginV2):
         self.provider.io.info("DanceableLyrics tool done.")
 ```
 
-# Write a Plugin
+## Write a Plugin
 In this guide, we use multiple data files. We read each directly to illustrate a connector-like plugin. That is, to connect directly to local or remote data sources. While here, we read CSV input files, these could be in any format, including formats that Alteryx Designer does not directly support.
 
 > :information_source: To see an Input tool that connects to a remote API, check out [Creating an API Tool](https://github.com/alteryx/ayx-developer-sdk/blob/main/docs/howto/how-to-make-api-tool/api-tool-guide.md)!
 
 > :information_source: Since this is an Input tool, we only focus on the `__init__` and `on_complete` functions. For additional information on the lifecycle of a plugin, refer to the [AYX Python SDK documentation](https://alteryx.github.io/ayx-python-sdk/plugin_lifecycle.html).
 
-## 1. Dependencies
+### 1. Dependencies
 The first step is to update our `./backend/requirements-thirdparty.txt` file and tell Python we depend on Polars as a 3rd-party dependency. To do this, add a single line to the file:
 
 ```txt
 polars==0.17.9
 ```
 
-## 2. Imports
+### 2. Imports
 The next step is to update our Python module's imports. Imports tell Python what other code we will reference in our plugin. Add the required import statements near the top of your `danceable_lyrics.py` file. Your code should look like this:
 
 ```python
@@ -80,7 +96,7 @@ import polars as pl
 import pyarrow as pa
 ```
 
-## 3. Initialization
+### 3. Initialization
 Now, let's update the plugin's `__init__` method and set up some basic variables that we will reference later in the code. To start, modify the start of `__init__` to set a base path to _where you extracted your data assets_. Use `self.DATASETS_BASE` to do so. The result should look something like this:
 
 ```python
@@ -180,7 +196,7 @@ def __init__(self, provider: AMPProviderV2) -> None:
 
 > :information_source: To make your Input plugin more dynamic, you can use the [Alteryx UI-SDK](https://github.com/alteryx/dev-harness) and have a user supply many of the variables above.
 
-## 4. Data Processing
+### 4. Data Processing
 Now it's time to process some data! Since we don't currently attempt incoming data, but rather, _provide_ data as output, we'll do the bulk of our work in `on_complete`.
 
 Our first data input is from the `genius_song_lyrics.csv` file, where we will discover songs with lyrics that contain our search terms:
@@ -305,7 +321,7 @@ self.provider.io.info(f"{self.name} finished.")
 
 > :information_source: You might notice something a bit odd here. We are constructing a PyArrow table (`pa.Table`) from a Pandas frame converted from Polars. This is because the current version of Polars `to_arrow()` produces unexpected results. Perhaps newer versions won't require this workaround.
 
-## 5. Putting It All Together
+### 5. Putting It All Together
 > :information_source: See [danceable_lyrics.py](../danceable-lyrics-input-tool/DanceableLyrics/backend/ayx_plugins/danceable_lyrics.py) for the full source.
 
 Let's take a look at our final `on_complete`. It should look like something like this:
@@ -405,7 +421,7 @@ def on_complete(self) -> None:
     self.provider.io.info(f"{self.name} finished.")
 ```
 
-# Package into a YXI
+## Package into a YXI
 Now that we have our code, it's time to package it all up into a portable YXI archive. To do this, we use the `ayx_plugin_cli create-yxi` command. The process looks like this:
 
 ```bash
@@ -423,7 +439,7 @@ Now that we have our code, it's time to package it all up into a portable YXI ar
 [Creating YXI] finished
 ```
 
-# Run the Test Client
+## Run the Test Client
 Before you run your plugin in Designer, it's good practice to do some basic testing with `ayx-sdk-cli`'s `plugin run` command to check for any errors. From your workspace...
 
 ```bash
@@ -436,17 +452,17 @@ Given the command above, our output should look something like this (we use [Ric
 
 ![danceable.csv](./assets/danceable-csv.png)
 
-# Install and Run in Designer
+## Install in Designer
 In this section, we will go over the 2 ways to install the plugin into Designer.
 
-## Method 1
+### Method 1
 After you create a .yxi, you can double-click the .yxi to install it in Designer. This opens Designer and prompts you to install the package in a new dialog box. It looks something like this:
 
 ![Designer Install Prompt](./assets/designer-install-prompt.png)
 
 Once it installs, you can find the plugin under the `Python SDK Examples` tool category.[^2]
 
-## Method 2
+### Method 2
 You can also create the `.yxi` _**and**_ install it all at once via the `ayx_plugin_cli designer-install` command. Choose the install option that matches your Designer install. Typically, this is the `user` install option.
 
 ```bash
@@ -468,7 +484,7 @@ If this is your first time installing these tools, or you have made modification
 
 Once the command finishes, you can open Designer and find your tool under the `Python SDK Examples` tool category.[^1]
 
-# Run in Designer
+## Run in Designer
 When you run this tool in Designer, it produces this output:
 
 ![Designer Output](./assets/designer-output.png)
