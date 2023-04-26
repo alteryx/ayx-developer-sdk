@@ -1,7 +1,7 @@
-# Creating a Workspace
-A Workspace is a directory containing information about one or more SDK produced plugins to be packaged into a single, deployable `.yxi` archive. A given Workspace contains a `ayx_workspace.json`, and all other necessary components to build plugins.
+# Create a Workspace
+A Workspace is a directory that contains information about one or more SDK-produced plugins to be packaged into a single, deployable `.yxi` archive. A given Workspace contains an `ayx_workspace.json` file and all other necessary components to build plugins.
 
-To create a Workspace, we first create a new, empty directory. Then, we run the sdk-workspace-init command inside that directory and fill out the prompts, which starts the workspace initialization process.
+To create a Workspace, we first create a new, empty directory. Then, we run the `sdk-workspace-init` command inside that directory and fill out the prompts, which starts the workspace initialization process.
 
 ```bash
 ~$ mkdir MyWorkspace
@@ -25,4 +25,4 @@ Workspace settings can be modified in: ayx_workspace.json
 [Generating config files] finished
 ```
 
-Next: [Creating a Plugin](create-a-plugin.md)
+Next: [Create a Plugin](create-a-plugin.md)

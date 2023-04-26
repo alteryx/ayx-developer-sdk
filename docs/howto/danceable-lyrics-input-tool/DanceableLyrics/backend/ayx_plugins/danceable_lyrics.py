@@ -32,17 +32,17 @@ class DanceableLyrics(PluginV2):
         self.name = "DanceableLyrics"
 
         # To build a more flexible plugin, read input path(s) from the user
-        self.DATASETS_BASE = "c:/users/bryan.ashby/downloads/datasets/Inspire2023/"
+        self.DATASETS_BASE = "c:/users/alteryx/DanceableLyricsData/"
 
         self.provider.push_outgoing_metadata(
             "Output",
             create_schema(
                 {
-                    "artist_name": {"type": FieldType.v_wstring,},
-                    "track_name": {"type": FieldType.v_wstring,},
-                    "danceability": {"type": FieldType.float,},
-                    "energy": {"type": FieldType.float,},
-                    "track_id": {"type": FieldType.v_wstring,},
+                    "artist_name": {"type": FieldType.v_wstring},
+                    "track_name": {"type": FieldType.v_wstring},
+                    "danceability": {"type": FieldType.float},
+                    "energy": {"type": FieldType.float},
+                    "track_id": {"type": FieldType.v_wstring},
                 }
             ),
         )
