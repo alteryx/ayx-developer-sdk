@@ -1,15 +1,6 @@
 # Test Client Command Reference
-:::
 
-::: node--info
-::: node--info--modified
-Last modified: December 15, 2022
-:::
-:::
-
-::: {.paragraph .paragraph--type--simple-content .paragraph--view-mode--default}
-::: {.clearfix .text-formatted .field .field--name--field-information .field--type--text-long .field--label--hidden}
-## Using Help {#using-help .index-item}
+## Using Help
 
 The test client itself offers help at any stage of the program. Just
 include `--help` where it\'s needed.
@@ -25,7 +16,7 @@ include `--help` where it\'s needed.
     ayx-sdk-cli.exe plugin run --help   # help for plugin/run
     ayx-sdk-cli.exe self --help         # help for self
 
-## Global Settings {#global-settings .index-item}
+## Global Settings
 
 #### assume-yes
 
@@ -37,7 +28,7 @@ Specify the number of threads to be used by the test client. The default
 is the number of CPU/cores on the machine. You might want to adjust this
 if important tasks are being run in the background.
 
-## Logging {#logging .index-item}
+## Logging
 
 This configures the logging options. You can specify log output to
 stdout or file. The default format is Human but you can specify other
@@ -59,75 +50,33 @@ client appends to it.
 #### log-format
 
 The test client supports human-readable (default),
-[Bunyan](../../external.html?link=https://github.com/trentm/node-bunyan "Bunyan"){rel="noopener"
-target="_blank"}, and JSON.
+[Bunyan](https://github.com/trentm/node-bunyan), and JSON.
 
 #### log-level
 
 Set the log level for the test client. By default this is INFO. Some
 levels might be extremely verbose.
-:::
-:::
 
-::: compound-code-block-container
-::: {.paragraph .paragraph--type--compound-code-block .paragraph--view-mode--default .accordion responsive-accordion-tabs="tabs" multi-expand="true"}
-::: {.accordion-item accordion-item=""}
-[INFO (default)](#){.accordion-title}
+##### INFO (default)
+    ayx-sdk-cli.exe plugin run BaseTools\::Passthrough --input input.csv --output test.csv
+    2022-10-17T19:34:50.144008Z  INFO ayx_sdk_cli::cli: User invocation command="ayx-sdk-cli.exe plugin run BaseTools\\::Passthrough --input input.csv --output test.csv"
+    ...
+    2022-10-17T19:34:50.151119Z  INFO ayx_sdk_cli::commands::plugin::run: Extension loaded extension="Passthrough v2.0.0 (runtime target: ayx-sdk-extension-python-3_8_5)"
+    2022-10-17T19:34:50.153458Z  INFO ayx_sdk_cli::commands::plugin::run: Async threadpool threadpool_size=16
+    2022-10-17T19:34:50.164368Z  INFO plugin_execution: ayx_sdk_cli::plugin::tool_process: Extension runtime spawned runtime_pid=11592
 
-::: {.accordion-content tab-content=""}
-` `
+##### DEBUG
+    /ayx-sdk-cli.exe plugin run BaseTools\::Passthrough --input input.csv --output output.csv --log-level debug
+    2022-10-17T18:57:02.814839Z  INFO ayx_sdk_cli::cli: User invocation command="ayx-sdk-cli.exe plugin run BaseTools\\::Passthrough --input input.csv --output test.csv --log-level debug"
+    ...
+    2022-10-17T18:57:02.822777Z DEBUG plugin_execution: ayx_sdk_cli::plugin::tool_process: Spawning extention runtime... command="python"
+    ...
+    2022-10-17T18:57:02.826512Z DEBUG plugin_execution: ayx_sdk_cli::commands::plugin::run::tool_service: Attempting to acquire extension runtime tool service port assignment...
+    2022-10-17T18:57:03.602284Z  INFO plugin_execution: ayx_sdk_cli::commands::plugin::run::tool_service: Acquired port from runtime tool service tool_service_port=53241
+    2022-10-17T18:57:03.602301Z  INFO plugin_execution: tool_client: Connecting to extension runtime tool service tool_service_address="http://localhost:53241"
 
-::: {.field .field--name--field-code-geshi .field--type--geshifield .field--label--hidden}
-::: geshifilter
-::: {.bash .geshifilter-bash style="font-family:monospace;"}
-``` {style="font-family: monospace; font-weight: normal; font-style: normal"}
-ayx-sdk-cli.exe plugin run BaseTools\::Passthrough --input input.csv --output test.csv
-2022-10-17T19:34:50.144008Z  INFO ayx_sdk_cli::cli: User invocation command="ayx-sdk-cli.exe plugin run BaseTools\\::Passthrough --input input.csv --output test.csv"
-...
-2022-10-17T19:34:50.151119Z  INFO ayx_sdk_cli::commands::plugin::run: Extension loaded extension="Passthrough v2.0.0 (runtime target: ayx-sdk-extension-python-3_8_5)"
-2022-10-17T19:34:50.153458Z  INFO ayx_sdk_cli::commands::plugin::run: Async threadpool threadpool_size=16
-2022-10-17T19:34:50.164368Z  INFO plugin_execution: ayx_sdk_cli::plugin::tool_process: Extension runtime spawned runtime_pid=11592
-```
-:::
-:::
-:::
 
-Copy Code
-:::
-:::
-
-::: {.accordion-item accordion-item=""}
-[DEBUG](#){.accordion-title}
-
-::: {.accordion-content tab-content=""}
-` `
-
-::: {.field .field--name--field-code-geshi .field--type--geshifield .field--label--hidden}
-::: geshifilter
-::: {.bash .geshifilter-bash style="font-family:monospace;"}
-``` {style="font-family: monospace; font-weight: normal; font-style: normal"}
-/ayx-sdk-cli.exe plugin run BaseTools\::Passthrough --input input.csv --output output.csv --log-level debug
-2022-10-17T18:57:02.814839Z  INFO ayx_sdk_cli::cli: User invocation command="ayx-sdk-cli.exe plugin run BaseTools\\::Passthrough --input input.csv --output test.csv --log-level debug"
-...
-2022-10-17T18:57:02.822777Z DEBUG plugin_execution: ayx_sdk_cli::plugin::tool_process: Spawning extention runtime... command="python"
-...
-2022-10-17T18:57:02.826512Z DEBUG plugin_execution: ayx_sdk_cli::commands::plugin::run::tool_service: Attempting to acquire extension runtime tool service port assignment...
-2022-10-17T18:57:03.602284Z  INFO plugin_execution: ayx_sdk_cli::commands::plugin::run::tool_service: Acquired port from runtime tool service tool_service_port=53241
-2022-10-17T18:57:03.602301Z  INFO plugin_execution: tool_client: Connecting to extension runtime tool service tool_service_address="http://localhost:53241"
-```
-:::
-:::
-:::
-
-Copy Code
-:::
-:::
-:::
-:::
-
-::: {.paragraph .paragraph--type--simple-content .paragraph--view-mode--default}
-::: {.clearfix .text-formatted .field .field--name--field-information .field--type--text-long .field--label--hidden}
-## Commands {#commands .index-item}
+## Commands
 
 ### Completion
 
@@ -160,87 +109,37 @@ Step 2: Add the following to the end of `$profile`.
 #### list
 
 List extensions found in the current workspace.
-:::
-:::
 
-::: compound-code-block-container
-::: {.paragraph .paragraph--type--compound-code-block .paragraph--view-mode--default .accordion responsive-accordion-tabs="tabs" multi-expand="true"}
-::: {.accordion-item accordion-item=""}
-[list](#){.accordion-title}
+    ayx-sdk-cli.exe extension list
+    ...
+    Found 9 extension(s):
+    - ConversionPassthrough v1.0.0 (runtime target: ayx-sdk-extension-python-3_8_5)
+    - Input v2.0.0 (runtime target: ayx-sdk-extension-python-3_8_5)
+    - Optional v2.0.0 (runtime target: ayx-sdk-extension-python-3_8_5)
+    - Passthrough v2.0.0 (runtime target: ayx-sdk-extension-python-3_8_5)
+    - MultipleInputs v2.0.0 (runtime target: ayx-sdk-extension-python-3_8_5)
+    - DcmInput v1.0.0 (runtime target: ayx-sdk-extension-python-3_8_5)
+    - MultiConnection v2.0.0 (runtime target: ayx-sdk-extension-python-3_8_5)
+    - MultipleOutputs v2.0.0 (runtime target: ayx-sdk-extension-python-3_8_5)
+    - Output v2.0.0 (runtime target: ayx-sdk-extension-python-3_8_5)
 
-::: {.accordion-content tab-content=""}
-` `
 
-::: {.field .field--name--field-code-geshi .field--type--geshifield .field--label--hidden}
-::: geshifilter
-::: {.bash .geshifilter-bash style="font-family:monospace;"}
-``` {style="font-family: monospace; font-weight: normal; font-style: normal"}
-ayx-sdk-cli.exe extension list
-...
-Found 9 extension(s):
-- ConversionPassthrough v1.0.0 (runtime target: ayx-sdk-extension-python-3_8_5)
-- Input v2.0.0 (runtime target: ayx-sdk-extension-python-3_8_5)
-- Optional v2.0.0 (runtime target: ayx-sdk-extension-python-3_8_5)
-- Passthrough v2.0.0 (runtime target: ayx-sdk-extension-python-3_8_5)
-- MultipleInputs v2.0.0 (runtime target: ayx-sdk-extension-python-3_8_5)
-- DcmInput v1.0.0 (runtime target: ayx-sdk-extension-python-3_8_5)
-- MultiConnection v2.0.0 (runtime target: ayx-sdk-extension-python-3_8_5)
-- MultipleOutputs v2.0.0 (runtime target: ayx-sdk-extension-python-3_8_5)
-- Output v2.0.0 (runtime target: ayx-sdk-extension-python-3_8_5)
-```
-:::
-:::
-:::
-
-Copy Code
-:::
-:::
-:::
-:::
-
-::: {.paragraph .paragraph--type--simple-content .paragraph--view-mode--default}
-::: {.clearfix .text-formatted .field .field--name--field-information .field--type--text-long .field--label--hidden}
 #### extension
 
 Provide information about a specific extension.
-:::
-:::
 
-::: compound-code-block-container
-::: {.paragraph .paragraph--type--compound-code-block .paragraph--view-mode--default .accordion responsive-accordion-tabs="tabs" multi-expand="true"}
-::: {.accordion-item accordion-item=""}
-[extension](#){.accordion-title}
+    ayx-sdk-cli.exe extension info Passthrough
+    ...
+    Name           : Passthrough
+    Package Name   : N/A
+    Description    : An example single-input-single-output tool. This tool takes data from the input anchor and, without changing it, writes it to the output anchor.
+    Kind           : com.alteryx.sdk.tool
+    Version        : 2.0.0
+    Runtime Target : ayx-sdk-extension-python-3_8_5
+    Category       : Python SDK Examples
+    Copyright      : 2022
 
-::: {.accordion-content tab-content=""}
-` `
 
-::: {.field .field--name--field-code-geshi .field--type--geshifield .field--label--hidden}
-::: geshifilter
-::: {.bash .geshifilter-bash style="font-family:monospace;"}
-``` {style="font-family: monospace; font-weight: normal; font-style: normal"}
-ayx-sdk-cli.exe extension info Passthrough
-...
-Name           : Passthrough
-Package Name   : N/A
-Description    : An example single-input-single-output tool. This tool takes data from the input anchor and, without changing it, writes it to the output anchor.
-Kind           : com.alteryx.sdk.tool
-Version        : 2.0.0
-Runtime Target : ayx-sdk-extension-python-3_8_5
-Category       : Python SDK Examples
-Copyright      : 2022
-```
-:::
-:::
-:::
-
-Copy Code
-:::
-:::
-:::
-:::
-
-::: {.paragraph .paragraph--type--simple-content .paragraph--view-mode--default}
-::: {.clearfix .text-formatted .field .field--name--field-information .field--type--text-long .field--label--hidden}
 ### Plugin
 
 #### run
@@ -252,9 +151,7 @@ the specified outputs given.
 `ayx-sdk-cli.exe plugin run [WORKSPACE_PATH]::[PLUGIN_NAME] --input <[SOURCE][:TYPE[:OPTIONS]][@ANCHOR]> --output <[DESTINATION][:TYPE[:OPTIONS]][@ANCHOR]> --runtime-command`
 
 For more information, go to [Test
-Client](test-client.html "Test Client"){entity-substitution="canonical"
-entity-type="node" entity-uuid="4a9d7d82-9e64-48b9-bb52-7c82d08c5c1f"
-rel="noopener" target="_blank"}.
+Client](https://help.alteryx.com/developer-help/test-client).
 
 ### Self
 
