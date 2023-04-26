@@ -1,27 +1,17 @@
 # DCM Input Example Tool
-:::
 
-::: node--info
-::: node--info--modified
-Last modified: February 16, 2022
-:::
-:::
-
-::: {.paragraph .paragraph--type--simple-content .paragraph--view-mode--default}
-::: {.clearfix .text-formatted .field .field--name--field-information .field--type--text-long .field--label--hidden}
-## Overview {#overview .index-item}
+## Overview
 
 The [Data Connection Manager (DCM)
-feature](../20223/designer/dcm-designer.html "Data Connection Manager (DCM)"){entity-substitution="canonical"
-entity-type="node" entity-uuid="73de3bee-6a9e-477f-a978-13f249edc18f"
-rel="noopener" target="_blank"} provides the ability to securely create,
+feature](https://help.alteryx.com/20223/designer/dcm-designer) provides the ability to securely create,
 retrieve, update, delete, and synchronize Data Sources, Credentials, and
 Connections (Credentials linked to a Data Source). Only a small subset
 of these functions is accessible from the Python SDK.
 
 The DCM Input tool example demonstrates how to use all these functions.
 
-## DCM Configuration {#dcm-configuration .index-item}
+
+## DCM Configuration
 
 The DCM Input tool requires the DCM feature to be enabled in Alteryx
 Designer. You can do this via the Admin configuration:
@@ -39,9 +29,7 @@ You can also enable DCM via Designer's User Settings:
 3.  Select **Override DCM Settings** and select **Enable DCM**.
 
 Please go to the [DCM
-Documentation](../20223/designer/dcm-designer.html "DCM Documentation"){entity-substitution="canonical"
-entity-type="node" entity-uuid="73de3bee-6a9e-477f-a978-13f249edc18f"
-rel="noopener" target="_blank"} for more information about DCM
+Documentation](https://help.alteryx.com/20223/designer/dcm-designer) for more information about DCM
 configuration.
 
 ## Prepare the DCM Connection {#prepare-the-dcm-connection .index-item}
