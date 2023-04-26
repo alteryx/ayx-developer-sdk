@@ -176,7 +176,6 @@ Contents of **some_file.txt**:
     7,8,9
 
 This doesn\'t require a schema:
-
 -  stdin is valid. It can be shared amongst any inputs, like a file.
 -  stdount is not valid. Similar to a file, multiple outputs can\'t write to it.
 
