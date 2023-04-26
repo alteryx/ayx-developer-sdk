@@ -1,15 +1,6 @@
 # AYX Python SDK v2 Example Tools
-:::
 
-::: node--info
-::: node--info--modified
-Last modified: February 16, 2022
-:::
-:::
-
-::: {.paragraph .paragraph--type--simple-content .paragraph--view-mode--default}
-::: {.clearfix .text-formatted .field .field--name--field-information .field--type--text-long .field--label--hidden}
-### Example Tools {#example-tools .index-item}
+### Example Tools
 
 These are example tools created using version 2 the [AYX Python
 SDK](ayx-python-sdk.html "AYX Python SDK"){entity-substitution="canonical"
@@ -17,25 +8,22 @@ entity-type="node" entity-uuid="fc38d31e-ff06-49a8-bb59-8398983ee2e8"
 target="_blank"}. When the tools are installed, they display in the SDK
 Examples tool category in Alteryx Designer.
 
-::: howto
+
 #### Back-end Tools
 
-::: howto--content
 These examples demonstrate back-end tools and are the same as the
 template tools available via the CLI. The user interface of the Input
 Tool example is interactive but please note that the other user
 interfaces in these examples are not interactive.
-:::
+
 
 #### Engine Compatibility
 
-::: howto--content
 The AYX Python SDK requires that the [AMP
 Engine](../20223/designer/alteryx-amp-engine.html "AMP Engine"){entity-substitution="canonical"
 entity-type="node" entity-uuid="e13022bf-27e2-45b6-ae25-0210fe3706a8"
 target="_blank"} is enabled.
-:::
-:::
+
 
 ### V2 Example Tools {#v2-example-tools .index-item}
 
