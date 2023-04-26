@@ -3,7 +3,7 @@
 Explore the [AYX Plugin
 CLI](https://help.alteryx.com/developer-help/ayx-plugin-cli) commands and parameters.
 
-## sdk-workspace-init {#sdk-workspace-init .index-item}
+## sdk-workspace-init
 
 This command initializes a workspace---a directory that contains all of
 the source code and configuration details for a set of Alteryx SDK
@@ -180,7 +180,7 @@ Note that admin installation requires admin access.
 -   Permissible Values: user, admin
 -   Default: user
 
-## designer-install {#designer-install .index-item}
+## designer-install
 
 This command builds the YXI from the current workspace and installs it
 into Designer.
@@ -201,7 +201,7 @@ Note that admin installation requires admin access.
 -   Permissible Values: user, admin
 -   Default: user
 
-## generate-config-files {#generate-config-files .index-item}
+## generate-config-files
 
 This command generates and updates the workspace config XML, individual
 tool config XMLs, and the tool's `manifest.json` file.
@@ -210,7 +210,7 @@ tool config XMLs, and the tool's `manifest.json` file.
 
 This command takes no parameters.
 
-## Sample ayx_workspace.json {#sample-ayx_workspace.json .index-item}
+## Sample ayx_workspace.json
 
 	{
 		"name": "TestTools",
