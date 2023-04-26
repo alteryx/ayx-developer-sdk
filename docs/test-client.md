@@ -181,17 +181,17 @@ This doesn\'t require a schema:
 -  stdount is not valid. Similar to a file, multiple outputs can\'t write to it.
 
 
-    `cat some_file.txt | ayx-sdk-cli.exe Passthrough 
-      --input :csv
-      --input :csv
-      --input :csv
-      --input :csv
-      --input :csv
-      --output :csv@Output1
-      --output :csv@Output2
-      --output :csv@Output3
-      --output :csv@Output4
-      --output :csv@Output5`
+    cat some_file.txt | ayx-sdk-cli.exe Passthrough 
+    --input :csv
+    --input :csv
+    --input :csv
+    --input :csv
+    --input :csv
+    --output :csv@Output1
+    --output :csv@Output2
+    --output :csv@Output3
+    --output :csv@Output4
+    --output :csv@Output5
 
 ## Command Reference 
 Go to [Test Client Command Reference](https://help.alteryx.com/developer-help/test-client-command-reference) for detailed information.
