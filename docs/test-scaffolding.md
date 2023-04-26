@@ -1,21 +1,11 @@
 # Test Scaffolding
-:::
 
-::: node--info
-::: node--info--modified
-Last modified: August 01, 2022
-:::
-:::
-
-::: {.paragraph .paragraph--type--simple-content .paragraph--view-mode--default}
-::: {.clearfix .text-formatted .field .field--name--field-information .field--type--text-long .field--label--hidden}
-## What is pytest? {#what-is-pytest .index-item}
+## What is pytest?
 
 Pytest is a [unit testing
-framework](../../external.html?link=https://docs.pytest.org/en/7.1.x/ "unit testing framework"){rel="noopener"
-target="_blank"} intended to test the Python code you write.
+framework](https://docs.pytest.org/en/7.1.x/) intended to test the Python code you write.
 
-## Install pytest {#install-pytest .index-item}
+## Install pytest
 
 To install pytest run this command:
 
@@ -28,7 +18,7 @@ You can install a specific pytest version, for example:
 We use version 5.4.1 internally, but these tests should run on later
 versions of pytest as well.
 
-## Run pytest {#run-pytest .index-item}
+## Run pytest
 
 Once you install pytest, you should be able to run your tests from the
 workspace root via:
@@ -83,7 +73,7 @@ the line numbers on the left to see a little red dot appear. Select and
 run the test in debug mode, and you\'ll be able to stop execution at
 that point and examine the values of local variables.
 
-## Generate Test {#generate-test .index-item}
+## Generate Test
 
 Any plugins generated with ayx_plugin_cli version 1.0.3+ should also
 come with unit test scaffolds. However, you can generate these scaffolds
@@ -108,7 +98,7 @@ exists in your `ayx_workspace.json`, using the same name as the tool's
 Also note that if you generate tests for tools that already exist, the
 tests need to be updated to reflect your plugin code.
 
-## Write Tests {#write-tests .index-item}
+## Write Tests
 
 To discover tests (by default), pytest searches for files that match the
 patterns `test_*.py` or `*_test.py`. Any functions that match the
@@ -129,7 +119,7 @@ The goal of unit testing is to discover these test failures ahead of
 time, and debug your logic until your output matches the expected
 output.
 
-## Interact with the Plugin Service {#interact-with-the-plugin-service .index-item}
+## Interact with the Plugin Service
 
 SdkToolTestService is a middleware layer that mocks out some of Alteryx
 Designer\'s functionality and allows you to test your plugin\'s
@@ -208,89 +198,29 @@ runs 3 times by default, one for each batch named in the list argument.
 These batches are defined in `conftest.py`. Edit, rename, and change
 these to suit your testing needs.
 
-## Examples {#examples .index-item}
-:::
-:::
+## Examples
 
-::: compound-code-block-container
-::: {.paragraph .paragraph--type--compound-code-block .paragraph--view-mode--default .accordion responsive-accordion-tabs="tabs" multi-expand="true"}
-::: {.accordion-item accordion-item=""}
-[Python](#){.accordion-title}
+    @pytest.mark.parametrize("record_batch", ["small_batch", "medium_batch", "large_batch"])
+    def test_on_record_batch(plugin_service_fixture, anchor, record_batch, request):
+        record_batch = request.getfixturevalue(record_batch)
+        plugin_service_fixture.run_on_record_batch(record_batch, anchor)
+        #  In this case, since the tool is a simple passthrough, the input data should match the output data, 1-1.
+        assert plugin_service_fixture.data_streams["Output"] == [record_batch]
+        #  In this case, there are no calls being made to provider.io, so the io_stream for on_record_batch should be empty.
+        assert plugin_service_fixture.io_stream == []
 
-::: {.accordion-content tab-content=""}
-` `
 
-::: {.field .field--name--field-code-geshi .field--type--geshifield .field--label--hidden}
-::: geshifilter
-::: {.python .geshifilter-python style="font-family:monospace;"}
-``` {style="font-family: monospace; font-weight: normal; font-style: normal"}
-@pytest.mark.parametrize("record_batch", ["small_batch", "medium_batch", "large_batch"])
-def test_on_record_batch(plugin_service_fixture, anchor, record_batch, request):
-    record_batch = request.getfixturevalue(record_batch)
-    plugin_service_fixture.run_on_record_batch(record_batch, anchor)
-    #  In this case, since the tool is a simple passthrough, the input data should match the output data, 1-1.
-    assert plugin_service_fixture.data_streams["Output"] == [record_batch]
-    #  In this case, there are no calls being made to provider.io, so the io_stream for on_record_batch should be empty.
-    assert plugin_service_fixture.io_stream == []
-```
-:::
-:::
-:::
+    def test_on_incoming_connection_complete(plugin_service_fixture, anchor):
+        plugin_service_fixture.run_on_incoming_connection_complete(anchor)
+        #  In this case, no data was written to any of the output anchors, so the streams should be empty.
+        assert plugin_service_fixture.data_streams == {}
+        #  In this case, the only call being made is "Connection connection on Anchor anchor" as an info message.
+        assert plugin_service_fixture.io_stream == [f"INFO:Connection {anchor.connection} on Anchor {anchor.name}"]
 
-Copy Code
-:::
-:::
-:::
-:::
 
-::: compound-code-block-container
-::: {.paragraph .paragraph--type--compound-code-block .paragraph--view-mode--default .accordion responsive-accordion-tabs="tabs" multi-expand="true"}
-::: {.accordion-item accordion-item=""}
-[Python](#){.accordion-title}
-
-::: {.accordion-content tab-content=""}
-` `
-
-::: {.field .field--name--field-code-geshi .field--type--geshifield .field--label--hidden}
-::: geshifilter
-::: {.python .geshifilter-python style="font-family:monospace;"}
-``` {style="font-family: monospace; font-weight: normal; font-style: normal"}
-def test_on_incoming_connection_complete(plugin_service_fixture, anchor):
-    plugin_service_fixture.run_on_incoming_connection_complete(anchor)
-    #  In this case, no data was written to any of the output anchors, so the streams should be empty.
-    assert plugin_service_fixture.data_streams == {}
-    #  In this case, the only call being made is "Connection connection on Anchor anchor" as an info message.
-    assert plugin_service_fixture.io_stream == [f"INFO:Connection {anchor.connection} on Anchor {anchor.name}"]
-```
-:::
-:::
-:::
-
-Copy Code
-:::
-:::
-:::
-:::
-
-::: compound-code-block-container
-::: {.paragraph .paragraph--type--compound-code-block .paragraph--view-mode--default .accordion responsive-accordion-tabs="tabs" multi-expand="true"}
-::: {.accordion-item accordion-item=""}
-[Python](#){.accordion-title}
-
-::: {.accordion-content tab-content=""}
-` `
-
-::: {.field .field--name--field-code-geshi .field--type--geshifield .field--label--hidden}
-::: geshifilter
-::: {.python .geshifilter-python style="font-family:monospace;"}
-``` {style="font-family: monospace; font-weight: normal; font-style: normal"}
-def test_on_complete(plugin_service_fixture):
-    plugin_service_fixture.run_on_complete()
-    #  In this case, no data was written to any of the output anchors, so the streams should be empty.
-    assert plugin_service_fixture.data_streams == {}
-    #  In this case, the only call being made is "Pass through tool done" as an info message.
-    assert plugin_service_fixture.io_stream == ["INFO:Pass through tool done"]
-```
-:::
-:::
-:::
+    def test_on_complete(plugin_service_fixture):
+        plugin_service_fixture.run_on_complete()
+        #  In this case, no data was written to any of the output anchors, so the streams should be empty.
+        assert plugin_service_fixture.data_streams == {}
+        #  In this case, the only call being made is "Pass through tool done" as an info message.
+        assert plugin_service_fixture.io_stream == ["INFO:Pass through tool done"]
