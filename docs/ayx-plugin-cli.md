@@ -66,7 +66,7 @@ We will support the latest version of the CLI. Visit [Release
 Notes](https://help.alteryx.com/developer-help/ayx-python-sdk-release-notes) to review new features as well as fixed and known
 issues.
 
-### Uninstall {#uninstall .index-item}
+### Uninstall
 
 To uninstall the CLI, run `pip uninstall ayx_plugin_cli`.
 
