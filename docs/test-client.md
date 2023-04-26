@@ -151,9 +151,11 @@ These are examples of the test client with a Multi-Connection tool:
         --input input.csv --input input.csv --input input.csv --input input.csv --input input.csv 
         --output output_one.csv@Output1 --output output_two.csv@Output2 --output output_three.csv@Output3 --output output_four.csv@Output4 --output output_five.csv@Output5     // ok!, input gets auto-mapped (multi-connection, but one anchor)
  
+ 
     ayx-sdk-cli.exe MultiConnection 
         --input input.csv --input input.csv --input input.csv --input input.csv --input input.csv 
         --output output_one.csv@Output1 --output output_two.csv@Output2 --output output_three.csv@Output3 --output output_four.csv@Output4                                      // error! forgot Output5!
+
 
     ayx-sdk-cli.exe MultiConnection 
         --input input.csv --input input.csv --input input.csv --input input.csv --input input.csv 
@@ -179,10 +181,8 @@ Contents of **some_file.txt**:
 
 This doesn\'t require a schema:
 
--   stdin is valid. It can be shared amongst any inputs, like a file.
--   stdount is not valid. Similar to a file, multiple outputs can\'t
-    write to it.
-
+-  stdin is valid. It can be shared amongst any inputs, like a file.
+-  stdount is not valid. Similar to a file, multiple outputs can\'t write to it.
 
     cat some_file.txt | ayx-sdk-cli.exe Passthrough 
         --input :csv
