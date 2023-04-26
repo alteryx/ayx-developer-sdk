@@ -156,8 +156,6 @@ class DanceableLyrics(PluginV2):
                 matches = pl.concat([matches, m])
 
         matches = matches.sort("danceability", descending=True)
-        # :TODO: debug OOP side -- why does only a to_arrow() fail?!
-        # self.provider.write_to_anchor('Output', matches.to_arrow())
 
         self.provider.write_to_anchor(
             "Output", pa.Table.from_pandas(matches.to_pandas())
