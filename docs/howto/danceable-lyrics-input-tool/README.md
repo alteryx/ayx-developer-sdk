@@ -491,9 +491,5 @@ When you run this tool in Designer, it produces this output:
 
 You can see that our top danceable track with the input lyrics provided is ["Track 10" by The Procussions](https://open.spotify.com/track/1xZJKDCFXuCRUr82qzaRDp)!
 
-https://open.spotify.com/track/1xZJKDCFXuCRUr82qzaRDp
-
-Thanks for reading, I hope you enjoyed this tutorial!
-
 
 > [^1]: :warning: If you created the plugin workspace with a non-default `Tool Category` (from the [Create a Workspace](#1-create-a-workspace) section), then the plugin will show up in the tab that corresponds to the input that was passed to `Tool Category`.
