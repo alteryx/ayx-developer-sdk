@@ -1,13 +1,13 @@
+# Metadata
+
 Metadata is a set of data used to describe the input or output data of a
 Python SDK plugin. Plugins use Python Arrow data types to exchange data
 with Alteryx Designer. The metadata is used to map this data during the
 conversion to or from the internal Designer data format ([Alteryx
 Multi-threaded
-Processing](../20223/designer/alteryx-amp-engine.html "Alteryx Multi-threaded Processing"){entity-substitution="canonical"
-entity-type="node" entity-uuid="e13022bf-27e2-45b6-ae25-0210fe3706a8"
-rel="noopener" target="_blank"} or AMP).
+Processing](https://help.alteryx.com/20223/designer/alteryx-amp-engine) or AMP).
 
-## Metadata Description {#metadata-description .index-item}
+## Metadata Description
 
 -   **name**: This is the same as the column name in a dataset.
 -   **type**: The internal AMP Designer type.
@@ -19,14 +19,14 @@ rel="noopener" target="_blank"} or AMP).
     to the file path of this input file).
 -   **description**: This is an all-purpose string field.
 
-## Why Use Metadata? {#why-use-metadata .index-item}
+## Why Use Metadata?
 
 It\'s not mandatory to use metadata in Python plugins. The simplest
 method is typically to create a Python Arrow schema directly, as the
 engine derives the necessary types when sent to Designer. But some
 plugins might need to export output data types to Designer at plugin
 creation to build the workflow. In this case, metadata has to be sent to
-Designer through the `__init__`{renderer-mark="true"} method.
+Designer through the `__init__` method.
 
 Also, sometimes you might need to fine-tune the data type used by
 Designer. Metadata is the only way to be sure to map a precise type of
@@ -36,7 +36,7 @@ some specific information through the Designer pipeline. Input metadata
 can also be used by the plugin for any reason, for example, the source
 field could be a file path the plugin can use.
 
-## Usage {#usage .index-item}
+## Usage
 
 You can use metadata in different places.
 
@@ -74,11 +74,11 @@ modify the source and description.
 On input plugins, a complete schema created with metadata can be
 exported to Designer for a precise data schema.
 
-## Use Cases {#use-cases .index-item}
+## Use Cases
 
 ### Define a Schema at \_\_init\_\_
 
-In this example, we specify type `int16`{renderer-mark="true"} for
+In this example, we specify type `int16` for
 column `volts`{renderer-mark="true"} and type
 `string`{renderer-mark="true"} for column
 `device`{renderer-mark="true"}.
@@ -95,7 +95,7 @@ column `volts`{renderer-mark="true"} and type
 
 ### Add Optional Information to the Data Flow
 
-In this case, `description`{renderer-mark="true"} metadata is added to
+In this case, `description` metadata is added to
 the batch.
 
     def on_record_batch(self, batch: "pa.Table", anchor: Anchor) - > None:
@@ -109,7 +109,7 @@ the batch.
 
 ### Get Information about the Incoming Data
 
-This example shows how to use the `source`{renderer-mark="true"}
+This example shows how to use the `source`
 metadata. In this case, the source metadata is a file path, but it can
 be anything that describes the address of the source of the data.
 
@@ -122,12 +122,12 @@ be anything that describes the address of the source of the data.
         
         self.provider.write_to_anchor("Output", batch)
 
-## Specifications {#specifications .index-item}
+## Specifications
 
 For V2 plugins, metadata is stored in PyArrow tables as a Python
 dictionary in each column schema. But Arrow doesn't offer easy methods
 to access this metadata.
-The `ayx_python_sdk.core.utils`{renderer-mark="true"} module provides
+The `ayx_python_sdk.core.utils` module provides
 functions to ease this access.
 
 ### set_metadata
@@ -142,7 +142,7 @@ unchanged.
 #### Example
 
 This example modifies the metadata of 2 columns,
-`volts`{renderer-mark="true"} and `ampere`{renderer-mark="true"}.
+`volts` and `ampere`.
 
     def on_record_batch(self, batch: "pa.Table", anchor: Anchor) - > None:
         batch = set_metadata(batch, {
@@ -161,21 +161,21 @@ This example modifies the metadata of 2 columns,
 `get_metadata(table, col_name)`
 
 Get all columns\' metadata or 1 column's metadata if
-`col_name`{renderer-mark="true"} is given, from the input PyArrow table.
+`col_name` is given, from the input PyArrow table.
 
--   If `col_name`{renderer-mark="true"} is given, only the dictionary of
+-   If `col_name` is given, only the dictionary of
     metadata for this column is returned.
 
--   If `col_name`{renderer-mark="true"} is not given, it returns a
+-   If `col_name` is not given, it returns a
     dictionary of column names and their corresponding metadata
     dictionary.
 
-#### Examples {#examples renderer-start-pos="5203"}
+#### Examples
 
     def on_record_batch(self, batch: "pa.Table", anchor: Anchor) -> None:
         meta_for_column_volts = get_metadata(batch, "volts")
 
-The above example `get_metadata`{renderer-mark="true"} returns the
+The above example `get_metadata` returns the
 metadata for 1 column, of the following format (in this example):
 
     meta_for_column_volts = {
@@ -186,11 +186,11 @@ metadata for 1 column, of the following format (in this example):
         "description": ""
     }
 
-::: note
+###### Note
 You can see in the above example that a number represents the type.
 Please refer to the Types section below for the mapping between type id
 and type names.
-:::
+
 
 This example returns all metadata:
 
@@ -216,24 +216,14 @@ The result dictionary looks like this:
         }
     }
 
-Refer to this sequence diagram for a visual representation of the
-metadata lifecycle:
-
-::: {.embedded-entity embed-button="image_embed" entity-embed-display="entity_reference:media_image" entity-type="media" entity-uuid="0b4c16f7-f617-4c30-b6a1-0c2aded335f2" langcode="en"}
-![](../sites/default/files/image/2022-12/workflow-metadata-lifecycle.png){width="627"
-height="453" loading="lazy" typeof="foaf:Image"}
-:::
-
 You can find a more complete example at [Metadata Plugin
-Example](metadata-plugin-example.html "Metadata Plugin Example"){entity-substitution="canonical"
-entity-type="node" entity-uuid="1ed60ab0-8638-4677-9c9c-f1f56232999c"
-rel="noopener" target="_blank"}.
+Example](https://help.alteryx.com/developer-help/metadata-plugin-example).
 
-## Types {#types .index-item}
+## Types
 
-The `ayx_python_sdk.core.field`{renderer-mark="true"} module provides a
+The `ayx_python_sdk.core.field` module provides a
 definition of the Designer types with the class
-`FieldType`{renderer-mark="true"}.
+`FieldType`.
 
 It defines a mapping between type names and a number:
 
@@ -256,8 +246,8 @@ It defines a mapping between type names and a number:
     FieldType.spatialobj = 17
 
 If only the type is specified at schema creation, the other metadata
-fields are automatically filled (`"size"`{renderer-mark="true"},
-`"scale"`{renderer-mark="true"}, and `"source"`{renderer-mark="true"}).
+fields are automatically filled (`"size"`,
+`"scale"`, and `"source"`).
 
 The maximum size specified by `"size"`{renderer-mark="true"} is set to
 the biggest when using string types but you can manually specify a size
@@ -266,17 +256,17 @@ all strings in the corresponding column are truncated to 4 characters.
 
 ### Special Types
 
--   The type `FieldType.blob`{renderer-mark="true"} is not supported
+-   The type `FieldType.blob` is not supported
     yet.
 
--   The type `FieldType.spatialobj`{renderer-mark="true"} supports
+-   The type `FieldType.spatialobj` supports
     spatial objects using the text format WKT. In order to use it,
-    `"source"`{renderer-mark="true"} metadata must be
-    `"WKT"`{renderer-mark="true"} (it\'s automatically set to it), so
+    `"source"` metadata must be
+    `"WKT"` (it\'s automatically set to it), so
     the source metadata field should not be modified.
 
--   The type `FieldType.fixeddecimal`{renderer-mark="true"} relies on
-    `"size"`{renderer-mark="true"} and `"scale"`{renderer-mark="true"}
+-   The type `FieldType.fixeddecimal` relies on
+    `"size"` and `"scale"`
     metadata items to specify the size of the integer part
-    (`size`{renderer-mark="true"}) and the size of the fractional part
-    (`scale`{renderer-mark="true"}).
+    (`size`) and the size of the fractional part
+    (`scale`).
