@@ -32,7 +32,7 @@ Please go to the [DCM
 Documentation](https://help.alteryx.com/20223/designer/dcm-designer) for more information about DCM
 configuration.
 
-## Prepare the DCM Connection {#prepare-the-dcm-connection .index-item}
+## Prepare the DCM Connection
 
 The DCM Input tool requires the DCM connection ID to work. To create a
 DCM connection, in Designer...
@@ -53,7 +53,7 @@ DCM connection, in Designer...
 9.  Select the **Link** button to finalize the creation of the
     connection.
 
-## Use the Tool {#use-the-tool .index-item}
+## Use the Tool
 
 If you know the DCM connection ID, select the DCM Input tool and enter
 DCM connection ID in the DCM ID field.
