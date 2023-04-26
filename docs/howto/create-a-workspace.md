@@ -25,4 +25,4 @@ Workspace settings can be modified in: ayx_workspace.json
 [Generating config files] finished
 ```
 
-Next: [Create a Plugin](create-a-plugin.md)
+Next: [Create a Plugin](./create-a-plugin.md)

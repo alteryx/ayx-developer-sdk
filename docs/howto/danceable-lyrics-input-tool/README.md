@@ -1,5 +1,14 @@
 # Danceable Lyrics
-In this guide, we use the [Alteryx Python SDK](https://pypi.org/project/ayx-python-sdk/) and [Alteryx Plugin CLI](https://pypi.org/project/ayx-plugin-cli/) to create a tool that connects directly to a set of data files and determines the most "danceable" songs that contain a set of lyrics. We use [Polars](https://www.pola.rs/) for fast data processing.
+In this guide, we use the [Alteryx Python SDK](https://pypi.org/project/ayx-python-sdk/) and [Alteryx Plugin CLI](https://pypi.org/project/ayx-plugin-cli/) to create a tool that connects directly to a set of data files and determines the most "danceable" songs that contain a set of lyrics. Perhaps we started this journey with the following problem statement:
+> I am a Spotify Product Analyst who wants to perform a POC on the feasibility of determining the most "danceable" songs that contain a set of lyrics. If possible this POC can help drive the development of a new Recommendation Feature on the Spotify App.
+
+We use the [Polars](https://www.pola.rs/) for data processing. Polars has many benefits over the more common Pandas, not limited to:
+* Extremely **fast**
+* Polars can optimize queries and perfrom parallel processing for free
+* A very familiar API to expressively manipulate `DataFrame`'s
+* Zero-copy support with [Apache Arrow](https://arrow.apache.org/), our native SDK format
+
+> :information_source: For more information on Polars, see [the User Guide](https://pola-rs.github.io/polars-book/user-guide/) and the [Python API](https://pola-rs.github.io/polars/py-polars/html/reference/).
 
 ## Table of Contents
 * [Download Input Data](#download-input-data)
@@ -25,11 +34,68 @@ Download and extract the required dataset files. You will reference them later i
 
 Go to the `README.md` files within the respective archives for source information.
 
+Before proceeding, let's take a quick look at the data set files:
+![head -n 170 .\genius_song_lyrics.csv | rich --csv -](./assets/genius-lyrics-head.png)
+
+Above, we see `genius_song_lyrics.csv` is made up of the columns `title`, `tag`, `artist`, `year`, `views`, `features`, `lyrics`, `id`, `language_cld3`, `language_ft`, and `language`. Notice that `lyrics` contains strings with multiple lines. Let's look at this just a bit closer:
+
+![head -n 5 .\genius_song_lyrics.csv](./assets/genius-lyrics-head2.png)
+
+We can see the strings are quoted. This is great, Polars supports all of this right out of the box!
+
+Moving on to our input files containing track features:
+![tail --bytes +4 ./artists.csv | rich -h 5 --csv -](./assets/artists-head.png)
+
+Above, we pipe commands through `tail --bytes +4` in order to skip past the first 4 bytes representing a UTF-8 [Byte Order Mark (BOM)](https://en.wikipedia.org/wiki/Byte_order_mark) in our input CSV files. But this is something Polars can handle for us. Let's try another approach using Python and Polars:
+
+```text
+>>> import polars as pl
+>>> print(pl.scan_csv("audio_features.csv").collect().head(5))
+shape: (5, 15)
+┌────────────────────────┬──────────────┬───────────────────────────────────┬──────────────┬───┬─────────────┬─────────┬────────────────┬─────────┐
+│ id                     ┆ acousticness ┆ analysis_url                      ┆ danceability ┆ … ┆ speechiness ┆ tempo   ┆ time_signature ┆ valence │
+│ ---                    ┆ ---          ┆ ---                               ┆ ---          ┆   ┆ ---         ┆ ---     ┆ ---            ┆ ---     │
+│ str                    ┆ f64          ┆ str                               ┆ f64          ┆   ┆ f64         ┆ f64     ┆ i64            ┆ f64     │
+╞════════════════════════╪══════════════╪═══════════════════════════════════╪══════════════╪═══╪═════════════╪═════════╪════════════════╪═════════╡
+│ 2jKoVlU7VAmExKJ1Jh3w9P ┆ 0.18         ┆ https://api.spotify.com/v1/audio… ┆ 0.893        ┆ … ┆ 0.283       ┆ 95.848  ┆ 4              ┆ 0.787   │
+│ 4JYUDRtPZuVNi7FAnbHyux ┆ 0.272        ┆ https://api.spotify.com/v1/audio… ┆ 0.52         ┆ … ┆ 0.427       ┆ 177.371 ┆ 4              ┆ 0.799   │
+│ 6YjKAkDYmlasMqYw73iB0w ┆ 0.0783       ┆ https://api.spotify.com/v1/audio… ┆ 0.918        ┆ … ┆ 0.133       ┆ 95.517  ┆ 4              ┆ 0.779   │
+│ 2YlvHjDb4Tyxl4A1IcDhAe ┆ 0.584        ┆ https://api.spotify.com/v1/audio… ┆ 0.877        ┆ … ┆ 0.259       ┆ 94.835  ┆ 4              ┆ 0.839   │
+│ 3UOuBNEin5peSRqdzvlnWM ┆ 0.17         ┆ https://api.spotify.com/v1/audio… ┆ 0.814        ┆ … ┆ 0.233       ┆ 93.445  ┆ 4              ┆ 0.536   │
+└────────────────────────┴──────────────┴───────────────────────────────────┴──────────────┴───┴─────────────┴─────────┴────────────────┴─────────┘
+>>> print(pl.scan_csv("r_track_artist.csv").collect().head(5))
+shape: (5, 2)
+┌────────────────────────┬────────────────────────┐
+│ track_id               ┆ artist_id              │
+│ ---                    ┆ ---                    │
+│ str                    ┆ str                    │
+╞════════════════════════╪════════════════════════╡
+│ 2jKoVlU7VAmExKJ1Jh3w9P ┆ 4tujQJicOnuZRLiBFdp3Ou │
+│ 2jKoVlU7VAmExKJ1Jh3w9P ┆ 2VX0o9LDIVmKIgpnwdJpOJ │
+│ 2jKoVlU7VAmExKJ1Jh3w9P ┆ 3iBOsmwGzRKyR0vs2I61xP │
+│ 2jKoVlU7VAmExKJ1Jh3w9P ┆ 22qf8cJRzBjIWb2Jc4JeOr │
+│ 4JYUDRtPZuVNi7FAnbHyux ┆ 4akj4uteQQrrGxhX9Rjuyf │
+└────────────────────────┴────────────────────────┘
+>>> print(pl.scan_csv("tracks.csv").collect().head(5))
+shape: (5, 10)
+┌────────────────────────┬─────────────┬──────────┬──────────┬───┬───────────────────────────────────┬──────────────┬────────────┬─────────────┐
+│ id                     ┆ disc_number ┆ duration ┆ explicit ┆ … ┆ preview_url                       ┆ track_number ┆ popularity ┆ is_playable │
+│ ---                    ┆ ---         ┆ ---      ┆ ---      ┆   ┆ ---                               ┆ ---          ┆ ---        ┆ ---         │
+│ str                    ┆ i64         ┆ i64      ┆ i64      ┆   ┆ str                               ┆ i64          ┆ i64        ┆ i64         │
+╞════════════════════════╪═════════════╪══════════╪══════════╪═══╪═══════════════════════════════════╪══════════════╪════════════╪═════════════╡
+│ 1dizvxctg9dHEyaYTFufVi ┆ 1           ┆ 275893   ┆ 1        ┆ … ┆                                   ┆ 12           ┆ 0          ┆ null        │
+│ 2g8HN35AnVGIk7B8yMucww ┆ 1           ┆ 252746   ┆ 1        ┆ … ┆ https://p.scdn.co/mp3-preview/77… ┆ 13           ┆ 77         ┆ null        │
+│ 49pnyECzcMGCKAqxfTB4JZ ┆ 3           ┆ 315080   ┆ 0        ┆ … ┆                                   ┆ 6            ┆ 8          ┆ 1           │
+│ 4E5IFAXCob6QqZaJMTw5YN ┆ 1           ┆ 240800   ┆ 1        ┆ … ┆ https://p.scdn.co/mp3-preview/f3… ┆ 2            ┆ 70         ┆ null        │
+│ 1gSt2UlC7mtRtJIc5zqKWn ┆ 2           ┆ 203666   ┆ 0        ┆ … ┆                                   ┆ 2            ┆ 50         ┆ null        │
+└────────────────────────┴─────────────┴──────────┴──────────┴───┴───────────────────────────────────┴──────────────┴────────────┴─────────────┘
+```
+
 ## Basic Plugin Setup
 Before you proceed, please ensure you have this basic setup:
 
-1. [Create a Workspace](create-a-workspace.md) to house your plugin.
-2. [Add a new plugin](create-a-plugin.md).
+1. [Create a Workspace](./create-a-workspace.md) to house your plugin.
+2. [Add a new plugin](./create-a-plugin.md).
     1. When prompted choose **Input** as the type.
     2. To match what is found in this guide, choose **DanceableLyrics** as the plugin name.
 
@@ -223,7 +289,7 @@ def on_complete(self) -> None:
     )
 ```
 
-Above, we tell Polars to create a `DataFrame` that contains select columns from rows that match our criteria. We also normalize some column names— we lowercase them and add aliases in our output. In our `filter` clause, we build a case-insensitive [regular expression](https://en.wikipedia.org/wiki/Regular_expression) from our list of terms. Finally, we filter out non-English terms and restrict results to only entries with more than `self.MIN_VIEWS`. You might want to alter these criteria a bit. For example, you might want to allow other languages.
+Above, we tell Polars to create a [DataFrame](https://pola-rs.github.io/polars/py-polars/html/reference/dataframe/index.html) that contains select columns from rows that match our criteria. We also normalize some column names— we lowercase them and add aliases in our output. In our `filter` clause, we build a case-insensitive [regular expression](https://en.wikipedia.org/wiki/Regular_expression) from our list of terms. Finally, we filter out non-English terms and restrict results to only entries with more than `self.MIN_VIEWS`. You might want to alter these criteria a bit. For example, you might want to allow other languages.
 
 The next section of code reads from multiple input files and joins them into a single `danceable_tracks` view of the data that contains columns that match our criteria.
 
