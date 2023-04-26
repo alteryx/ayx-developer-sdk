@@ -33,7 +33,7 @@ if the plugin runs as expected!
         multiplexing to numerous tools and resources. For the test
         client case, it\'s only 1 output source.
 
-## Supported File Types {#supported-file-types .index-item}
+## Supported File Types
 
 -   CSV (\*.csv)
 -   JSON (\*.json)
@@ -182,6 +182,7 @@ This doesn\'t require a schema:
 -   stdin is valid. It can be shared amongst any inputs, like a file.
 -   stdount is not valid. Similar to a file, multiple outputs can\'t
     write to it.
+
 
     cat some_file.txt | ayx-sdk-cli.exe Passthrough 
         --input :csv
