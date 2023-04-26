@@ -72,7 +72,7 @@ If you don\'t know the connection ID...
     information, acquires a write-lock for it, updates the connection
     with a new password, and frees the write-lock.
 
-## Python SDK DCM API {#python-sdk-dcm-api .index-item}
+## Python SDK DCM API
 
 A special \"dcm\" Provider of the PluginV2 class contains these
 asynchronous methods to work with DCM:
