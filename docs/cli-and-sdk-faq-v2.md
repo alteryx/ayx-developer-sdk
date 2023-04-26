@@ -118,11 +118,6 @@ in Alteryx Designer. To do so\...
 3.  Check the check box to **Use AMP Engine**.\
      
 
-    ::: {.embedded-entity embed-button="image_embed" entity-embed-display="entity_reference:media_image" entity-type="media" entity-uuid="fb415d6e-39cf-47ab-9d5f-2159a673ccd3" langcode="en"}
-    ![Thumbnail](../sites/default/files/image/2021-03/enable-amp-engine.png "Enable AMP Engine"){width="500"
-    height="553" loading="lazy" typeof="foaf:Image"}
-
-
 ## How do I customize the icon for a new Alteryx tool category?
 
 This is not done directly via the SDK, however, you can customize the
