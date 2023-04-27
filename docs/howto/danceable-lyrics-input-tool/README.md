@@ -1,14 +1,14 @@
 # Danceable Lyrics
-In this guide, we use the [Alteryx Python SDK](https://pypi.org/project/ayx-python-sdk/) and [Alteryx Plugin CLI](https://pypi.org/project/ayx-plugin-cli/) to create a tool that connects directly to a set of data files and determines the most "danceable" songs that contain a set of lyrics. Perhaps we started this journey with the following problem statement:
-> I am a Spotify Product Analyst who wants to perform a POC on the feasibility of determining the most "danceable" songs that contain a set of lyrics. If possible this POC can help drive the development of a new Recommendation Feature on the Spotify App.
+In this guide, we use the [Alteryx Python SDK](https://pypi.org/project/ayx-python-sdk/) and [Alteryx Plugin CLI](https://pypi.org/project/ayx-plugin-cli/) to create a tool that connects directly to a set of data files and determines the most "danceable" songs that contain a set of lyrics. Perhaps we started this journey with this problem statement:
+> I'm a Spotify Product Analyst who wants to perform a proof of concept (POC) on whether it's possible to determine the most "danceable" songs that contain a set of lyrics. If possible, this POC can help drive the development of a new Recommendation feature on the Spotify app.
 
-We use the [Polars](https://www.pola.rs/) for data processing. Polars has many benefits over the more common Pandas, not limited to:
-* Extremely **fast**
-* Polars can optimize queries and perfrom parallel processing for free
-* A very familiar API to expressively manipulate `DataFrame`'s
-* Zero-copy support with [Apache Arrow](https://arrow.apache.org/), our native SDK format
+We use [Polars](https://www.pola.rs/) for data processing. Polars has many benefits over the more common Pandas. Some key benefits include:
+* It's extremely **fast**.
+* Polars can optimize queries and perform parallel processing for free.
+* It has a very familiar API to expressively manipulate `DataFrame`s.
+* Zero-copy support with [Apache Arrow](https://arrow.apache.org/), our native SDK format.
 
-> :information_source: For more information on Polars, see [the User Guide](https://pola-rs.github.io/polars-book/user-guide/) and the [Python API](https://pola-rs.github.io/polars/py-polars/html/reference/).
+> :information_source: For more information on Polars, go to the [Polars User Guide](https://pola-rs.github.io/polars-book/user-guide/) and the [Python API](https://pola-rs.github.io/polars/py-polars/html/reference/).
 
 ## Table of Contents
 * [Download Input Data](#download-input-data)
@@ -34,7 +34,7 @@ Download and extract the required dataset files. You will reference them later i
 
 Go to the `README.md` files within the respective archives for source information.
 
-Before proceeding, let's take a quick look at the data set files:
+Before we proceed, let's take a quick look at the data set files:
 ![head -n 170 .\genius_song_lyrics.csv | rich --csv -](./assets/genius-lyrics-head.png)
 
 Above, we see `genius_song_lyrics.csv` is made up of the columns `title`, `tag`, `artist`, `year`, `views`, `features`, `lyrics`, `id`, `language_cld3`, `language_ft`, and `language`. Notice that `lyrics` contains strings with multiple lines. Let's look at this just a bit closer:
@@ -43,10 +43,10 @@ Above, we see `genius_song_lyrics.csv` is made up of the columns `title`, `tag`,
 
 We can see the strings are quoted. This is great, Polars supports all of this right out of the box!
 
-Moving on to our input files containing track features:
+Let's move on to our input files which contain track features:
 ![tail --bytes +4 ./artists.csv | rich -h 5 --csv -](./assets/artists-head.png)
 
-Above, we pipe commands through `tail --bytes +4` in order to skip past the first 4 bytes representing a UTF-8 [Byte Order Mark (BOM)](https://en.wikipedia.org/wiki/Byte_order_mark) in our input CSV files. But this is something Polars can handle for us. Let's try another approach using Python and Polars:
+Above, we pipe commands through `tail --bytes +4` in order to skip past the first 4 bytes, which represent a UTF-8 [Byte Order Mark (BOM)](https://en.wikipedia.org/wiki/Byte_order_mark) in our input CSV files. But this is something Polars can handle for us. Let's try another approach using Python and Polars:
 
 ```text
 >>> import polars as pl
