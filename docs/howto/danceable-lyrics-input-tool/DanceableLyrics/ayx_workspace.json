@@ -1,0 +1,43 @@
+{
+    "name": "DanceableLyrics",
+    "tool_category": "Python SDK Examples",
+    "package_icon_path": "configuration\\default_package_icon.png",
+    "author": "Bryan Ashby <bryan.ashby@alteryx.com>",
+    "company": "Alteryx, Inc.",
+    "copyright": "2023",
+    "description": "Contains the DanceableLyrics Inspire 2023 demo",
+    "ayx_cli_version": "1.0.4.dev0",
+    "backend_language": "python",
+    "backend_language_settings": {
+        "python_version": "3.8",
+        "requirements_local_path": "tool_backends\\requirements-local.txt",
+        "requirements_thirdparty_path": "tool_backends\\requirements-thirdparty.txt"
+    },
+    "tools": {
+        "DanceableLyrics": {
+            "backend": {
+                "tool_module": "ayx_plugins",
+                "tool_class_name": "DanceableLyrics"
+            },
+            "ui": {},
+            "configuration": {
+                "long_name": "DanceableLyrics",
+                "description": "Danceable Lyrics",
+                "version": "1.0",
+                "search_tags": [],
+                "help_url": "https://help.alteryx.com/developer-help",
+                "icon_path": "configuration\\DanceableLyrics_1_0\\icon.png",
+                "input_anchors": {},
+                "output_anchors": {
+                    "Output": {
+                        "label": "",
+                        "allow_multiple": false,
+                        "optional": false
+                    }
+                },
+                "dcm_namespace": ""
+            }
+        }
+    },
+    "tool_version": "1.0"
+}
