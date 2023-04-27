@@ -176,13 +176,13 @@ view the changes.
 
 For more information about the Python SDK, please go to the [reference
 documents](https://help.alteryx.com/developer-help/ayx-python-sdk) or access the full [Python
-SDK documentation](https://alteryx.github.io/ayx-python-sdk/index.html_.
+SDK documentation](https://alteryx.github.io/ayx-python-sdk/index.html).
 You can also access this documentation locally via this command:
 
 `ayx_python_sdk docs`
 
 
-### Troubleshooting {#troubleshooting .index-item}
+### Troubleshooting
 
 -   If you get a workflow error that says 'Can\'t find plugin
     \"SdkEnginePlugin.dll\"\', or \"This tool is only supported in the
