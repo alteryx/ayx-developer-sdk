@@ -250,7 +250,8 @@ in Alteryx Designer. To do so\...
 1.  In Alteryx Designer, access the **Workflow - Configuration** window.
 2.  Select the **Runtime** tab.
 3.  Check the check box to **Use AMP Engine**.\
-     
+
+![Enable Amp Engine](assets/enable-amp-engine.png)
 
 ## _"How do I customize the icon for a new Alteryx tool category?"_
 
