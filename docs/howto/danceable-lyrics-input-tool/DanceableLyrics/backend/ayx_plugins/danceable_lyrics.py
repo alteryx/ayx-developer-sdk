@@ -31,7 +31,6 @@ class DanceableLyrics(PluginV2):
 
     @staticmethod
     def _validate_datasets_dir(datasets_dir: Path) -> None:
-        """Ensure that the datasets directory exists, and contains all the expected files."""
         if not datasets_dir.is_dir():
             raise WorkflowRuntimeError("Bad path")
 
@@ -42,18 +41,20 @@ class DanceableLyrics(PluginV2):
             "genius_song_lyrics.csv",
             "audio_features.csv"
         ]
+        nonexistent_files = list(
+            filter(lambda filepath: not filepath.is_file(), map(lambda filename: (datasets_dir / filename), filenames))
+        )
 
-        existing_files = [((datasets_dir / filename).is_file(), datasets_dir / filename) for filename in filenames]
-
-        if not all(list(zip(*existing_files))[0]):
-            raise WorkflowRuntimeError(f"Expected files not found: {','.join([str(y[1]) for y in list(filter(lambda x: not x[0], existing_files))])}")
+        if len(nonexistent_files) != 0:
+            raise WorkflowRuntimeError(
+                f"Expected files not found: {','.join(map(str, nonexistent_files))}")
 
     def __init__(self, provider: AMPProviderV2) -> None:
         """Construct a plugin."""
         self.provider = provider
         self.name = "DanceableLyrics"
 
-        # Replace this with the path to the folder containing the datasets.
+        # To build a more flexible plugin, read input path(s) from the user
         self.DATASETS_BASE = Path("c:/users/alteryx/DanceableLyricsData/")
 
         self._validate_datasets_dir(self.DATASETS_BASE)
