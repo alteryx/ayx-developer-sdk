@@ -94,8 +94,8 @@ shape: (5, 10)
 ## Basic Plugin Setup
 Before you proceed, please ensure you have this basic setup:
 
-1. [Create a Workspace](./create-a-workspace.md) to house your plugin.
-2. [Add a new plugin](./create-a-plugin.md).
+1. [Create a Workspace](../create-a-workspace.md) to house your plugin.
+2. [Add a new plugin](../create-a-plugin.md).
     1. When prompted choose **Input** as the type.
     2. To match what is found in this guide, choose **DanceableLyrics** as the plugin name.
 
