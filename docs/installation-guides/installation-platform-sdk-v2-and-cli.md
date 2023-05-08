@@ -11,7 +11,7 @@ This page describes how to install the Alteryx Platform SDK and Alteryx Plugin C
 * Download and install [Miniconda](https://docs.conda.io/en/latest/miniconda.html).
 * Open an Anaconda Prompt to create a new virutal environment:
 ```
-conda create -m MyEnvName python=3.8.5 nodejs=14 doit
+conda create -n MyEnvName python=3.8.5 nodejs=14 doit
 ```
 * Activate the environment:
 ```
