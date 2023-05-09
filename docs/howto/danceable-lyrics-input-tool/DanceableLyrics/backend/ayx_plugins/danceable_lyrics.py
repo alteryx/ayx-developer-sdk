@@ -54,7 +54,7 @@ class DanceableLyrics(PluginV2):
         self.provider = provider
         self.name = "DanceableLyrics"
 
-        # To build a more flexible plugin, read input path(s) from the user
+        # Point this variable to your extracted datasets directory:
         self.DATASETS_BASE = Path("c:/users/alteryx/DanceableLyricsData/")
 
         self._validate_datasets_dir(self.DATASETS_BASE)
