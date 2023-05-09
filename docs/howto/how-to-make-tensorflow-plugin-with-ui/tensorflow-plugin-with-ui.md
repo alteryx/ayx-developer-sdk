@@ -74,6 +74,10 @@ Finally, the tool will return a report of the training results to the UI and exp
 When in `PREDICT` mode, the tool will take text input via the input anchor, then run predictions on them and output those results to its output anchor.
 
 
+### Create a Workspace
+
+Run the following, responding as prompted
+
 ```powershell
 $ mkdir tensorflow-ui-examples
 $ cd ./tensorflow-ui-examples/
@@ -92,6 +96,10 @@ Backend Language (python): python
 [Generating config files] Generating top level config XML file...
 [Generating config files] finished
 ```
+
+Once the above is complete, we recommmend you create your python environment with `venv` or other supported virtual environment modules.
+This will allow you to iteravely develop locally, while you may still deploy with "prod" requirements. We'll briefly cover how to do that later in the guide as well.
+
 
 ### 1.2.5. Create a Plugin
 Next, use the `create-ayx-plugin` command and reply to the prompts to generate the our tool template code. For this tool, we want to use the `single-input-single-output`. (may switch to optional*)
@@ -734,10 +742,264 @@ Some examples of why one might do this include:
 Here, we load our model with `keras.saveing.load_model(...)`. Note we append `-exported' to differentiate our training model and "production" model. 
 As you develop more serious tools, you are free to develop your own methods of sensical model deployment and storage. Here, we simply note the ability to do so!
 
-Then, we call `model.predict` on our loaded model, take the results, and write them to our output anchor for use in the workflow.
+Then, we call `model.predict(...)` on our loaded model, take the results, and write them to our output anchor for use in the workflow.
 
 Now, this is all of our backend! Since our (soon to exist) tests are passing, we'll move on to our frontend and enable these mocked values to be dynamically set by the user!
 
 
 ## Writing the Frontend: UI SDK
+
+_Please Note: if you are not familiar with React and the UI SDK, we recommend the (tbd link)[Getting Started with UI SDK and PythonSDK] guide first, or as a supplementary as you may need to reference the above guide for detailed steps._
+
+As some quick prep work, lets make sure you setup your frontend. As of (E-Note: version num of "no ui" option?)], if you did not intialize a ui as described in the guide linked above you may not have one by default. No problem! Simply run:
+`ayx_plugin_cli generate-ui` (E-Note: Correct command?)
+Then you should then have your tool's UI files under `workspace-dir/ui/ToolName`. 
+Next, we want to start up the UI SDK's [dev-harness](https://alteryx.github.io/alteryx-ui/).
+You should be able to simply run `npm install` and then `npm start` as expected in a React/node app.
+If you hit an issue, we recommend referring to the recommended supplementary or other troubleshooting tips provided in detail on the `alteryx-ui` documentation.
+
+In addition, the depth of React App optimization and how-tos are deep. 
+We keep our usage here functional (in the application and user sense of the word), and will explain less in depth than our tensorflow backend - as that is what this guide is focused on.
+
+Update `./ui/TextClassifier/src` to reflect the following, taking care to read any notes provided:
+
+
+### Module: `./index.tsx`
+
+```jsx
+import React, { useContext} from 'react';
+import ReactDOM from 'react-dom';
+import { AyxAppWrapper, Box, Grid, TextField, 
+  Typography, Container } from '@alteryx/ui';
+import { Context as UiSdkContext, DesignerApi } from '@alteryx/react-comms';
+import DataInputSection from './components/DataInputSection';
+import ModelSection from './components/ModelSection';
+import _ from "lodash";
+
+const Explorer = () => {
+  const [model, handleUpdateModel] = useContext(UiSdkContext);
+  // (E-Note: Believe we can import and use our text input component here too)
+  const onHandleTextChange = (event, configType, key) => {
+    const newModel = _.cloneDeep(model);
+    newModel.Configuration[configType][key] = event.target.value;
+    handleUpdateModel(newModel);
+  };
+
+
+  return (
+    <Box marginTop={4}>
+      <DataInputSection  />
+    <Container>
+          <Typography variant="h1" gutterBottom>
+      Text Vectorization
+    </Typography>
+    <Grid alignItems="flex-end" container spacing={2}>
+      <Grid item xs>
+        <TextField
+          fullWidth
+          type="number"
+          id="sequence-length"
+          label="Sequence Length"
+          onChange={(e) => onHandleTextChange(e, 'textVectorizationConfig', 'sequenceLength')}
+          value={model.Configuration.textVectorizationConfig.sequenceLength || 250}
+        />
+
+      </Grid>
+    </Grid>
+    </Container>
+    <Container>
+          <Typography variant="h1" gutterBottom>
+      Model and Training Configuration
+    </Typography>
+    <Grid alignItems="flex-end" container spacing={2}>
+    <ModelSection />
+    </Grid>
+    </Container>
+
+    </Box>
+  );
+};
+
+
+const App = () => {
+  return (
+    <Box marginTop={3}>
+      <Container>
+        <Grid container spacing={3}>
+          <Grid item xs={12}>
+          
+          </Grid>
+          <Grid item xs={12}>
+            <Explorer />
+          </Grid>
+        </Grid>
+      </Container>
+    </Box>
+  )
+}
+
+const datasetConfig = {
+  dataUrl: "",
+  datasetTargetDir: ".",
+  batchSize: 32,
+  seed: 42,
+  shouldCache: true,
+  trainingSetDir: "aclImdb/train",
+  testSetDir: "aclImdb/test", 
+}
+
+const datasetInfo = {
+  rawTrainSample: 
+    {textBatch: [], labelBatch: []}
+  ,
+  vectorizedSample: {
+    sampleRaw: "placeholder sample",
+    sampleVectorized: "09 90 1 1 0 0 12",
+  },
+  vocabIntValue: 0,
+  vocabTranslation: '',
+}
+
+const textVectorizationConfig = {
+  sequenceLength: 250,
+  outputMode: 'int',
+  outputModeIndex: 0,
+  outputModeAnchorEl: null,
+  tokenChips: [],
+  translationRequest: {
+    token: "",
+  }
+}
+
+const modelConfig = {
+  embeddingDim: 16,
+  showSummary: false,
+  modelName: "text-classifier-model"
+}
+
+const modelEvaluation = {
+  loss: 0.0,
+  accuracy: 0.0,
+  history: {
+    trainingLoss: [],
+    trainingBinaryAccuracy: [],
+    validationLoss: [],
+    validationBinaryAccuracy: [],
+  }
+}
+
+const trainingConfig = {
+  epochs: 4,
+  maxFeatures: 10000,
+}
+
+const Configuration = {
+  plotUri: [],
+  datasetConfig,
+  textVectorizationConfig,
+  modelConfig,
+  trainingConfig,
+  modelEvaluation,
+  datasetInfo,
+}
+
+const defaultConfig = {
+  Configuration,
+}
+
+const Tool = () => {
+  return (
+    <DesignerApi messages={{}} defaultConfig={{...defaultConfig}}>
+      <AyxAppWrapper> 
+        <App />
+      </AyxAppWrapper>
+    </DesignerApi>
+  )
+}
+
+ReactDOM.render(
+  <Tool />,
+  document.getElementById('app')
+);
+```
+
+While it comes with an impressive line count by default, our only non-boilerplate additions are skeleton frames in our return statement and default configuration as defined and detailed by the `alteryx-ui` API and docs.
+
+### Module: `./src/constants.tsx`
+
+```tsx
+export const DS_CONFIG = 'datasetConfig'
+export const MDL_CONFIG = 'modelConfig'
+export const EVAL_CONFIG = 'modelEvaluation'
+```
+
+Next we need a directory to store our components. In addition, a subdirectory for our charting component.
+You should now have
+
+```
+|- src/
+  |- components/
+    |- charting/
+  |- index.html
+  |- index.tsx
+  ...
+  |- webpack.prod.js
+```
+
+### Module:  `./src/components/*`
+We can now add the following to our `components` directory.
+**Note**: We are again, but for the _frontend_ SDK, creating **reusable** components we could import or place into other tools we or others develop (_depending on a publishers license and availability_) using your components and vice-versa!
+In other words, when we create our first file below, `config-inputs.tsx`, we are creating a component to sprinkle about other places and avoid copying, pasting, and in turn propegating stale code casing all sorts of sneaky bugs in the near (or even scarier... **FAR** future!!) future.
+
+#### Component(s): `config-inputs.tsx`
+
+```jsx
+import React, { useContext } from 'react';
+import { TextField } from '@alteryx/ui';
+import { Context as UiSdkContext } from '@alteryx/react-comms';
+import _ from 'lodash'
+
+
+const ConfigTextInput = ({value, configType, vKey, elId, label, inputType="string"}) => {
+    const [model, handleUpdateModel] = useContext(UiSdkContext);
+
+    const onHandleTextChange = (event, configType, key) => {
+        const newModel = _.cloneDeep(model);
+        newModel.Configuration[configType][key] = event.target.value;
+        handleUpdateModel(newModel);
+    };
+
+    return (<TextField
+          fullWidth
+          type={inputType}
+          id={elId}
+          label={label}
+          onChange={(e) => onHandleTextChange(e, configType, vKey)}
+          value={value}
+        />)
+    }
+
+export {ConfigTextInput};  
+```
+
+**Important Note**: One of the few things we will explicitely call out here for the UI SDK, as it is so critical to developing.
+React's state model will _not_ "properly" update nested lists (as seen in our defaultConfig) or objects due to how it tracks changes.
+Therefore, we use `lodash` as recommended by the `alteryx-ui` docs to ensure our `model` stays up to date without stale or redundant data.
+A common symptom of this issue is self-replicating lists, ie:
+
+```js
+// where model will = {someValue: [1], valueToUpdate: 5}
+const [model, handleUpdateModel] = useContext(UiSdkContext);
+// Create a shallow copy instead of using `lodash` or other method of deepcopy
+a = model;
+
+a.valueToUpdate = 8;
+// then use `handleUpdateModel` call
+// ... promise resovles and..
+>> 'a: {someValue: [1, 1], valueToUpdate: 8}'
+```
+
+
+That said, overall this is a simple reusable component to allow text input fields tracked via a given key and value within our config.
+In this module, you could add other inputs and fields like `FileInput`.
 
