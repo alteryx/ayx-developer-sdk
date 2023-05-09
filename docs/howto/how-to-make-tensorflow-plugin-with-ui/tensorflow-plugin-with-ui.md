@@ -235,7 +235,7 @@ and:
  `self.data_url = self.provider.tool_config["datasetConfig"]["datasetTargetDir"]` 
  and the lines below it are utilizing the `tool_config` dict (link to tool_config in docs) to access data and tool configuration sent by the UI SDK.
 
-You may have already noticed, but `tool_config` will contain the values we said we'd mock before deploying to designer.
+You may have already noticed, but `tool_config` will contain the values we said we'd mock befiore deploying to designer.
 Once we have developed our frontend, a user will be able to populate these fields.
 Until then, you can safely use constants for testing. (better phrasing?)
 
@@ -438,9 +438,9 @@ def info(self, s: str):
   self.provider.io.info(s)
 ```
 
-While the method itself is fairly straight-forward, it comes with a point of advice: We retained the difference between **logging** and **messaging** for many reasons.
-A primary one being that the tool _user_ does not always need, and even less so *want*, to see debugging output.
-That considered, do not use the above as a cruch or without consideration; logging is cheap but _messaging_ is expensive!
+While the method itself is fairly straight-forward, it includes(spellcheck) a notable point: there is a distinct difference between **logging** and **messaging**.
+There are many reasons we made this choice, a large one being that the tool _user_ does not always need, and even less so *want*, to see debugging output.
+Given that, do not use the above as a cruch or without consideration; logging is cheap but _messaging_ is expensive!
 A good rule of thumb is to keep your `self.provider.io` calls to a minimum, only sending what your USER needs to see.
 Whereas you can leverage `logging` more freely, especially when paired with the available debugging flag (NOTE: reference needed here).
 Helpers like the above should be used sparingly or you will risk slowing your tool with expensive IO! _(A very important consideration in ML)_
@@ -461,7 +461,24 @@ elif self.MODE == 'PREVIEW':
 Now, that we have data and a way to feed it as input into our model we a ready to move on to the next mode.
 
 
-### `MODEL` mode
+### `TRAIN` mode
+
+Now so far we've:
+* Created custom methods to support tensorflow API calls
+* Added `DATA` mode, a way for a user to input and load a data source as a dataset
+* Added `PREVIEW` mode, a way for a user to request preview data from the backend for feedback during data prepping
+* Mocked out (actual tests needed) our frontend UI object and tested to verify functionality
+  
+In our third mode, `MODEL`, a user(NOTE: change to this phrasing in earlier paragraphs?) will input:
+
+* Where to store their generated and trained text classifier NN
+* What to name the model
+* Various tunable model training parameters
+* a TextVectorization option
+
+Then, we will collect the reporting data tensorflow provides for training and send it to the UI SDK (frontend) for the user to see dynamically generated visual feedback and data from the training session(s).
+
+
 
 #### Function: `create_and_save_model`
 
@@ -542,7 +559,9 @@ Now, that we have data and a way to feed it as input into our model we a ready t
             raise e
 ```
 
-While this method may _appear_ intimidating, don't let it scare you off! This is simply the core code of our companion piece, gently refactored to fit into our tool process's runtime and lifecycle.
+While this method may be intimidating, don't let it scare you!
+This is simply the core code of our companion piece, gently refactored to fit into our tool's (and the PythonSdk's) runtime and lifecycle.
+
 In this method we:
   * load our dataset `tf.data.Dataset.save` 's sibling
   * create and adapt our `vectorize_layer: tensorflow.keras.layers.TextVectorization` as recommended by tensorflow
@@ -550,4 +569,175 @@ In this method we:
   * init, compile, evaluate and save our base model to generate our previews
   * save
 
-You may have noticed we use a decorater here too, `staticmethod`. 
+You may have noticed we use a decorater here too, `staticmethod`.
+We do this to allow us to call this with `Multiprocessing`  to train our model without blocking our python sdk service process. We also add in a multiprocessing queue to easily retrieve the results and send it to the frontend before ending.
+Lastly for this method, note we catch a generalized exception and explicity raise it. This allows us to throw in a controlled way such that designer can report, but log it _before_ the process terminates as we discussed early on in this section of the guide.
+
+As you might have noticed, we currently have a non-trivial amount of arguments.
+Since we collect these via IPC (**Read:** InterProcess Communication: N processes running separately; think excel and tablue with a linked spreadsheet.), these will also be more difficult to keep in synch.
+As such, we want a function to extract these that we can wrap in a try/catch block to explicitly catch and report `KeyErrors` or similarly common exceptions in this context.
+
+
+#### Function: `get_model_args()`
+
+```python
+def get_model_args(self):
+  try:
+    root_url = self.data_url
+    max_features = int(self.provider.tool_config["trainingConfig"]["maxFeatures"])
+    seq_length = int(self.provider.tool_config["textVectorizationConfig"]["sequenceLength"])
+    # Make a text-only dataset (without labels), then call adapt
+    embedding_dim = int(self.provider.tool_config["modelConfig"]["embeddingDim"])
+    model_save_loc = self.provider.tool_config["modelConfig"]["modelName"]
+    epochs = int(self.provider.tool_config["trainingConfig"]["epochs"])
+  except Exception as e:
+    self.info(str(e)) # Editing(E)-NOTE: warn method?
+    self.provider.io.error(f"An invalid key or value was provided: {str(e)}")
+  return (
+    root_url,
+    max_features,
+    seq_length,
+    embedding_dim,
+    model_save_loc,
+    epochs
+  )
+```
+
+This should be fairly straight-forward by now, good ol' dictionary access. (E-NOTE: Idiom safe?)
+Otherwise, carefully note what we do, and do not, cast.
+Consider why this may be, relative to the next code updates in `init` and `on_complete`.
+
+#### Function (Update): `__init__`
+
+```python
+    def __init__(self, provider: "AMPProviderV2") -> None:
+        """Construct a plugin."""
+        # snip... 
+        self.model_save_loc = self.provider.tool_config["modelConfig"]["modelName"]
+        self.exported_model = f"{self.model_save_loc}-exported"
+
+        self.provider.io.info("Plugin initialized.")
+```
+
+### Function (Update): `on_complete`
+
+```python
+    def on_complete(self) -> None:
+        """
+        Clean up any plugin resources, or push records for an input tool.
+
+        This method gets called when all other plugin processing is complete.
+In this method, a Plugin designer should perform any cleanup for their plugin.
+        However, if the plugin is an input-type tool (it has no incoming connections),
+        processing (record generation) should occur here.
+
+        Note: A tool with an optional input anchor and no incoming connections should
+        also write any records to output anchors here.
+        """
+        try:
+            if self.MODE == 'DATA':
+                self.setup_data()
+            elif self.MODE == 'TRAIN':
+                fn_args = self.get_model_args()
+                # TODO: Update this to its own function.
+                # NOTE: Need to remove test data pushes
+                df = pd.DataFrame({"Results": [0.0, 0.0]})
+                batch_to_send = pa.RecordBatch.from_pandas(df=df, preserve_index=False)
+                self.provider.write_to_anchor("Output", batch_to_send)
+                q = Queue()
+                p = Process(target=self.create_and_save_model, args=(q, *fn_args))
+                p.start()
+                history = q.get()
+                p.join()
+                history_dict = history.history
+                conf = self.provider.full_config
+                self.info("Setting new history")
+
+                # Pot, meet kettle. Need another method or opportunity for Additional Execercise section?
+                ui_history = {}
+
+                ui_history["trainingLoss"] = history_dict["loss"]
+                ui_history["trainingBinaryAccuracy"] = history_dict["binary_accuracy"]
+                ui_history["validationLoss"] = history_dict["val_loss"]
+                ui_history["validationBinaryAccuracy"] = history_dict["val_binary_accuracy"]
+                conf['Configuration']["modelEvaluation"]['history'] = ui_history
+                self.provider.save_full_config(conf)
+            elif self.MODE == 'EVAL':
+                model = tf.keras.saving.load_model(self.provider.tool_config["modelConfig"]["modelName"], custom_objects={'custom_standardization': custom_standardization})
+            elif self.MODE == 'PREVIEW':
+                self.send_preview_data()
+```
+
+The majority of the above speaks for itself at this point in the guide.
+Our most notable (conceptual) addition is likely the `MultiProcessing` section: 
+
+```python
+q = Queue()
+p = Process(target=self.create_and_save_model, args=(q, *fn_args))
+p.start()
+history = q.get()
+p.join()
+```
+
+Note that this is, "just enough" to prevent blocking. There are an incredible amount of resources available online and on python's official documentation. For our purposes, just know we're using the `Process(...)` to wrap our expensive compute task - allowing us to avoid blocking the python server IO.
+
+Now the backend can generate, train, and deploy/export a new model! All that's left now is our final step, allowing the user to use the "production" model to predict on data in a workflow!
+
+
+### `PREDICT`
+
+In our last mode, we will need to update our `on_record_batch` function to allow us to call `model.predict(...)` on values passed to us in the workflow. In our case, we will eventully use a text input for testing.
+**NOTE** however, this could be _any_ sort of record batch, as long as it can connect to our anchor and with the appropriate code updates!
+In other words, allow our user to use our "production" version for predictions.
+
+Some examples of why one might do this include:
+* a tool developer can ship both a trained model that exemplifies expected behaviour alongside "starter" training data for new user-generated and trained models.
+* A tool developer may ship a "base" model. This model may then be tuned and trained further by the user in their workflow.
+* With additional UI, users may choose how/where/when to deploy models for use in other workflows or jobs.
+* Workflows running on Server may do **any of the above to generate serious, performant, and production-grade models** which also...
+* Empowers tool **developers AND users** to create production grade tensorflow AI/ML pipelines!
+
+#### Function: `on_record_batch`
+
+```python
+    def on_record_batch(self, batch: "pa.Table", anchor: "Anchor") -> None:
+        """
+        Process the passed record batch.
+
+        The method that gets called whenever the plugin receives a record batch on an input.
+
+        This method IS NOT called during update-only mode.
+
+        Parameters
+        ----------
+        batch
+            A pyarrow Table containing the received batch.
+        anchor
+            A namedtuple('Anchor', ['name', 'connection']) containing input connection identifiers.
+        """
+        if self.MODE == "PREDICT":
+            model = tf.keras.saving.load_model(f'{self.provider.tool_config["modelConfig"]["modelName"]}-exported', custom_objects={'custom_standardization': custom_standardization})
+            self.info("Loaded model, predicting...")
+            
+            try:
+                results = model.predict(batch['Beep'].to_pylist())
+            except Exception as e:
+                self.provider.io.error(f"ERR during predict")
+                raise e
+                
+            df = pd.DataFrame({"Results": [float(n[0]) for n in results]})
+            batch_to_send = pa.RecordBatch.from_pandas(df=df, preserve_index=False)
+            self.provider.write_to_anchor("Output", batch_to_send)
+            self.info("TextClassifier tool done.")
+```
+
+Here, we load our model with `keras.saveing.load_model(...)`. Note we append `-exported' to differentiate our training model and "production" model. 
+As you develop more serious tools, you are free to develop your own methods of sensical model deployment and storage. Here, we simply note the ability to do so!
+
+Then, we call `model.predict` on our loaded model, take the results, and write them to our output anchor for use in the workflow.
+
+Now, this is all of our backend! Since our (soon to exist) tests are passing, we'll move on to our frontend and enable these mocked values to be dynamically set by the user!
+
+
+## Writing the Frontend: UI SDK
+
