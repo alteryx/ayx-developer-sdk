@@ -568,7 +568,7 @@ Now that we have our code, it's time to package it all up into a portable YXI ar
 ```
 
 ## Run the Test Client
-Before you run your plugin in Designer, it's good practice to do some basic testing with `ayx-sdk-cli`'s `plugin run` command to check for any errors. From your workspace...
+Before you run your plugin in Designer, it's good practice to do some basic testing with `ayx-sdk-cli`'s `plugin run` command to check for any errors. Download and install the test client from [here](https://github.com/alteryx/ayx-developer-sdk/releases/tag/v2022.12.0) and run this from your workspace...
 
 ```bash
 ayx-sdk-cli plugin run DanceableLyrics -o danceable.csv
