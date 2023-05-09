@@ -4,7 +4,7 @@ In this guide, we use the [Alteryx Python SDK](https://pypi.org/project/ayx-pyth
 To achieve this, We'll reference Tensorflow's [official tutorial](https://www.tensorflow.org/tutorials/keras/text_classification) and recreate the Basic Text Classifier as a workflow tool!
 
 Upon completing this guide, you will know how to:
-- Develop, debug, and troubleshoot using the Python and UI SDKs
+- Develop using the Python and UI SDKs
 - Exchange data between UI and Python SDK processes; during both `UPDATE` and `RUN` modes
 - Use metaprogramming, Python SDK, and the UI SDK to create editable configuration and dynamic behaviour between or during workflow runs
 - Package and use 3rd party libraries from `npm` and `pypi` in a tool
@@ -74,7 +74,7 @@ Finally, the tool will return a report of the training results to the UI and exp
 When in `PREDICT` mode, the tool will take text input via the input anchor, then run predictions on them and output those results to its output anchor.
 
 
-### Create a Workspace
+## Create a Workspace
 
 Run the following, responding as prompted
 
@@ -101,7 +101,7 @@ Once the above is complete, we recommmend you create your python environment wit
 This will allow you to iteravely develop locally, while you may still deploy with "prod" requirements. We'll briefly cover how to do that later in the guide as well.
 
 
-### 1.2.5. Create a Plugin
+## 1.2.5. Create a Plugin
 Next, use the `create-ayx-plugin` command and reply to the prompts to generate the our tool template code. For this tool, we want to use the `single-input-single-output`. (may switch to optional*)
 
 ```powershell
@@ -1003,3 +1003,520 @@ a.valueToUpdate = 8;
 That said, overall this is a simple reusable component to allow text input fields tracked via a given key and value within our config.
 In this module, you could add other inputs and fields like `FileInput`.
 
+
+#### Component(s): `DataInfo.tsx`, `DataInputSection.tsx`
+
+##### `DataInfo.tsx`
+
+```jsx
+import React, { useContext } from 'react';
+import { Grid, Container, Typography, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@alteryx/ui';
+import { Context as UiSdkContext } from '@alteryx/react-comms';
+import TokenTranslation from "./TokenTranslation";
+
+const DataTable = ({rows}) => {
+
+  return (
+  <TableContainer component={Paper}>
+    <Table size="small">
+      <TableHead>
+        <TableRow>
+          <TableCell>Label </TableCell>
+          <TableCell align="left">Review</TableCell>
+        </TableRow>
+      </TableHead>
+      <TableBody>
+        {rows.map((row, rowNum) => (
+          <TableRow key={`row-${rowNum}}`}>
+            <TableCell component="th" scope="row">
+              {row.label}
+            </TableCell>
+            <TableCell align="right">{row.text}</TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  </TableContainer>)
+};
+
+const VectorizationPreview = ({sampleRaw, sampleVectorized}) => {
+    return (<Grid spacing={1} container>
+        <Grid item> {sampleRaw} </Grid>
+        <Grid item> {sampleVectorized} </Grid>
+    </Grid>)
+}
+
+export const DataInfo = () => {
+    const [model] = useContext(UiSdkContext)
+    const tableRows = model.Configuration.datasetInfo.rawTrainSample.textBatch.map((val, index) => {
+        return {text: val, label: model.Configuration.datasetInfo.rawTrainSample.labelBatch[index]}
+    })
+    let vectorzationSample = model.Configuration.datasetInfo.vectorizedSample
+    return (
+        <Container>
+        <Typography variant="h1"> Data Info </Typography>
+        <Grid alignItems="flex-end" container spacing={1}>
+            <Grid item> <DataTable rows={tableRows} /> </Grid>
+            <Grid item> <VectorizationPreview {...vectorzationSample} /> </Grid>
+            <Grid item> <TokenTranslation /></Grid>
+        </Grid>
+        </Container>)
+}
+```
+
+A datatable that accepts `tableRows` to preview samples of our test data as it will be given to our model. Additionally, some vectorization sampling and token samples as we've defined them in our backend.
+
+
+##### DataInputSection
+
+```jsx
+import React, {useContext, useState} from "react";
+
+import { ConfigTextInput } from './config-inputs';
+
+import { Container, Grid, Typography } from '@alteryx/ui';
+import { DS_CONFIG } from '../constants';
+
+import {Context as UiSdkContext} from "@alteryx/react-comms"
+import { DataInfo } from "./DataInfo";
+
+const DataInputSection = () => {
+    const [model, _] = useContext(UiSdkContext);
+    const {datasetInfo} = model.Configuration.datasetInfo
+    let inputItems = [
+        {configType:DS_CONFIG, vKey:"datasetTargetDir", elId:"dataset-target-dir", label:"Dataset Src Dir"},
+        {configType:DS_CONFIG, vKey:"trainingSetDir", elId:"dataset-train-dir", label:"Dataset Training Directory"},
+        {configType:DS_CONFIG, vKey:"testSetDir", elId:"dataset-test-dir", label:"Dataset Test Directory"},
+        {configType:DS_CONFIG, vKey:"batchSize", elId:"batch-size", inputType:"number", label:"Batch Size"},
+        {configType:DS_CONFIG, vKey:"seed", elId:"seed", inputType:"number", label:"seed"},
+    ]
+
+    const configTextInputs = inputItems.map((item) => {
+        let val = model.Configuration[item.configType][item.vKey]
+        
+        return <ConfigTextInput {...item} value={val} />
+    })
+
+    return (
+    <Container>
+        <Typography variant="h1"> Data Input </Typography>
+        <Grid alignItems="flex-end" container spacing={2}>
+            {configTextInputs.map((field, index) => {
+                return (<Grid item key={`ds-conf-grid-${index}`}>
+                    {field}
+                    </Grid>)
+            })}
+        </Grid>
+            <DataInfo  />
+        </Container>
+    )
+}
+
+export default DataInputSection;
+```
+
+We define the attributes and key value pairs for several config text inputs using our earlier defined `ConfigTextInput`.
+Then, we bundle them up into a grid to neatly display the inputs. You may have noticed, but note the `vKey` values and `label`s and how they match our `provider.tool_config` values we mocked earlier.
+These will be how the User(s) define their data options as we've discussed.
+There will be similar additions for other values in coming src as well.
+
+#### Component(s): `model-views.tsx`, `ModelSection`, `TokenTranslation`
+
+
+##### `model-views.tsx`
+
+```jsx
+import React, {useContext} from "react";
+
+import { ConfigTextInput } from './config-inputs';
+
+import { Container, Grid, Typography, Card, CardContent, CardHeader, useTheme } from '@alteryx/ui';
+import { MDL_CONFIG } from '../constants';
+
+import {Context as UiSdkContext} from "@alteryx/react-comms"
+import { InteractiveLinePlot } from "./charting/line-plots";
+
+const colors = {
+    trainingLoss: "rgba(255, 99, 132, 0.5)",
+    trainingBinaryAccuracy: "rgba(255, 99, 132, 0.5)",
+    validationLoss: "rgba(255, 99, 132, 0.5)",
+    validationBinaryAccuracy: "rgba(255, 99, 132, 0.5)",
+}
+
+export const ModelTraining = () => {
+    const [model] = useContext(UiSdkContext);
+
+    let inputItems = [
+        {configType:MDL_CONFIG, vKey:"embeddingDim", elId:"embedding-dim", label:"Embedding Dimension"},
+        {configType:MDL_CONFIG, vKey:"modelName", elId:"model-name", label:"Model Name"},
+        {configType:"trainingConfig", vKey:"epochs", elId:"epochs", inputType:"number", label:"Epochs"},
+        {configType:"trainingConfig", vKey:"maxFeatures", elId:"max-features", inputType:"number", label:"Max Features"},
+    ]
+
+    const configTextInputs = inputItems.map((item, i) => {
+        let val = model.Configuration[item.configType][item.vKey]
+        
+        return <ConfigTextInput {...item} value={val} key={`model-cfg-txt-${i}`} />
+    })
+
+    const {history} = model.Configuration.modelEvaluation
+    const labels = history.trainingLoss.map((_, epochNum) => epochNum + 1)
+    const datasets = Object.entries(history).map(([label, data]) => {
+            return {
+        label,
+        data,
+        borderColor: colors[label],
+        backgroundColor: colors[label]}
+            })
+    return (
+    <Container>
+        <Typography variant="h1">Model Evaluation</Typography>
+        <Grid alignItems="flex-end" container spacing={2}>
+            {configTextInputs.map((field, index) => {
+                return (<Grid item key={`ds-conf-grid-${index}`}>
+                    {field}
+                    </Grid>)
+            })}
+        </Grid>
+        <Grid container>
+            <InteractiveLinePlot plotTitle="Eval Results" 
+                labels={labels} datasets={datasets} />
+        </Grid>
+        </Container>
+    )
+}
+
+const StatCard = ({title, stat}) => {
+        return  (<Card>
+            <CardHeader title={title} />
+            <CardContent>
+              <Typography>
+                {stat}
+              </Typography>
+            </CardContent>
+          </Card>)
+}
+
+export const ModelEvaluation = () => {
+    // Filter out the history states for this view
+    const [model] = useContext(UiSdkContext);
+    const {loss, accuracy} = model.Configuration.modelEvaluation
+    let cards = [
+        {title: "loss", stat:loss},
+        {title: "accuracy", stat: accuracy},
+    ]
+    return (
+    <Container>
+        <Typography variant="h1">Model Evaluation Results</Typography>
+        <Grid alignItems="flex-end" container spacing={2}>
+            {cards.map((card, keyInc) => {
+                return (
+                    <Grid item key={`stat-item-${keyInc}`}>
+                    <StatCard {...card}  />
+                    </Grid>
+                )}
+            )}
+        </Grid>
+        </Container>
+    )
+}
+```
+##### `TokenTranslation.tsx`
+
+
+```jsx
+import React, { useContext, useState } from 'react';
+import { Context as UiSdkContext } from '@alteryx/react-comms';
+import { Button, Chip, Container, Divider, Grid, TextField } from '@alteryx/ui';
+
+import _ from 'lodash';
+
+
+const TokenRequestField = () => {
+    const [model, handleUpdateModel] = useContext(UiSdkContext)
+    const {token} = model.Configuration.textVectorizationConfig.translationRequest
+
+    const tokenUpdateFn = (inputValue) => {
+        const newModel = _.cloneDeep(model);
+        newModel.Configuration.textVectorizationConfig.translationRequest.token = inputValue
+        handleUpdateModel(newModel)
+    }
+
+    return (<Container>
+        <TextField
+          fullWidth
+          id="text-vect-config-field"
+          label={"Enter a comma separated list of tokens to translate next PREVIEW run."}
+          onChange={(event) => tokenUpdateFn(event.target.value)}
+          value={token} />
+    </Container>)
+}
+
+const TokenDisplay = ()=> {
+    const [model, handleUpdateModel] = useContext(UiSdkContext)
+
+    const tokenChips = model.Configuration.textVectorizationConfig.tokenChips.map((chip, num) => {
+        return {...chip, key: num}
+    })
+
+    const handleDelete = targetChip => () => {
+        const newModel = _.cloneDeep(model)
+        let {tokenChips} = model.Configuration.textVectorizationConfig
+        newModel.Configuration.textVectorizationConfig.tokenChips = tokenChips.filter(chip => {
+            return chip.key !== targetChip.key
+        })
+        handleUpdateModel(newModel)
+    }
+
+    return (<Grid container justify="center">
+        {
+            tokenChips ? tokenChips.map((item, i) => {
+                let fullLabel = `${item.token}:${item.translation}`
+                return (<Grid item key={i} >
+                    <Chip label={fullLabel} 
+                    onDelete={handleDelete(fullLabel)} />
+                    </Grid>) 
+            }) : null
+        }
+    </Grid >)
+}
+
+const TokenTranslation = () => {
+
+
+    return (
+        <Container>
+            <Container>
+            <TokenRequestField />
+            </Container>
+            <Divider/>
+            <Container>
+            <TokenDisplay />
+            </Container>
+        </Container>
+    )
+}
+
+export default TokenTranslation;
+```
+
+##### `ModelSection.tsx`
+
+```jsx
+import React, {useState} from "react";
+
+import PropTypes from 'prop-types';
+import { Tabs, Tab, AppBar, Typography, Paper, Container, useTheme } from '@alteryx/ui';
+
+import { ModelEvaluation, ModelTraining } from "./model-views";
+
+function TabContainer({ children, dir }) {
+  return (
+    <Typography component="div" dir={dir} style={{ padding: 8 * 3 }}>
+      {children}
+    </Typography>
+  );
+}
+
+TabContainer.propTypes = {
+  children: PropTypes.node.isRequired,
+  dir: PropTypes.string
+};
+
+TabContainer.defaultProps = { dir: 'ltr' };
+
+
+const ModelSection = () => {
+ 
+  const theme = useTheme();
+
+  const [selectedTab, setValue] = useState(0);
+
+  const modelTabs = {
+    0: <TabContainer dir={theme.direction}><ModelTraining  /></TabContainer>,
+    1: <TabContainer dir={theme.direction}><ModelEvaluation /></TabContainer>,
+  }
+    
+  return (
+    <Container>
+      <Paper>
+        <AppBar color="default" elevation={0} position="static">
+          <Tabs indicatorColor="primary" onChange={(_, newValue) => {setValue(newValue)}} textColor="primary" value={selectedTab} variant="fullWidth">
+            <Tab label="Training & Evaluation" />
+            <Tab label="Prediction" />
+          </Tabs>
+        </AppBar>
+        {modelTabs[selectedTab]}
+      </Paper>
+    </Container>
+  );
+}
+
+export default ModelSection;
+```
+
+#### Component(s): `./src/components/charting/line-plots.tsx`
+
+
+```jsx
+import React, {useState} from "react";
+
+import { AppBar, Container, useTheme } from '@alteryx/ui';
+
+import {
+  Chart as ChartJS,
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend,
+} from 'chart.js';
+import { Line } from 'react-chartjs-2';
+
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  Title,
+  Tooltip,
+  Legend
+);
+
+
+
+
+
+export const InteractiveLinePlot = ({labels, plotTitle, datasets, ...rest}) => {
+    const theme = useTheme();
+    let options = {
+  responsive: true,
+  plugins: {
+    legend: {
+      position: 'top' as const,
+    },
+    title: {
+      display: true,
+      text: plotTitle,
+        },
+    },
+    };
+
+    const data = {
+        labels,
+        datasets,
+        rest
+    }
+
+    return (
+    <Container>
+        <AppBar color="default" elevation={0} position="static">
+            {plotTitle} <br />
+            <Line options={options} data={data}  />;
+        </AppBar>
+        
+    </Container>
+  );
+}
+```
+
+## Testing End to End
+Now, you should see a GUI that looks like the below (E-Note: will add screencap doing one more fresh build for screens since updates):
+
+
+#### Figure: Tool GUI
+
+[figure here]
+
+
+## Package into a YXI
+
+First, we should ensure we have all our dependencies for both front and backend. Then, we run `create-yxi` to package each of these into a deployable using their respective package managers.
+
+### Python Dependencies
+
+Add `tensorflow==2.12.0` to your tool's `requirements-third-party.txt`.
+
+### React dependencies
+
+Run `npm install --save lodash chart.js`
+
+### CLI packaging command
+
+Run the `ayx_plugin_cli create-yxi` command which bundles all the plugins in the workspace into a `.yxi` archive. It should look something like this:
+```powershell
+$ create-yxi
+[Creating YXI] started
+[Creating YXI] -- generate_config_files:generate_config_xml
+// output truncated //
+[Creating YXI] .  create_yxi:create_yxi
+[Creating YXI] finished
+```
+
+The resulting `.yxi` archive should be located in the `build/yxi` directory of your plugin workspace.
+
+## Install and Run in Designer
+
+### Method 1
+After you create a `.yxi`, you can double-click the `.yxi` or drag and drop it into Designer to install it. This prompts you to install the package in a new dialog box. Which looks something like this:
+
+![YXI Install Dialog](./assets/install-yxi-dialog.jpg)
+
+Once it installs, you can find the plugin under the `Tensorflow Python SDK Examples` tool category.
+
+### Method 2
+You can also create the `.yxi` _**and**_ install it all in one step via the `designer-install` command. Choose the install option that matches your Designer install. Typically, this is the `user` install option. 
+
+```powershell
+$ designer-install
+Install Type (user, admin) [user]: user
+[Creating YXI] started
+[Creating YXI] -- generate_config_files:generate_config_xml
+// output truncated //
+[Installing yxi D:\src\tmp\build\yxi\FilterUITool.yxi into designer] finished
+If this is your first time installing these tools, or you have made modifications to your ayx_workspace.json file, please restart Designer for these changes to take effect.
+```
+
+Once the command finishes, you can open Designer and find your tool under the `Tensorflow Python SDK Examples` tool category.
+
+Drag it into your workflow. Using the recommended dataset (need a reference list, and include this [E-Note: <-]) at your chosen location, fill in the form similarly to below:
+
+[TODO: SS of it. Have testing ones in case]
+
+**TODO/ E-Note: add a selector to the UI, last second thought - debuggin or toggling in the shiv directory sucks and don't want that smell in the guide. Just a toggle switch on the UI for each mode. Forgot to circle back and add that earlier. Quick lift, like a 1**
+
+(once it's in) Use the "MODE" selector to run them in the following order, for reasons described in the begining of the guide: `DATA` -> `PREVIEW` -> `TRAIN` -> `PREDICT`.
+
+Outputs should resemble the following:
+
+#### Figure: `DATA` mode:
+
+[New SS]
+
+#### Figure: `PREVIEW` mode:
+
+[New SS]
+
+#### Figure: `TRAIN` mode:
+
+[New SS]
+
+#### Figure: `PREDICT` mode:
+
+[New SS]
+
+## Congratulations!
+
+You have successfully created your first Tensorflow Keras NN model, from scratch, in a workflow! If you're up to the challenge, we recommended the following exercises to test your new skills!
+
+### Exercises
+
+1. Create a second plugin for your production model.
+   1. Try locally using your production model by referencing it on your hard drive.
+   2. Convert the above to use a production model included in the yxi as a standalone deployable. (See pythons packaging module for idiomatic ways to include your model!)
+2. Add a FileExplorer to our text input fields for more intuitive data source input.
+3. Add an option to _continue_ training a model rather than overwriting each time.
+4. Convert the tensorflow companion piece exercises.
+   
