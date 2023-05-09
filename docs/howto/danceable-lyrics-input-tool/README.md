@@ -259,6 +259,26 @@ Finally, let's add some additional criteria for our analysis and an output messa
 When you have completed the above steps, your `__init__` should look something like this:
 
 ```python
+    @staticmethod
+    def _validate_datasets_dir(datasets_dir: Path) -> None:
+        if not datasets_dir.is_dir():
+            raise WorkflowRuntimeError("Bad path")
+
+        filenames = [
+            "artists.csv",
+            "tracks.csv",
+            "r_track_artist.csv",
+            "genius_song_lyrics.csv",
+            "audio_features.csv"
+        ]
+        nonexistent_files = list(
+            filter(lambda filepath: not filepath.is_file(), map(lambda filename: (datasets_dir / filename), filenames))
+        )
+
+        if len(nonexistent_files) != 0:
+            raise WorkflowRuntimeError(
+                f"Expected files not found: {','.join(map(str, nonexistent_files))}")
+
     def __init__(self, provider: AMPProviderV2) -> None:
         """Construct a plugin."""
         self.provider = provider
