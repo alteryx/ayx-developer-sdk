@@ -327,113 +327,110 @@ Our first data input is from the `genius_song_lyrics.csv` file, where we will di
 
 ```python
     def on_complete(self) -> None:
-        self.provider.io.info(f"{self.name} gathering sample lyrics...")
 
-        sample = (
-            pl.scan_csv(self.DATASETS_BASE / "genius_song_lyrics.csv")
-            .select(
-                pl.col("title").str.to_lowercase().alias("track_name"),
-                pl.col("artist").str.to_lowercase().alias("artist_name"),
-                "lyrics",
-                "language",
-                "views",
-            )
-            .filter(
-                pl.col("lyrics").str.contains("(?i)" + "|(?i)".join(self.LYRICS_TERMS))
-            )
-            .filter(pl.col("language") == "en")
-            .filter(pl.col("views") > self.MIN_VIEWS)
-            .collect()
+    self.provider.io.info(f"{self.name} building sample lyrics query...")
+
+    sample = (
+        pl.scan_csv(self.DATASETS_BASE + "genius_song_lyrics.csv")
+        .select(
+            pl.col("title").str.to_lowercase().alias("track_name"),
+            pl.col("artist").str.to_lowercase().alias("artist_name"),
+            "lyrics",
+            "language",
+            "views",
         )
+        .filter(
+            (pl.col("views") > self.MIN_VIEWS)
+            & (pl.col("language") == "en")
+            & (
+                pl.col("lyrics").str.contains(
+                    "(?i)" + "|(?i)".join(self.LYRICS_TERMS)
+                )
+            )
+        )
+        .select("track_name", "artist_name")
+    )
 ```
 
-Above, we tell Polars to create a [DataFrame](https://pola-rs.github.io/polars/py-polars/html/reference/dataframe/index.html) that contains select columns from rows that match our criteria. We also normalize some column names— we lowercase them and add aliases in our output. In our `filter` clause, we build a case-insensitive [regular expression](https://en.wikipedia.org/wiki/Regular_expression) from our list of terms. Finally, we filter out non-English terms and restrict results to only entries with more than `self.MIN_VIEWS`. You might want to alter these criteria a bit. For example, you might want to allow other languages.
+Above, we tell Polars to create a [LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) that contains select columns from rows that match our criteria. We also normalize some column names—we lowercase them and add aliases in the output. In the `filter` clause, we build a case-insensitive [regular expression](https://en.wikipedia.org/wiki/Regular_expression) from the list of terms. We then filter out non-English terms and restrict results to only entries with more than `self.MIN_VIEWS`. Finally, we only use `track_name` and `artist_name` in the query. You might want to alter these criteria a bit. For example, you might want to allow other languages.
 
 The next section of code reads from multiple input files and joins them into a single `danceable_tracks` view of the data that contains columns that match our criteria.
 
 ```python
-        self.provider.io.info(f"{self.name} gathering danceable track information...")
+    self.provider.io.info(
+        f"{self.name} building danceable track information query..."
+    )
 
-        artists = (
-            pl.scan_csv(self.DATASETS_BASE / "artists.csv")
-            .select(
+    artists = pl.scan_csv(self.DATASETS_BASE + "artists.csv").select(
                 pl.col("name").str.to_lowercase().alias("artist_name"),
-                pl.col("id").alias("artist_id"),
-            )
-            .collect()
-        )
+        pl.col("id").alias("artist_id"),
+    )
 
-        tracks = (
-            pl.scan_csv(self.DATASETS_BASE / "tracks.csv")
-            .select(
-                pl.col("name").str.to_lowercase().alias("track_name"),
-                pl.col("id").alias("track_id"),
-                "explicit",
-            )
-            .filter(pl.col("explicit") == 0)
-            .collect()
+    tracks = (
+        pl.scan_csv(self.DATASETS_BASE + "tracks.csv")
+        .select(
+            pl.col("name").str.to_lowercase().alias("track_name"),
+            pl.col("id").alias("track_id"),
+            "explicit",
         )
+        .filter(pl.col("explicit") == 0)
+    )
 
-        track_artists = (
-            pl.scan_csv(self.DATASETS_BASE / "r_track_artist.csv")
-            .select(pl.col("track_id"), pl.col("artist_id"))
-            .sort("track_id")
-            .collect()
+    audio_features = (
+        pl.scan_csv(self.DATASETS_BASE + "audio_features.csv")
+        .select(pl.col("id").alias("track_id"), "danceability", "energy", "tempo",)
+        .filter(
+            (pl.col("danceability").is_between(*self.DANCEABILITY_RANGE))
+            & (pl.col("energy").is_between(*self.ENERGY_RANGE))
+            & (pl.col("tempo").is_between(*self.TEMPO_RANGE))
         )
+    )
 
-        audio_features = (
-            pl.scan_csv(self.DATASETS_BASE / "audio_features.csv")
-            .select(pl.col("id").alias("track_id"), "danceability", "energy", "tempo",)
-            .filter(pl.col("danceability").is_between(*self.DANCEABILITY_RANGE))
-            .filter(pl.col("energy").is_between(*self.ENERGY_RANGE))
-            .filter(pl.col("tempo").is_between(*self.TEMPO_RANGE))
-            .sort("track_id")
-            .collect()
-        )
+    track_artists = (
+        pl.scan_csv(self.DATASETS_BASE + "r_track_artist.csv")
+        .select("track_id", "artist_id")
+        .join(artists, on="artist_id")
+        .join(tracks, on="track_id")
+        .join(audio_features, on="track_id")
+    )
 
-        danceability_tracks = (
-            track_artists.join(artists, on="artist_id")
-            .join(tracks, on="track_id")
-            .join(audio_features, on="track_id")
+    danceability_tracks = (
+        track_artists.select(
+            "artist_name",
+            "track_name",
+            "danceability",
+            "energy",
+            ("https://open.spotify.com/track/" + pl.col("track_id")),
         )
+        .groupby(["artist_name", "track_name"])
+        .agg([pl.all().sort_by("danceability", descending=True).first()])
+    )
 ```
 
-If we output danceability_tracks via `print(danceability_tracks)`, we'll see a header similar to this:
+The above code joins `track_artists` against `artists`, `tracks`, and `audio_features`. `danceability_tracks` is then created by selecting the desired columns from `track_artists`. We also prefix the `track_id` with a base URL to build a full Spotify open link.
+
+We then group by `artist_name` and `track_name`. Each group is sorted by `danceability`, and the row with the highest `danceability` is taken.
+
+If we output `danceability_tracks` via `print(danceability_tracks.collect())`, we'll see a header similar to this:
 
 ```txt
-track_id | artist_id | artist_name | track_name | explicit | danceability | energy | tempo
+artist_name | track_name | danceability | energy | literal
 ```
 As you can see, this combines data from multiple sources.
 
 Now that we have both a sample of songs with lyrics that contain our terms and track information that includes "danceability", let's find our matches! Add this code:
 
 ```python
-        self.provider.io.info(f"{self.name} calculating final results...")
+    self.provider.io.info(f"{self.name} calculating final results...")
 
-        matches = pl.DataFrame()
-        for row in sample.rows(named=True):
-            artist = row["artist_name"]
-            track = row["track_name"]
-            m = (
-                danceability_tracks.select(
-                    "artist_name",
-                    "track_name",
-                    "danceability",
-                    "energy",
-                    ("https://open.spotify.com/track/" + pl.col("track_id")),
-                )
-                .filter(pl.col("artist_name") == artist)
-                .filter(pl.col("track_name") == track)
-                .limit(1)
-            )
-
-            if not m.is_empty():
-                matches = pl.concat([matches, m])
-
-        matches = matches.sort("danceability", descending=True)
+    matches = (
+        danceability_tracks.join(sample, on=["artist_name", "track_name"])
+        .sort("danceability", descending=True)
+        .collect()
+    )
 ```
 
-The above code loops over all the rows in our sample. Since we provide `named=True`, Polars also includes the column name in each `row` value. We then look for a single match with a matching `artist_name` and `track_name` (via `limit(1)`) in `danceability_tracks`. Additionally, we prefix the `track_id` with a base URL to build a full Spotify open link. We append to the `matches` `DataFrame` for any matches. Finally, we sort the results by `danceability`.
+The above code joins `danceability_tracks` with the entries in `sample`. The results are then sorted by `danceability`.
 
 Now that we have our `matches`, let's output them to Designer!
 
@@ -453,36 +450,39 @@ Now that we have our `matches`, let's output them to Designer!
 Let's take a look at our final `on_complete`. It should look like something like this:
 
 ```python
-    def on_complete(self) -> None:
-        self.provider.io.info(f"{self.name} gathering sample lyrics...")
+def on_complete(self) -> None:
 
-        sample = (
-            pl.scan_csv(self.DATASETS_BASE / "genius_song_lyrics.csv")
-            .select(
-                pl.col("title").str.to_lowercase().alias("track_name"),
-                pl.col("artist").str.to_lowercase().alias("artist_name"),
-                "lyrics",
-                "language",
-                "views",
-            )
-            .filter(
-                pl.col("lyrics").str.contains("(?i)" + "|(?i)".join(self.LYRICS_TERMS))
-            )
-            .filter(pl.col("language") == "en")
-            .filter(pl.col("views") > self.MIN_VIEWS)
-            .collect()
+    self.provider.io.info(f"{self.name} building sample lyrics query...")
+
+    sample = (
+        pl.scan_csv(self.DATASETS_BASE + "genius_song_lyrics.csv")
+        .select(
+            pl.col("title").str.to_lowercase().alias("track_name"),
+            pl.col("artist").str.to_lowercase().alias("artist_name"),
+            "lyrics",
+            "language",
+            "views",
         )
-
-        self.provider.io.info(f"{self.name} gathering danceable track information...")
-
-        artists = (
-            pl.scan_csv(self.DATASETS_BASE / "artists.csv")
-            .select(
-                pl.col("name").str.to_lowercase().alias("artist_name"),
-                pl.col("id").alias("artist_id"),
+        .filter(
+            (pl.col("views") > self.MIN_VIEWS)
+            & (pl.col("language") == "en")
+            & (
+                pl.col("lyrics").str.contains(
+                    "(?i)" + "|(?i)".join(self.LYRICS_TERMS)
+                )
             )
-            .collect()
         )
+        .select("track_name", "artist_name")
+    )
+
+    self.provider.io.info(
+        f"{self.name} building danceable track information query..."
+    )
+
+    artists = pl.scan_csv(self.DATASETS_BASE + "artists.csv").select(
+        pl.col("name").str.to_lowercase().alias("artist_name"),
+        pl.col("id").alias("artist_id"),
+    )
 
         tracks = (
             pl.scan_csv(self.DATASETS_BASE / "tracks.csv")
@@ -492,61 +492,51 @@ Let's take a look at our final `on_complete`. It should look like something like
                 "explicit",
             )
             .filter(pl.col("explicit") == 0)
-            .collect()
-        )
-
-        track_artists = (
-            pl.scan_csv(self.DATASETS_BASE / "r_track_artist.csv")
-            .select(pl.col("track_id"), pl.col("artist_id"))
-            .sort("track_id")
-            .collect()
         )
 
         audio_features = (
             pl.scan_csv(self.DATASETS_BASE / "audio_features.csv")
             .select(pl.col("id").alias("track_id"), "danceability", "energy", "tempo",)
-            .filter(pl.col("danceability").is_between(*self.DANCEABILITY_RANGE))
-            .filter(pl.col("energy").is_between(*self.ENERGY_RANGE))
-            .filter(pl.col("tempo").is_between(*self.TEMPO_RANGE))
-            .sort("track_id")
-            .collect()
+        .filter(
+            (pl.col("danceability").is_between(*self.DANCEABILITY_RANGE))
+            & (pl.col("energy").is_between(*self.ENERGY_RANGE))
+            & (pl.col("tempo").is_between(*self.TEMPO_RANGE))
         )
+    )
 
-        danceability_tracks = (
-            track_artists.join(artists, on="artist_id")
-            .join(tracks, on="track_id")
-            .join(audio_features, on="track_id")
+    track_artists = (
+        pl.scan_csv(self.DATASETS_BASE + "r_track_artist.csv")
+        .select("track_id", "artist_id")
+        .join(artists, on="artist_id")
+        .join(tracks, on="track_id")
+        .join(audio_features, on="track_id")
+    )
+
+    danceability_tracks = (
+        track_artists.select(
+            "artist_name",
+            "track_name",
+            "danceability",
+            "energy",
+            ("https://open.spotify.com/track/" + pl.col("track_id")),
         )
+        .groupby(["artist_name", "track_name"])
+        .agg([pl.all().sort_by("danceability", descending=True).first()])
+    )
 
-        self.provider.io.info(f"{self.name} calculating final results...")
+    self.provider.io.info(f"{self.name} calculating final results...")
 
-        matches = pl.DataFrame()
-        for row in sample.rows(named=True):
-            artist = row["artist_name"]
-            track = row["track_name"]
-            m = (
-                danceability_tracks.select(
-                    "artist_name",
-                    "track_name",
-                    "danceability",
-                    "energy",
-                    ("https://open.spotify.com/track/" + pl.col("track_id")),
-                )
-                .filter(pl.col("artist_name") == artist)
-                .filter(pl.col("track_name") == track)
-                .limit(1)
-            )
+    matches = (
+        danceability_tracks.join(sample, on=["artist_name", "track_name"])
+        .sort("danceability", descending=True)
+        .collect()
+    )
 
-            if not m.is_empty():
-                matches = pl.concat([matches, m])
+    self.provider.write_to_anchor(
+        "Output", pa.Table.from_pandas(matches.to_pandas())
+    )
 
-        matches = matches.sort("danceability", descending=True)
-
-        self.provider.write_to_anchor(
-            "Output", pa.Table.from_pandas(matches.to_pandas())
-        )
-
-        self.provider.io.info(f"{self.name} finished.")
+    self.provider.io.info(f"{self.name} finished.")
 ```
 
 ## Package into a YXI

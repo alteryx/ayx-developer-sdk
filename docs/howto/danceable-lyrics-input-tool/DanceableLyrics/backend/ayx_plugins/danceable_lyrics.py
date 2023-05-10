@@ -94,7 +94,8 @@ class DanceableLyrics(PluginV2):
         raise NotImplementedError("Input tools don't receive batches.")
 
     def on_complete(self) -> None:
-        self.provider.io.info(f"{self.name} gathering sample lyrics...")
+
+        self.provider.io.info(f"{self.name} building sample lyrics query...")
 
         sample = (
             pl.scan_csv(self.DATASETS_BASE / "genius_song_lyrics.csv")
@@ -106,23 +107,25 @@ class DanceableLyrics(PluginV2):
                 "views",
             )
             .filter(
-                pl.col("lyrics").str.contains("(?i)" + "|(?i)".join(self.LYRICS_TERMS))
+                (pl.col("views") > self.MIN_VIEWS)
+                & (pl.col("language") == "en")
+                & (
+                    pl.col("lyrics").str.contains(
+                        "(?i)" + "|(?i)".join(self.LYRICS_TERMS)
             )
-            .filter(pl.col("language") == "en")
-            .filter(pl.col("views") > self.MIN_VIEWS)
-            .collect()
+        )
+            )
+            .select("track_name", "artist_name")
         )
 
-        self.provider.io.info(f"{self.name} gathering danceable track information...")
+        self.provider.io.info(
+            f"{self.name} building danceable track information query..."
+        )
 
-        artists = (
-            pl.scan_csv(self.DATASETS_BASE / "artists.csv")
-            .select(
+        artists = pl.scan_csv(self.DATASETS_BASE / "artists.csv").select(
                 pl.col("name").str.to_lowercase().alias("artist_name"),
                 pl.col("id").alias("artist_id"),
             )
-            .collect()
-        )
 
         tracks = (
             pl.scan_csv(self.DATASETS_BASE / "tracks.csv")
@@ -132,55 +135,45 @@ class DanceableLyrics(PluginV2):
                 "explicit",
             )
             .filter(pl.col("explicit") == 0)
-            .collect()
-        )
-
-        track_artists = (
-            pl.scan_csv(self.DATASETS_BASE / "r_track_artist.csv")
-            .select(pl.col("track_id"), pl.col("artist_id"))
-            .sort("track_id")
-            .collect()
         )
 
         audio_features = (
             pl.scan_csv(self.DATASETS_BASE / "audio_features.csv")
             .select(pl.col("id").alias("track_id"), "danceability", "energy", "tempo",)
-            .filter(pl.col("danceability").is_between(*self.DANCEABILITY_RANGE))
-            .filter(pl.col("energy").is_between(*self.ENERGY_RANGE))
-            .filter(pl.col("tempo").is_between(*self.TEMPO_RANGE))
-            .sort("track_id")
-            .collect()
+            .filter(
+                (pl.col("danceability").is_between(*self.DANCEABILITY_RANGE))
+                & (pl.col("energy").is_between(*self.ENERGY_RANGE))
+                & (pl.col("tempo").is_between(*self.TEMPO_RANGE))
+        )
         )
 
-        danceability_tracks = (
-            track_artists.join(artists, on="artist_id")
+        track_artists = (
+            pl.scan_csv(self.DATASETS_BASE / "r_track_artist.csv")
+            .select("track_id", "artist_id")
+            .join(artists, on="artist_id")
             .join(tracks, on="track_id")
             .join(audio_features, on="track_id")
         )
 
-        self.provider.io.info(f"{self.name} calculating final results...")
-
-        matches = pl.DataFrame()
-        for row in sample.rows(named=True):
-            artist = row["artist_name"]
-            track = row["track_name"]
-            m = (
-                danceability_tracks.select(
+        danceability_tracks = (
+            track_artists.select(
                     "artist_name",
                     "track_name",
                     "danceability",
                     "energy",
                     ("https://open.spotify.com/track/" + pl.col("track_id")),
                 )
-                .filter(pl.col("artist_name") == artist)
-                .filter(pl.col("track_name") == track)
-                .limit(1)
+            .groupby(["artist_name", "track_name"])
+            .agg([pl.all().sort_by("danceability", descending=True).first()])
             )
 
-            if not m.is_empty():
-                matches = pl.concat([matches, m])
+        self.provider.io.info(f"{self.name} calculating final results...")
 
-        matches = matches.sort("danceability", descending=True)
+        matches = (
+            danceability_tracks.join(sample, on=["artist_name", "track_name"])
+            .sort("danceability", descending=True)
+            .collect()
+        )
 
         self.provider.write_to_anchor(
             "Output", pa.Table.from_pandas(matches.to_pandas())
