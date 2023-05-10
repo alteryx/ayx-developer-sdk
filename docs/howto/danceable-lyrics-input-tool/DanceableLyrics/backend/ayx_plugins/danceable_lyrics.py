@@ -41,13 +41,13 @@ class DanceableLyrics(PluginV2):
             "genius_song_lyrics.csv",
             "audio_features.csv"
         ]
-        nonexistent_files = list(
+        nonexistent_files = ','.join(map(str, list(
             filter(lambda filepath: not filepath.is_file(), map(lambda filename: (datasets_dir / filename), filenames))
-        )
+        )))
 
         if len(nonexistent_files) != 0:
             raise WorkflowRuntimeError(
-                f"Expected files not found: {','.join(map(str, nonexistent_files))}")
+                f"Expected files not found: {nonexistent_files}")
 
     def __init__(self, provider: AMPProviderV2) -> None:
         """Construct a plugin."""
