@@ -71,14 +71,13 @@ modify the source and description.
 
 ### on_complete Method
 
-On input plugins, a complete schema created with metadata can be
-exported to Designer for a precise data schema.
+On input plugins, you can export a complete schema created with metadata to Designer for a precise data schema.
 
 ## Use Cases
 
 ### Define a Schema at \_\_init\_\_
 
-In this example, we specify type `int16` for
+This example specifies type `int16` for
 column `volts` and type
 `string` for column
 `device`.
@@ -188,7 +187,7 @@ metadata for 1 column, of the following format (in this example):
 
 ###### Note
 You can see in the above example that a number represents the type.
-Please refer to the Types section below for the mapping between type id
+Please refer to the Types section below for the mapping between type ID
 and type names.
 
 

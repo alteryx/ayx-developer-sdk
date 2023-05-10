@@ -149,9 +149,9 @@ commands to doit tasks.
 
 ### _"Do I need to whitelist anything to use the CLI?"_
 
-To download and install the CLI, be notified of a newer version of the
+To download and install the CLI, receive notifications of newer versions of the
 CLI, or check for updates to the CLI, you need to whitelist
-[https://pypi.org/](https://pypi.org/).
+https://pypi.org/.
 Otherwise, feel free to use the CLI completely offline.
 
 ### _"What packages do I need to download?"_
@@ -232,10 +232,10 @@ The CLI facilitates the process of custom tool creation for any SDK.
 ## _"What's the difference between sdk-workspace-init and create-ayx-plugin commands?"_
 
 -   `sdk-workspace-init`: This command initializes a workspace directory
-    --- think of this as a project playground where all your custom
-    plugins exist. The workspace directory will be setup with a
-    pre-defined folder structure which enables the rest of the CLI
-    commands to properly function.
+	--- think of this as a project playground where all your custom
+	plugins exist. The workspace directory is set up with a
+	pre-defined folder structure, which enables the rest of the CLI
+commands to properly function.
 -   `create-ayx-plugin`: This command adds a plugin to the workspace.
     You must choose a template tool type and specify a tool name.
 

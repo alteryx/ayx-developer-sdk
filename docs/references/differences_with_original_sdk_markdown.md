@@ -21,13 +21,12 @@ Getting Started
 Getting started in the old SDK typically means looking at an example
 plugin, copying the code and file structure, and then modifying it to
 suit your own needs. The new SDK provides a command-line interface (CLI)
-that takes care of all of this project setup. Access the documentation
-[here](https://help.alteryx.com/developer-help/ayx-plugin-cli-quickstart).
+that takes care of all of this project setup. Go to the [documentation](https://help.alteryx.com/developer-help/ayx-plugin-cli-quickstart) for more information.
 
 Development
 -----------
 
-In the original Python SDK, the backend of a tool is developed via a
+In the original Python SDK, the back end of a tool is developed via a
 class definition that satisfies the interface described in the [AYX
 Plugin Python
 Class](https://help.alteryx.com/current/developer-help/ayxplugin-python-class)
@@ -43,25 +42,24 @@ lines.
 To alleviate this problem, the new SDK simplifies the interface that
 must be satisfied, to a bare minimum set of requirements.
 
-Similar to the original SDK, in the new SDK a developer must write a
+Similar to the original SDK, in the new SDK, you must write a
 `Plugin` class. In the new SDK, a base class definition of `Plugin` is
-defined to be used as a parent. This gives the developer a level of
-comfort that they have implemented all necessary methods to have a valid
+defined to be used as a parent. This gives you a level of
+comfort that you have implemented all necessary methods to have a valid
 Alteryx Designer plugin.
 
 Additionally, in the original SDK, a class called `IncomingInterface`
 was required. This requirement was removed in the new SDK, as incoming
 interfaces and connections are handled behind the scenes by the SDK, and
-made available to the developer via the new `Provider` concept.
+made available to you via the new `Provider` concept.
 
 Deployment
 ----------
 
 Once plugin development is complete, the plugin is often distributed via
-the YXI file format. The instructions for packaging a YXI in the
-original SDK [can be found
-here](https://help.alteryx.com/current/developer-help/package-tool).
-However, this packaging process was significantly simplified by the new
+the YXI file format. You can find the instructions for packaging a YXI in the
+original SDK at [Package a Tool](https://help.alteryx.com/current/developer-help/package-tool).
+This packaging process was significantly simplified by the new
 SDK CLI, described in the [Getting
 Started](https://extensibility.pages.git.alteryx.com/ayx-sdks/getting_started.html)
 guide.

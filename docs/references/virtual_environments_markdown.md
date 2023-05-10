@@ -7,7 +7,7 @@ Developing in a Virtual Environment
 We recommend that you develop your custom plugins inside a virtual
 environment. This creates an isolated development environment that
 minimizes the risk of creating a package that Alteryx Designer and other
-users won\'t be able to use. It does this by keeping the dependencies
+users won't be able to use. To do this, it keeps the dependencies
 required by different projects separate.
 
 Workspace Setup

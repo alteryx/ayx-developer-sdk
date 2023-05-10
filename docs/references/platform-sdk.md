@@ -15,7 +15,7 @@ While Alteryx Designer provides a wide range of functionality with the
 available tools, you might find that you perform a specific action or
 task that could be better served by creating a custom tool or plugin.
 You can distribute custom tools within your organization and environment
-and still leverage the speed and flexibility of Designer and Gallery.
+and still leverage the speed and flexibility of Designer and Server.
 
 A custom tool or plugin consists of 2 components:
 

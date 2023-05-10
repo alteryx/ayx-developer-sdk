@@ -84,7 +84,7 @@ Running the File Provider
 -------------------------
 
 The file provider is run from a command-line argument. The only argument
-the user must pass in is a path to a JSON file with this format:
+you must pass in, is a path to a JSON file with this format:
 
 1.  `tool`: This is a dictionary with 2 keys: `plugin` and `path`.
 
@@ -101,10 +101,10 @@ the user must pass in is a path to a JSON file with this format:
     absolute path of the workflow\'s configuration file, in other words,
     `path/to/ExampleWorkflowConfig.xml`.
 4.  `inputs`: This is a list of dictionaries that contain information
-    about the tool\'s input connections. It is optional since not all
-    tools have input. The user should specify input information for each
-    input connection that is associated with this tool. Each input
-    dictionary has 3 keys: `anchor_name`, `records`, and `metadata`.
+	about the tool\'s input connections. It's optional since not all
+	tools have input. You should specify input information for each
+	input connection that is associated with this tool. Each input
+	dictionary has 3 keys: `anchor_name`, `records`, and `metadata`.
 
      -   `anchor_name`: Contains a string that corresponds to the name
          of the input connection\'s anchor, which has to match an input
@@ -121,6 +121,13 @@ the user must pass in is a path to a JSON file with this format:
     information for each output anchor that is associated with this
     tool. Each output dictionary has 3 keys: `anchor_name`, `records`,
     and `metadata`.
+
+	`outputs`: This is a list of dictionaries that specify where the
+	tool\'s output anchor information should be stored. It\'s optional
+	since not all tools have output. You should specify output
+	information for each output anchor that is associated with this
+	tool. Each output dictionary has 3 keys: `anchor_name`, `records`,
+	and `metadata`.
 
      -   `anchor_name`: Contains a string that corresponds to the name
          of the output anchor, which has to match an output anchor name

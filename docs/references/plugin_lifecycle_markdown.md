@@ -28,8 +28,8 @@ plugin. Any resources required to read from and write to Designer can be
 obtained via methods/properties on the `ProviderV2`.
 
 In Alteryx Designer, input anchors can have 1 or many connections. If
-you have any input connections, in the next stage of the lifecycle
-consists of each of those input connections sends data downstream. From
+you have any input connections, the next stage of the lifecycle
+consists of each of those input connections sending data downstream. From
 the `PluginV2` perspective, the `on_incoming_connection_complete` method
 is called for each connection once the engine is done sending records.
 The parameter that `on_record_batch` receives is the connection that a
@@ -80,7 +80,7 @@ Since the goal of an update-only run is to build output metadata, the
 `AMPProviderV2`, which sets incoming and outgoing anchor information,
 including the name and metadata. Additionally, since `__init__` runs in
 update-only mode, you should aim to perform a minimal amount of
-processing in this methods, since a fast update makes users happy.
+processing in this method, since a fast update makes users happy.
 
 Refer to the sequence diagram for a visual representation of this
 lifecycle:

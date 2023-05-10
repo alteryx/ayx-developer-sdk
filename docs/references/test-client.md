@@ -4,7 +4,7 @@
 
 The `ayx-sdk-cli` is the newest addition to the Alteryx Developer
 Experience product suite. It currently contains the Test Client and is
-the next iteration of CLI. The `ayx-sdk-cli` will house all the
+the next iteration of the CLI. The `ayx-sdk-cli` houses all the
 functionality for Desktop and future Cloud Developer Experience
 offerings.
 

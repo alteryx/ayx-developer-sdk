@@ -51,33 +51,34 @@ The `on_record_batch` method is called for each input connection on an
 anchor.
 
 This method also receives an `Anchor` object (as well as all the records
-and data sent from E2) in the form of a [PyArrows
+and data sent from AMP) in the form of a [PyArrows
 Table](https://arrow.apache.org/docs/python/generated/pyarrow.Table.html).
 
-In this method, the plugin writer can manipulate the data before writing
+In this method, you can manipulate the data before writing
 the data to the output anchor using
 `self.provider.write_to_anchor(self.output_anchor_name, table)`
+
 
 The on\_complete Method
 -----------------------
 
 The `on_complete` method is called at the end of the runtime execution.
 
-This typically does any cleanup required for the Ayx Plugin Tool. If the
-plugin is an Input tool-type, this method is used to read in the data
-from the datasource and push it to the output anchor. (since an Input
+This method typically does any cleanup required for the Ayx Plugin Tool. If the
+plugin is an Input tool type, this method is used to read the data
+from the data source and push it to the output anchor (since an Input
 tool-type has no input anchors or connections, and therefore
 `on_incoming_connection_complete` and `on_record_batch` are not called).
 
 Proxy Environment Configuration
 -------------------------------
 
-If you are running your plugin on a network that requires a proxy, you
-might encounter errors when you make external requests (An API as a data
-source, for example) We provide a convience function to inherit
+If you run your plugin on a network that requires a proxy, you
+might encounter errors when you make external requests (an API as a data
+source, for example). We provide a convenient function to inherit
 configuration from Designer in `proxy_requests`. The
 `proxy_requests.create_proxied_session` function returns a `PACSession`
 initialized with any found Designer proxy authentication settings. If
-you need any addition configuration, you can extend the `PACSession`
-further; see the [PyPAC Docs](https://pypac.readthedocs.io/en/latest/)
+you need any additional configuration, you can extend the PACSession
+further. Refer to the [PyPAC Docs](https://pypac.readthedocs.io/en/latest/)
 for more info.

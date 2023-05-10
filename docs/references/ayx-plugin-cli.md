@@ -180,8 +180,7 @@ optional.
 
 #### \--tool-name
 
-This parameter becomes the name of the tool. Spaces are allowed but will
-be cleaned into underscores and Pascal case. For example, for a Python
+This parameter becomes the name of the tool. Spaces are allowed but are cleaned into underscores and Pascal case. For example, for a Python
 plugin named "A Test Tool", the filename is `a_test_tool.py`, and the
 `class/ui/config` name is `ATestTool`.
 
@@ -231,13 +230,13 @@ This command takes no parameters.
 This command takes a YXI (any CLI-built or legacy SDK YXI) and installs
 it into Designer.
 
-Note: This command can be run from anywhere, not just Alteryx Workspace
+Note: You can run this command from anywhere, not just Alteryx Workspace
 directories.
 
 ### Parameters
 
 Note: If a parameter is not passed in as part of the CLI call, the CLI
-will wait for standard input for the ignored parameters, even if they're
+waits for standard input for the ignored parameters, even if they're
 optional.
 
 #### \--yxi-path
@@ -267,7 +266,7 @@ into Designer.
 ### Parameters
 
 Note: If a parameter is not passed in as part of the CLI call, the CLI
-will wait for standard input for the ignored parameters, even if they're
+waits for standard input for the ignored parameters, even if they're
 optional.
 
 #### \--install-type
@@ -392,8 +391,8 @@ To create a default tool with the AYX Plugin CLI, follow these steps.
 
 #### Initialize Workspace
 
-To initialize the plugin workspace, run `sdk-workspace-init`. You will
-be asked to define these items:
+To initialize the plugin workspace, run `sdk-workspace-init`. You need to define these items:
+
 
 -   Package Name: The name of the folder where you will create tools.
 -   Tool Category: The Alteryx Designer tool category where all of the
@@ -406,7 +405,7 @@ be asked to define these items:
 
 #### Add Plugin
 
-Once your workspace is ready, run `create-ayx-plugin`. You will be asked
+Once your workspace is ready, run `create-ayx-plugin`. You need
 to define these items:
 
 -   Tool Name: The display name of the tool in Alteryx Designer.

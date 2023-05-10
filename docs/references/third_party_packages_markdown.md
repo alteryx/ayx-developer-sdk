@@ -13,11 +13,11 @@ There are 2 options:
 1.  Manually add dependencies. If you use this approach, make sure to
     include all dependencies (including any sub-dependencies).
 
-2. Use `pip freeze > requirements.txt` to generate a new
-requirements.txt file in the workspace. You will need to prune this file
-to remove any dependencies that aren\'t explicitly imported or required
-by your plugin. Do this before you copy or overwrite the contents to the
-`requirements-thirdparty.txt` file
+2. 	Use `pip freeze > requirements.txt` to generate a new
+	requirements.txt file in the workspace. You need to prune this file
+	to remove any dependencies that aren't explicitly imported or required
+	by your plugin. Do this before you copy or overwrite the contents to the
+	`requirements-thirdparty.txt` file.
 
 Using 3rd-party Packages in Code
 --------------------------------

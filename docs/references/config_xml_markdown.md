@@ -37,14 +37,9 @@ These are the permissible XML tags and their explanations:
  -   `<InputConnections>`: The input anchors for the Ayx Plugin Tool.
 
       -   `<Connection>`: An individual anchor attached to the tool.
-      -   `<Connection>`: An individual anchor attached to the tool.
-      -   `Name`: The name of the input anchor. This name is
       -   `Name`: The name of the input anchor. This name is
           referenced in the Alteryx Core SDK to look up anchors for
-          referenced in the Alteryx Core SDK to look up anchors for
           receiving and setting data.
-          receiving and setting data.
-      -   `AllowMultiple`: A flag that indicates whether multiple
       -   `AllowMultiple`: A flag that indicates whether multiple
           connections can be fed into this anchor.
       -   `Optional`: A flag that indicates whether a connection to
