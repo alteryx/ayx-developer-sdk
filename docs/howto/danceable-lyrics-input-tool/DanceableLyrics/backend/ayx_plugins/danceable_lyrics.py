@@ -14,7 +14,10 @@
 """Example input tool."""
 from collections import namedtuple
 
+from pathlib import Path
+
 from ayx_python_sdk.core import PluginV2
+from ayx_python_sdk.core.exceptions import WorkflowRuntimeError
 from ayx_python_sdk.core.field import FieldType
 from ayx_python_sdk.core.utils import create_schema
 from ayx_python_sdk.providers.amp_provider.amp_provider_v2 import AMPProviderV2
@@ -26,13 +29,35 @@ import pyarrow as pa
 class DanceableLyrics(PluginV2):
     """Concrete implementation of an AyxPlugin."""
 
+    @staticmethod
+    def _validate_datasets_dir(datasets_dir: Path) -> None:
+        if not datasets_dir.is_dir():
+            raise WorkflowRuntimeError("Bad path")
+
+        filenames = [
+            "artists.csv",
+            "tracks.csv",
+            "r_track_artist.csv",
+            "genius_song_lyrics.csv",
+            "audio_features.csv"
+        ]
+        nonexistent_files = ','.join(map(str, list(
+            filter(lambda filepath: not filepath.is_file(), map(lambda filename: (datasets_dir / filename), filenames))
+        )))
+
+        if len(nonexistent_files) != 0:
+            raise WorkflowRuntimeError(
+                f"Expected files not found: {nonexistent_files}")
+
     def __init__(self, provider: AMPProviderV2) -> None:
         """Construct a plugin."""
         self.provider = provider
         self.name = "DanceableLyrics"
 
-        # To build a more flexible plugin, read input path(s) from the user
-        self.DATASETS_BASE = "c:/users/alteryx/DanceableLyricsData/"
+        # Point this variable to your extracted datasets directory:
+        self.DATASETS_BASE = Path("c:/users/alteryx/DanceableLyricsData/")
+
+        self._validate_datasets_dir(self.DATASETS_BASE)
 
         self.provider.push_outgoing_metadata(
             "Output",
@@ -72,7 +97,7 @@ class DanceableLyrics(PluginV2):
         self.provider.io.info(f"{self.name} gathering sample lyrics...")
 
         sample = (
-            pl.scan_csv(self.DATASETS_BASE + "genius_song_lyrics.csv")
+            pl.scan_csv(self.DATASETS_BASE / "genius_song_lyrics.csv")
             .select(
                 pl.col("title").str.to_lowercase().alias("track_name"),
                 pl.col("artist").str.to_lowercase().alias("artist_name"),
@@ -91,7 +116,7 @@ class DanceableLyrics(PluginV2):
         self.provider.io.info(f"{self.name} gathering danceable track information...")
 
         artists = (
-            pl.scan_csv(self.DATASETS_BASE + "artists.csv")
+            pl.scan_csv(self.DATASETS_BASE / "artists.csv")
             .select(
                 pl.col("name").str.to_lowercase().alias("artist_name"),
                 pl.col("id").alias("artist_id"),
@@ -100,7 +125,7 @@ class DanceableLyrics(PluginV2):
         )
 
         tracks = (
-            pl.scan_csv(self.DATASETS_BASE + "tracks.csv")
+            pl.scan_csv(self.DATASETS_BASE / "tracks.csv")
             .select(
                 pl.col("name").str.to_lowercase().alias("track_name"),
                 pl.col("id").alias("track_id"),
@@ -111,14 +136,14 @@ class DanceableLyrics(PluginV2):
         )
 
         track_artists = (
-            pl.scan_csv(self.DATASETS_BASE + "r_track_artist.csv")
+            pl.scan_csv(self.DATASETS_BASE / "r_track_artist.csv")
             .select(pl.col("track_id"), pl.col("artist_id"))
             .sort("track_id")
             .collect()
         )
 
         audio_features = (
-            pl.scan_csv(self.DATASETS_BASE + "audio_features.csv")
+            pl.scan_csv(self.DATASETS_BASE / "audio_features.csv")
             .select(pl.col("id").alias("track_id"), "danceability", "energy", "tempo",)
             .filter(pl.col("danceability").is_between(*self.DANCEABILITY_RANGE))
             .filter(pl.col("energy").is_between(*self.ENERGY_RANGE))
