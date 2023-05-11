@@ -80,7 +80,7 @@ YXIs.
 # AYX Plugin CLI Commands
 
 Explore the [AYX Plugin
-CLI](https://help.alteryx.com/developer-help/ayx-plugin-cli) commands and parameters.
+CLI](./ayx-plugin-cli.md) commands and parameters.
 
 ## sdk-workspace-init
 

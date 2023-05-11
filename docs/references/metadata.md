@@ -218,7 +218,7 @@ The result dictionary looks like this:
 ![Workflow Metadata Lifecycle Diagram](assets/workflow-metadata-lifecycle.png)
 
 You can find a more complete example at [Metadata Plugin
-Example](https://help.alteryx.com/developer-help/metadata-plugin-example).
+Example](./metadata-plugin-example.py).
 
 ## Types
 

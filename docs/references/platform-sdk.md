@@ -27,11 +27,11 @@ A custom tool or plugin consists of 2 components:
 2.  The engine, which processes logic to handle records passed to and
     from the Alteryx Engine. To create the engine component, use the
     [AYX Python
-    SDK](https://help.alteryx.com/developer-help/ayx-python-sdk).
+    SDK](./ayx-python-sdk-v2.md).
 
 To help facilitate the creation of a custom tool or plugin, you can
 leverage the [AYX Plugin
-CLI](https://help.alteryx.com/developer-help/ayx-plugin-cli).
+CLI](./ayx-plugin-cli.md).
 This command-line tool walks you through generating the set of files and
 folders needed for your custom project. The CLI includes commands for
 common tasks like packaging the tool for deployment.
@@ -57,38 +57,5 @@ respective help page below.
 ### SDK Quickstart Guide
 
 Visit the [Platform SDK Quickstart
-Guide](https://help.alteryx.com/developer-help/platform-sdk-quickstart-guide) to learn how to use the latest developer tools to
+Guide](../howto/platform-sdk-quickstart-guide.md) to learn how to use the latest developer tools to
 create a custom plugin or tool for use in Alteryx.
-
-### Explore SDK Resources
-
-Visit these additional SDK resources:
-
--   [SDK Quickstart
-    Guide](https://help.alteryx.com/developer-help/platform-sdk-quickstart-guide)
--   [AYX Plugin CLI
-    Quickstart](https://help.alteryx.com/developer-help/ayx-plugin-cli)
-    -   [CLI
-        Overview](https://help.alteryx.com/developer-help/ayx-plugin-cli-overview)
-    -   [Command
-        Reference](https://help.alteryx.com/developer-help/ayx-plugin-cli-commands)
--   [AYX Python SDK
-    v2](https://help.alteryx.com/developer-help/ayx-python-sdk-v2)
-    -   [Engine SDK vs Platform
-        SDK](https://help.alteryx.com/developer-help/engine-sdk-vs-platform-sdk-key-differences)
-    -   [AYX Python SDK
-        Documentation](https://alteryx.github.io/ayx-python-sdk/index.html)
-    -   [v2 Example
-        Tools](https://help.alteryx.com/developer-help/ayx-python-sdk-v2-example-tools)
-    -   [Release
-        Notes](https://help.alteryx.com/developer-help/ayx-python-sdk-release-notes)
--   [AYX UI
-    SDK](https://help.alteryx.com/developer-help/ayx-ui-sdk)
-    -   [HTML GUI SDK vs UI
-        SDK](https://help.alteryx.com/developer-help/html-gui-sdk-vs-ui-sdk-key-differences)
-    -   [Alteryx
-        Components](https://alteryx.github.io/alteryx-ui/)
-    -   [React
-        Communications](https://alteryx.github.io/react-comms/)
-    -   [Dev
-        Harness](https://github.com/alteryx/dev-harness)

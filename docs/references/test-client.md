@@ -195,7 +195,7 @@ This doesn\'t require a schema:
 
 
 ## Command Reference 
-Go to [Test Client Command Reference](https://help.alteryx.com/developer-help/test-client-command-reference) for detailed information.
+Go to [Test Client Command Reference](./test-client.md) for detailed information.
 # Test Client Command Reference
 
 ## Using Help
@@ -349,7 +349,7 @@ the specified outputs given.
 `ayx-sdk-cli.exe plugin run [WORKSPACE_PATH]::[PLUGIN_NAME] --input <[SOURCE][:TYPE[:OPTIONS]][@ANCHOR]> --output <[DESTINATION][:TYPE[:OPTIONS]][@ANCHOR]> --runtime-command`
 
 For more information, go to [Test
-Client](https://help.alteryx.com/developer-help/test-client).
+Client](./test-client.md).
 
 ### Self
 

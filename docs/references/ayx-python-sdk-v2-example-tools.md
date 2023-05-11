@@ -3,7 +3,7 @@
 ### Example Tools
 
 These are example tools created using version 2 the [AYX Python
-SDK](https://help.alteryx.com/developer-help/ayx-python-sdk). When the tools are installed, they display in the SDK
+SDK](./ayx-python-sdk-v2.md). When the tools are installed, they display in the SDK
 Examples tool category in Alteryx Designer.
 
 
@@ -45,7 +45,7 @@ An example input tool that connects to DCM via the UI window. You
 can [download](https://help.alteryx.com/sites/default/files/2022-02/DcmInputTool_0.yxi) and
 install this example in Alteryx Designer. For more about this tool, go
 to [DCM Input Example
-Tool](https://help.alteryx.com/developer-help/dcm-input-example-tool).
+Tool](./dcm-input-example-tool.md).
 
 #### Input Tool
 

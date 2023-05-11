@@ -69,7 +69,7 @@ We no longer require the use of Pandas and DataFrames for record IO. If your too
 
 ## _"Can I use Python’s multiprocessing and/or threads?"_
 
-Yes, but only if you really need to. Before you do, please read our [Extensibility Best Practices](best_practices.md).
+Yes, but only if you really need to. Before you do, please read our [Extensibility Best Practices](./best_practices.md).
 
 ## _"Can I run Plugins outside of Designer?"_
 
@@ -79,7 +79,7 @@ One way is to run directly with Python from the terminal. For example:
 C:\Users\Your.Name\AppData\Local\Alteryx\bin\Python\python-3.8.5-embed-amd64\python.exe main.pyz start-sdk-tool-service ayx_plugins Input
 ```
 
-Recently, we released the [Test Client CLI](https://help.alteryx.com/developer-help/test-client).
+Recently, we released the [Test Client CLI](./test-client.md).
 ```cmd
 ./ayx-sdk-cli.exe plugin run BaseTools::Passthrough --input input.csv --out output.csv
 ```
@@ -176,7 +176,7 @@ The requirements for each package are:
 
 The original [Python Engine
 SDK](https://help.alteryx.com/developer-help/python-engine-sdk) is complex, runs in-process, and can be slow. The [AYX
-Python SDK](https://help.alteryx.com/developer-help/ayx-python-sdk) design solves these issues. It runs
+Python SDK](./ayx-python-sdk-v2.md) design solves these issues. It runs
 out-of-process using gRPC to communicate. It also simplifies the
 development process of new tools to 4 function calls, abstracting away a
 lot of the previous SDK function calls.
@@ -188,7 +188,7 @@ multiple plugins and are not bound by the restrictions of the C++
 
 ## _"Python Engine SDK and AYX Python SDK. What's the difference?"_
 
-[AYX Python SDK](https://help.alteryx.com/developer-help/ayx-python-sdk-v2) is a new SDK product. It improves upon
+[AYX Python SDK](./ayx-python-sdk-v2) is a new SDK product. It improves upon
 the original Python Engine SDK by providing a consistent development
 experience moving forward. While the Python Engine SDK was designed to
 use the original engine, the new AYX Python SDK leverages the brand new [AMP
