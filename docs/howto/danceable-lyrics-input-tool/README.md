@@ -105,32 +105,22 @@ After you run the above setup procedures, you will have a file named `danceable_
 class DanceableLyrics(PluginV2):
     """Concrete implementation of an AyxPlugin."""
 
+    @staticmethod
+    def _validate_datasets_dir(datasets_dir: Path) -> None:
+        # truncated code
+
     def __init__(self, provider: AMPProviderV2) -> None:
         self.provider = provider
         # truncated code
 
     def on_incoming_connection_complete(self, anchor: namedtuple) -> None:
-        # truncated code
+        raise NotImplementedError("Input tools don't receive batches.")
 
-    def on_record_batch(self, batch: "Table", anchor: namedtuple) -> None:
-        # truncated code
+    def on_record_batch(self, batch: "pa.Table", anchor: namedtuple) -> None:
+        raise NotImplementedError("Input tools don't receive batches.")
 
     def on_complete(self) -> None:
-        import pandas as pd
-        import pyarrow as pa
-
-        df = pd.DataFrame(
-            {
-                "x": [1, 2, 3],
-                "y": ["hello", "world", "from ayx_python_sdk!"],
-                "z": [self.config_value, self.config_value, self.config_value],
-            }
-        )
-
-        packet = pa.Table.from_pandas(df)
-
-        self.provider.write_to_anchor("Output", packet)
-        self.provider.io.info("DanceableLyrics tool done.")
+        # truncated code
 ```
 
 ## Write a Plugin
@@ -190,16 +180,14 @@ It's probably a good idea to validate this path and ensure 1) that it exists, 2)
             "tracks.csv",
             "r_track_artist.csv",
             "genius_song_lyrics.csv",
-            "audio_features.csv"
+            "audio_features.csv",
         ]
-        nonexistent_files = list(
-            filter(lambda filepath: not filepath.is_file(), map(lambda filename: (datasets_dir / filename), filenames))
+        nonexistent_files = ", ".join(
+            filter(lambda filepath: not (datasets_dir / filepath).is_file(), filenames)
         )
 
-        if len(nonexistent_files) != 0:
-            raise WorkflowRuntimeError(
-                f"Expected files not found: {','.join(map(str, nonexistent_files))}")
-
+        if nonexistent_files:
+            raise WorkflowRuntimeError(f"Expected files not found: {nonexistent_files}")
 ```
 
 and then call this method like so:
@@ -214,18 +202,18 @@ and then call this method like so:
 Next, let's tell downstream tools what our plugin's metadata looks like. That is, what fields and their data types the plugin will output:
 
 ```python
-        self.provider.push_outgoing_metadata(
-            "Output",
-            create_schema(
-                {
-                    "artist_name": {"type": FieldType.v_wstring},
-                    "track_name": {"type": FieldType.v_wstring},
-                    "danceability": {"type": FieldType.float},
-                    "energy": {"type": FieldType.float},
-                    "track_id": {"type": FieldType.v_wstring},
-                }
-            ),
-        )
+    self.provider.push_outgoing_metadata(
+        "Output",
+        create_schema(
+            {
+                "artist_name": {"type": FieldType.v_wstring},
+                "track_name": {"type": FieldType.v_wstring},
+                "danceability": {"type": FieldType.float},
+                "energy": {"type": FieldType.float},
+                "track_id": {"type": FieldType.v_wstring},
+            }
+        ),
+    )
 ```
 
 Now Designer and downstream tools will know exactly what kind of data to expect from our plugin.
@@ -233,14 +221,14 @@ Now Designer and downstream tools will know exactly what kind of data to expect 
 Since we want to find the "most danceable" songs based on particular lyrics, let's provide some terms or phrases. Our tool will then gather songs (or "tracks") that contain lyrics with these terms.
 
 ```python
-        self.LYRICS_TERMS = [
-            "star wars",
-            "star trek",
-            "luke skywalker",
-            "captain kirk",
-            "spock",
-            "yoda",
-        ]
+    self.LYRICS_TERMS = [
+        "star wars",
+        "star trek",
+        "luke skywalker",
+        "captain kirk",
+        "spock",
+        "yoda",
+    ]
 ```
 
 > :warning: Be aware that these datasets are *not* filtered in any way, and songs or titles might contain explicit content!
@@ -248,74 +236,54 @@ Since we want to find the "most danceable" songs based on particular lyrics, let
 Finally, let's add some additional criteria for our analysis and an output message to display when the plugin is initialized. Feel free to play around with these values!
 
 ```python
-        self.DANCEABILITY_RANGE = [0.45, 0.99]
-        self.ENERGY_RANGE = [0.45, 0.75]
-        self.TEMPO_RANGE = [110.0, 140.0]
-        self.MIN_VIEWS = 1000
+    self.DANCEABILITY_RANGE = [0.45, 0.99]
+    self.ENERGY_RANGE = [0.45, 0.75]
+    self.TEMPO_RANGE = [110.0, 140.0]
+    self.MIN_VIEWS = 1000
 
-        self.provider.io.info(f"{self.name} initialized.")
+    self.provider.io.info(f"{self.name} initialized.")
 ```
 
 When you have completed the above steps, your `__init__` should look something like this:
 
 ```python
-    @staticmethod
-    def _validate_datasets_dir(datasets_dir: Path) -> None:
-        if not datasets_dir.is_dir():
-            raise WorkflowRuntimeError("Bad path")
+def __init__(self, provider: AMPProviderV2) -> None:
+    """Construct a plugin."""
+    self.provider = provider
+    self.name = "DanceableLyrics"
 
-        filenames = [
-            "artists.csv",
-            "tracks.csv",
-            "r_track_artist.csv",
-            "genius_song_lyrics.csv",
-            "audio_features.csv"
-        ]
-        nonexistent_files = list(
-            filter(lambda filepath: not filepath.is_file(), map(lambda filename: (datasets_dir / filename), filenames))
-        )
+    # Point this variable to your extracted datasets directory:
+    self.DATASETS_BASE = Path("c:/users/alteryx/DanceableLyricsData/")
 
-        if len(nonexistent_files) != 0:
-            raise WorkflowRuntimeError(
-                f"Expected files not found: {','.join(map(str, nonexistent_files))}")
+    self._validate_datasets_dir(self.DATASETS_BASE)
 
-    def __init__(self, provider: AMPProviderV2) -> None:
-        """Construct a plugin."""
-        self.provider = provider
-        self.name = "DanceableLyrics"
+    self.provider.push_outgoing_metadata(
+        "Output",
+        create_schema(
+            {
+                "artist_name": {"type": FieldType.v_wstring},
+                "track_name": {"type": FieldType.v_wstring},
+                "danceability": {"type": FieldType.float},
+                "energy": {"type": FieldType.float},
+                "track_id": {"type": FieldType.v_wstring},
+            }
+        ),
+    )
 
-        # Point this variable to your extracted datasets directory:
-        self.DATASETS_BASE = Path("c:/users/alteryx/DanceableLyricsData/")
+    self.LYRICS_TERMS = [
+        "star wars",
+        "star trek",
+        "luke skywalker",
+        "captain kirk",
+        "spock",
+        "yoda",
+    ]
+    self.DANCEABILITY_RANGE = [0.45, 0.99]
+    self.ENERGY_RANGE = [0.45, 0.75]
+    self.TEMPO_RANGE = [110.0, 140.0]
+    self.MIN_VIEWS = 1000
 
-        self._validate_datasets_dir(self.DATASETS_BASE)
-
-        self.provider.push_outgoing_metadata(
-            "Output",
-            create_schema(
-                {
-                    "artist_name": {"type": FieldType.v_wstring},
-                    "track_name": {"type": FieldType.v_wstring},
-                    "danceability": {"type": FieldType.float},
-                    "energy": {"type": FieldType.float},
-                    "track_id": {"type": FieldType.v_wstring},
-                }
-            ),
-        )
-
-        self.LYRICS_TERMS = [
-            "star wars",
-            "star trek",
-            "luke skywalker",
-            "captain kirk",
-            "spock",
-            "yoda",
-        ]
-        self.DANCEABILITY_RANGE = [0.45, 0.99]
-        self.ENERGY_RANGE = [0.45, 0.75]
-        self.TEMPO_RANGE = [110.0, 140.0]
-        self.MIN_VIEWS = 1000
-
-        self.provider.io.info(f"{self.name} initialized.")
+    self.provider.io.info(f"{self.name} initialized.")
 ```
 
 > :information_source: To make your Input plugin more dynamic, you can use the [Alteryx UI-SDK](https://github.com/alteryx/dev-harness) and have a user supply many of the variables above.
@@ -326,123 +294,120 @@ Now it's time to process some data! Since we don't currently attempt incoming da
 Our first data input is from the `genius_song_lyrics.csv` file, where we will discover songs with lyrics that contain our search terms:
 
 ```python
-    def on_complete(self) -> None:
-        self.provider.io.info(f"{self.name} gathering sample lyrics...")
+def on_complete(self) -> None:
 
-        sample = (
-            pl.scan_csv(self.DATASETS_BASE / "genius_song_lyrics.csv")
-            .select(
-                pl.col("title").str.to_lowercase().alias("track_name"),
-                pl.col("artist").str.to_lowercase().alias("artist_name"),
-                "lyrics",
-                "language",
-                "views",
-            )
-            .filter(
-                pl.col("lyrics").str.contains("(?i)" + "|(?i)".join(self.LYRICS_TERMS))
-            )
-            .filter(pl.col("language") == "en")
-            .filter(pl.col("views") > self.MIN_VIEWS)
-            .collect()
+    self.provider.io.info(f"{self.name} building sample lyrics query...")
+
+    sample = (
+        pl.scan_csv(self.DATASETS_BASE / "genius_song_lyrics.csv")
+        .select(
+            pl.col("title").str.to_lowercase().alias("track_name"),
+            pl.col("artist").str.to_lowercase().alias("artist_name"),
+            "lyrics",
+            "language",
+            "views",
         )
+        .filter(
+            (pl.col("views") > self.MIN_VIEWS)
+            & (pl.col("language") == "en")
+            & (
+                pl.col("lyrics").str.contains(
+                    "(?i)" + "|(?i)".join(self.LYRICS_TERMS)
+                )
+            )
+        )
+        .select("track_name", "artist_name")
+    )
 ```
 
-Above, we tell Polars to create a [DataFrame](https://pola-rs.github.io/polars/py-polars/html/reference/dataframe/index.html) that contains select columns from rows that match our criteria. We also normalize some column names— we lowercase them and add aliases in our output. In our `filter` clause, we build a case-insensitive [regular expression](https://en.wikipedia.org/wiki/Regular_expression) from our list of terms. Finally, we filter out non-English terms and restrict results to only entries with more than `self.MIN_VIEWS`. You might want to alter these criteria a bit. For example, you might want to allow other languages.
+Above, we tell Polars to create a [LazyFrame](https://pola-rs.github.io/polars/py-polars/html/reference/lazyframe/index.html) that contains select columns from rows that match our criteria. We also normalize some column names—we lowercase them and add aliases in the output. In the `filter` clause, we build a case-insensitive [regular expression](https://en.wikipedia.org/wiki/Regular_expression) from the list of terms. We then filter out non-English terms and restrict results to only entries with more than `self.MIN_VIEWS`. Finally, we only use `track_name` and `artist_name` in the query. You might want to alter these criteria a bit. For example, you might want to allow other languages.
 
 The next section of code reads from multiple input files and joins them into a single `danceable_tracks` view of the data that contains columns that match our criteria.
 
 ```python
-        self.provider.io.info(f"{self.name} gathering danceable track information...")
+    self.provider.io.info(
+        f"{self.name} building danceable track information query..."
+    )
 
-        artists = (
-            pl.scan_csv(self.DATASETS_BASE / "artists.csv")
-            .select(
-                pl.col("name").str.to_lowercase().alias("artist_name"),
-                pl.col("id").alias("artist_id"),
-            )
-            .collect()
-        )
+    artists = pl.scan_csv(self.DATASETS_BASE / "artists.csv").select(
+        pl.col("name").str.to_lowercase().alias("artist_name"),
+        pl.col("id").alias("artist_id"),
+    )
 
-        tracks = (
-            pl.scan_csv(self.DATASETS_BASE / "tracks.csv")
-            .select(
-                pl.col("name").str.to_lowercase().alias("track_name"),
-                pl.col("id").alias("track_id"),
-                "explicit",
-            )
-            .filter(pl.col("explicit") == 0)
-            .collect()
+    tracks = (
+        pl.scan_csv(self.DATASETS_BASE / "tracks.csv")
+        .select(
+            pl.col("name").str.to_lowercase().alias("track_name"),
+            pl.col("id").alias("track_id"),
+            "explicit",
         )
+        .filter(pl.col("explicit") == 0)
+    )
 
-        track_artists = (
-            pl.scan_csv(self.DATASETS_BASE / "r_track_artist.csv")
-            .select(pl.col("track_id"), pl.col("artist_id"))
-            .sort("track_id")
-            .collect()
+    audio_features = (
+        pl.scan_csv(self.DATASETS_BASE / "audio_features.csv")
+        .select(pl.col("id").alias("track_id"), "danceability", "energy", "tempo",)
+        .filter(
+            (pl.col("danceability").is_between(*self.DANCEABILITY_RANGE))
+            & (pl.col("energy").is_between(*self.ENERGY_RANGE))
+            & (pl.col("tempo").is_between(*self.TEMPO_RANGE))
         )
+    )
 
-        audio_features = (
-            pl.scan_csv(self.DATASETS_BASE / "audio_features.csv")
-            .select(pl.col("id").alias("track_id"), "danceability", "energy", "tempo",)
-            .filter(pl.col("danceability").is_between(*self.DANCEABILITY_RANGE))
-            .filter(pl.col("energy").is_between(*self.ENERGY_RANGE))
-            .filter(pl.col("tempo").is_between(*self.TEMPO_RANGE))
-            .sort("track_id")
-            .collect()
-        )
+    track_artists = (
+        pl.scan_csv(self.DATASETS_BASE / "r_track_artist.csv")
+        .select("track_id", "artist_id")
+        .join(artists, on="artist_id")
+        .join(tracks, on="track_id")
+        .join(audio_features, on="track_id")
+    )
 
-        danceability_tracks = (
-            track_artists.join(artists, on="artist_id")
-            .join(tracks, on="track_id")
-            .join(audio_features, on="track_id")
+    danceability_tracks = (
+        track_artists.select(
+            "artist_name",
+            "track_name",
+            "danceability",
+            "energy",
+            ("https://open.spotify.com/track/" + pl.col("track_id")),
         )
+        .groupby(["artist_name", "track_name"])
+        .agg([pl.all().sort_by("danceability", descending=True).first()])
+    )
 ```
 
-If we output danceability_tracks via `print(danceability_tracks)`, we'll see a header similar to this:
+The above code joins `track_artists` against `artists`, `tracks`, and `audio_features`. `danceability_tracks` is then created by selecting the desired columns from `track_artists`. We also prefix the `track_id` with a base URL to build a full Spotify open link.
+
+We then group by `artist_name` and `track_name`. Each group is sorted by `danceability`, and the row with the highest `danceability` is taken.
+
+If we output `danceability_tracks` via `print(danceability_tracks.collect())`, we'll see a header similar to this:
 
 ```txt
-track_id | artist_id | artist_name | track_name | explicit | danceability | energy | tempo
+artist_name | track_name | danceability | energy | literal
 ```
 As you can see, this combines data from multiple sources.
 
 Now that we have both a sample of songs with lyrics that contain our terms and track information that includes "danceability", let's find our matches! Add this code:
 
 ```python
-        self.provider.io.info(f"{self.name} calculating final results...")
+    self.provider.io.info(f"{self.name} calculating final results...")
 
-        matches = pl.DataFrame()
-        for row in sample.rows(named=True):
-            artist = row["artist_name"]
-            track = row["track_name"]
-            m = (
-                danceability_tracks.select(
-                    "artist_name",
-                    "track_name",
-                    "danceability",
-                    "energy",
-                    ("https://open.spotify.com/track/" + pl.col("track_id")),
-                )
-                .filter(pl.col("artist_name") == artist)
-                .filter(pl.col("track_name") == track)
-                .limit(1)
-            )
-
-            if not m.is_empty():
-                matches = pl.concat([matches, m])
-
-        matches = matches.sort("danceability", descending=True)
+    matches = (
+        danceability_tracks.join(sample, on=["artist_name", "track_name"])
+        .sort("danceability", descending=True)
+        .collect()
+    )
 ```
 
-The above code loops over all the rows in our sample. Since we provide `named=True`, Polars also includes the column name in each `row` value. We then look for a single match with a matching `artist_name` and `track_name` (via `limit(1)`) in `danceability_tracks`. Additionally, we prefix the `track_id` with a base URL to build a full Spotify open link. We append to the `matches` `DataFrame` for any matches. Finally, we sort the results by `danceability`.
+The above code joins `danceability_tracks` with the entries in `sample`. The results are then sorted by `danceability`.
 
 Now that we have our `matches`, let's output them to Designer!
 
 ```python
-        self.provider.write_to_anchor(
-            "Output", pa.Table.from_pandas(matches.to_pandas())
-        )
+    self.provider.write_to_anchor(
+        "Output", pa.Table.from_pandas(matches.to_pandas())
+    )
 
-        self.provider.io.info(f"{self.name} finished.")
+    self.provider.io.info(f"{self.name} finished.")
 ```
 
 > :information_source: You might notice something a bit odd here. We are constructing a PyArrow table (`pa.Table`) from a Pandas frame converted from Polars. This is because the current version of Polars `to_arrow()` produces unexpected results. Perhaps newer versions won't require this workaround.
@@ -453,100 +418,93 @@ Now that we have our `matches`, let's output them to Designer!
 Let's take a look at our final `on_complete`. It should look like something like this:
 
 ```python
-    def on_complete(self) -> None:
-        self.provider.io.info(f"{self.name} gathering sample lyrics...")
+def on_complete(self) -> None:
 
-        sample = (
-            pl.scan_csv(self.DATASETS_BASE / "genius_song_lyrics.csv")
-            .select(
-                pl.col("title").str.to_lowercase().alias("track_name"),
-                pl.col("artist").str.to_lowercase().alias("artist_name"),
-                "lyrics",
-                "language",
-                "views",
-            )
-            .filter(
-                pl.col("lyrics").str.contains("(?i)" + "|(?i)".join(self.LYRICS_TERMS))
-            )
-            .filter(pl.col("language") == "en")
-            .filter(pl.col("views") > self.MIN_VIEWS)
-            .collect()
+    self.provider.io.info(f"{self.name} building sample lyrics query...")
+
+    sample = (
+        pl.scan_csv(self.DATASETS_BASE / "genius_song_lyrics.csv")
+        .select(
+            pl.col("title").str.to_lowercase().alias("track_name"),
+            pl.col("artist").str.to_lowercase().alias("artist_name"),
+            "lyrics",
+            "language",
+            "views",
         )
-
-        self.provider.io.info(f"{self.name} gathering danceable track information...")
-
-        artists = (
-            pl.scan_csv(self.DATASETS_BASE / "artists.csv")
-            .select(
-                pl.col("name").str.to_lowercase().alias("artist_name"),
-                pl.col("id").alias("artist_id"),
-            )
-            .collect()
-        )
-
-        tracks = (
-            pl.scan_csv(self.DATASETS_BASE / "tracks.csv")
-            .select(
-                pl.col("name").str.to_lowercase().alias("track_name"),
-                pl.col("id").alias("track_id"),
-                "explicit",
-            )
-            .filter(pl.col("explicit") == 0)
-            .collect()
-        )
-
-        track_artists = (
-            pl.scan_csv(self.DATASETS_BASE / "r_track_artist.csv")
-            .select(pl.col("track_id"), pl.col("artist_id"))
-            .sort("track_id")
-            .collect()
-        )
-
-        audio_features = (
-            pl.scan_csv(self.DATASETS_BASE / "audio_features.csv")
-            .select(pl.col("id").alias("track_id"), "danceability", "energy", "tempo",)
-            .filter(pl.col("danceability").is_between(*self.DANCEABILITY_RANGE))
-            .filter(pl.col("energy").is_between(*self.ENERGY_RANGE))
-            .filter(pl.col("tempo").is_between(*self.TEMPO_RANGE))
-            .sort("track_id")
-            .collect()
-        )
-
-        danceability_tracks = (
-            track_artists.join(artists, on="artist_id")
-            .join(tracks, on="track_id")
-            .join(audio_features, on="track_id")
-        )
-
-        self.provider.io.info(f"{self.name} calculating final results...")
-
-        matches = pl.DataFrame()
-        for row in sample.rows(named=True):
-            artist = row["artist_name"]
-            track = row["track_name"]
-            m = (
-                danceability_tracks.select(
-                    "artist_name",
-                    "track_name",
-                    "danceability",
-                    "energy",
-                    ("https://open.spotify.com/track/" + pl.col("track_id")),
+        .filter(
+            (pl.col("views") > self.MIN_VIEWS)
+            & (pl.col("language") == "en")
+            & (
+                pl.col("lyrics").str.contains(
+                    "(?i)" + "|(?i)".join(self.LYRICS_TERMS)
                 )
-                .filter(pl.col("artist_name") == artist)
-                .filter(pl.col("track_name") == track)
-                .limit(1)
             )
-
-            if not m.is_empty():
-                matches = pl.concat([matches, m])
-
-        matches = matches.sort("danceability", descending=True)
-
-        self.provider.write_to_anchor(
-            "Output", pa.Table.from_pandas(matches.to_pandas())
         )
+        .select("track_name", "artist_name")
+    )
 
-        self.provider.io.info(f"{self.name} finished.")
+    self.provider.io.info(
+        f"{self.name} building danceable track information query..."
+    )
+
+    artists = pl.scan_csv(self.DATASETS_BASE / "artists.csv").select(
+        pl.col("name").str.to_lowercase().alias("artist_name"),
+        pl.col("id").alias("artist_id"),
+    )
+
+    tracks = (
+        pl.scan_csv(self.DATASETS_BASE / "tracks.csv")
+        .select(
+            pl.col("name").str.to_lowercase().alias("track_name"),
+            pl.col("id").alias("track_id"),
+            "explicit",
+        )
+        .filter(pl.col("explicit") == 0)
+    )
+
+    audio_features = (
+        pl.scan_csv(self.DATASETS_BASE / "audio_features.csv")
+        .select(pl.col("id").alias("track_id"), "danceability", "energy", "tempo",)
+        .filter(
+            (pl.col("danceability").is_between(*self.DANCEABILITY_RANGE))
+            & (pl.col("energy").is_between(*self.ENERGY_RANGE))
+            & (pl.col("tempo").is_between(*self.TEMPO_RANGE))
+        )
+    )
+
+    track_artists = (
+        pl.scan_csv(self.DATASETS_BASE / "r_track_artist.csv")
+        .select("track_id", "artist_id")
+        .join(artists, on="artist_id")
+        .join(tracks, on="track_id")
+        .join(audio_features, on="track_id")
+    )
+
+    danceability_tracks = (
+        track_artists.select(
+            "artist_name",
+            "track_name",
+            "danceability",
+            "energy",
+            ("https://open.spotify.com/track/" + pl.col("track_id")),
+        )
+        .groupby(["artist_name", "track_name"])
+        .agg([pl.all().sort_by("danceability", descending=True).first()])
+    )
+
+    self.provider.io.info(f"{self.name} calculating final results...")
+
+    matches = (
+        danceability_tracks.join(sample, on=["artist_name", "track_name"])
+        .sort("danceability", descending=True)
+        .collect()
+    )
+
+    self.provider.write_to_anchor(
+        "Output", pa.Table.from_pandas(matches.to_pandas())
+    )
+
+    self.provider.io.info(f"{self.name} finished.")
 ```
 
 ## Package into a YXI
