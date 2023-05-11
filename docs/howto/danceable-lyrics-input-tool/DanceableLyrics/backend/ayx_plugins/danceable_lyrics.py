@@ -41,16 +41,8 @@ class DanceableLyrics(PluginV2):
             "genius_song_lyrics.csv",
             "audio_features.csv",
         ]
-        nonexistent_files = ",".join(
-            map(
-                str,
-                list(
-                    filter(
-                        lambda filepath: not filepath.is_file(),
-                        map(lambda filename: (datasets_dir / filename), filenames),
-                    )
-                ),
-            )
+        nonexistent_files = ", ".join(
+            filter(lambda filepath: not (datasets_dir / filepath).is_file(), filenames)
         )
 
         if nonexistent_files:
