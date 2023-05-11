@@ -2,21 +2,10 @@
 
 #### Python SDK v2
 
-Version 2 of AYX Python SDK is now available. For the best experience,
-and to ensure compatibility with the most recent versions of Designer,
-please use v2 of [AYX Python
-SDK.](https://help.alteryx.com/developer-help/ayx-python-sdk-v2)
-
--   To learn more about v2 of the AYX Python SDK, go to [Changes and
-    Improvements to Python SDK in
-    v2.0.0](https://help.alteryx.com/developer-help/changes-and-improvements-python-sdk-v2).
--   If you need to access v1 documentation, you can [download the
-    content](https://help.alteryx.com/sites/default/files/2022-02/1.0_0.zip).
-
 The steps below illustrate how to use the latest developer tools to
 create a custom plugin or tool for use in Alteryx. For more information
 about new SDKs and their usage within Alteryx, please visit [Platform
-SDK](https://help.alteryx.com/developer-help/platform-sdk).
+SDK](../references/platform-sdk.md).
 
 ### Requirements and Prerequisites
 
@@ -30,7 +19,7 @@ machine:
 -   [node](https://nodejs.org/en/download/) [14](https://nodejs.org/en/blog/release/v14.17.3/)
 -   [Git](https://git-scm.com/downloads)
 
-\*Alteryx Designer version 2021.4 is required to use the Alteryx Python
+\*Alteryx Designer version 2021.4 or greater is required to use the Alteryx Python
 SDK v2.0.0.
 
 ### CLI
@@ -84,7 +73,7 @@ location of your workspace and view the files that were created for the
 new plugin.
 
 For more information about the CLI, please visit the [reference
-documents](https://help.alteryx.com/developer-help/ayx-plugin-cli-overview).
+documents](../references/ayx-plugin-cli.md).
 
 ### UI SDK
 
@@ -137,17 +126,6 @@ documents](https://alteryx.github.io/alteryx-ui/).
 
 ### Python SDK
 
-#### Warning
-V1 of AYX Python SDK is only compatible with Alteryx Designer versions
-2021.2 and 2021.3. For the best experience, and to ensure compatibility
-with the most recent versions of Designer, please use [version 2 of AYX
-Python
-SDK](https://help.alteryx.com/developer-help/ayx-python-sdk-v2).
-
-To learn more about version 2 of the AYX Python SDK, go to [Changes and
-Improvements to Python SDK in
-v2.0.0](https://help.alteryx.com/developer-help/changes-and-improvements-python-sdk-v2).
-
 
 The Python SDK defines the way that you should create the engine/back
 end/runtime of your tool. The back end also receives the configuration
@@ -173,7 +151,7 @@ Open Alteryx Designer, search for your tool, place it on the canvas, and
 view the changes.
 
 For more information about the Python SDK, please go to the [reference
-documents](https://help.alteryx.com/developer-help/ayx-python-sdk) or access the full [Python
+documents](../references/ayx-python-sdk-v2.md) or access the full [Python
 SDK documentation](https://alteryx.github.io/ayx-python-sdk/index.html).
 You can also access this documentation locally via this command:
 

@@ -132,10 +132,10 @@ can be changed at any time to any Python file as long as it contains a
 `Plugin` class that registers with the Alteryx Core SDK.
 
 -   For a detailed explanation of the Config.xml file, go to [Tool
-	Configurations.](https://extensibility.pages.git.alteryx.com/ayx-sdks/python-sdk/config_xml.html).
+	Configurations.](../references/config_xml_markdown.md).
 -   For information on the main.py file within your Ayx Plugin Tool,
 	go to [Plugin Code
-	Overview.](https://extensibility.pages.git.alteryx.com/ayx-sdks/python-sdk/plugin_code.html).
+	Overview.](../references/plugin_code_markdown.md).
 
 ### Configuration Panel GUI
 
