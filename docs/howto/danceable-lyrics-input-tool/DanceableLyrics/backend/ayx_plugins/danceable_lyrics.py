@@ -39,15 +39,22 @@ class DanceableLyrics(PluginV2):
             "tracks.csv",
             "r_track_artist.csv",
             "genius_song_lyrics.csv",
-            "audio_features.csv"
+            "audio_features.csv",
         ]
-        nonexistent_files = ','.join(map(str, list(
-            filter(lambda filepath: not filepath.is_file(), map(lambda filename: (datasets_dir / filename), filenames))
-        )))
+        nonexistent_files = ",".join(
+            map(
+                str,
+                list(
+                    filter(
+                        lambda filepath: not filepath.is_file(),
+                        map(lambda filename: (datasets_dir / filename), filenames),
+                    )
+                ),
+            )
+        )
 
-        if len(nonexistent_files) != 0:
-            raise WorkflowRuntimeError(
-                f"Expected files not found: {nonexistent_files}")
+        if nonexistent_files:
+            raise WorkflowRuntimeError(f"Expected files not found: {nonexistent_files}")
 
     def __init__(self, provider: AMPProviderV2) -> None:
         """Construct a plugin."""
@@ -112,8 +119,8 @@ class DanceableLyrics(PluginV2):
                 & (
                     pl.col("lyrics").str.contains(
                         "(?i)" + "|(?i)".join(self.LYRICS_TERMS)
-            )
-        )
+                    )
+                )
             )
             .select("track_name", "artist_name")
         )
@@ -123,9 +130,9 @@ class DanceableLyrics(PluginV2):
         )
 
         artists = pl.scan_csv(self.DATASETS_BASE / "artists.csv").select(
-                pl.col("name").str.to_lowercase().alias("artist_name"),
-                pl.col("id").alias("artist_id"),
-            )
+            pl.col("name").str.to_lowercase().alias("artist_name"),
+            pl.col("id").alias("artist_id"),
+        )
 
         tracks = (
             pl.scan_csv(self.DATASETS_BASE / "tracks.csv")
@@ -144,7 +151,7 @@ class DanceableLyrics(PluginV2):
                 (pl.col("danceability").is_between(*self.DANCEABILITY_RANGE))
                 & (pl.col("energy").is_between(*self.ENERGY_RANGE))
                 & (pl.col("tempo").is_between(*self.TEMPO_RANGE))
-        )
+            )
         )
 
         track_artists = (
@@ -157,15 +164,15 @@ class DanceableLyrics(PluginV2):
 
         danceability_tracks = (
             track_artists.select(
-                    "artist_name",
-                    "track_name",
-                    "danceability",
-                    "energy",
-                    ("https://open.spotify.com/track/" + pl.col("track_id")),
-                )
+                "artist_name",
+                "track_name",
+                "danceability",
+                "energy",
+                ("https://open.spotify.com/track/" + pl.col("track_id")),
+            )
             .groupby(["artist_name", "track_name"])
             .agg([pl.all().sort_by("danceability", descending=True).first()])
-            )
+        )
 
         self.provider.io.info(f"{self.name} calculating final results...")
 
