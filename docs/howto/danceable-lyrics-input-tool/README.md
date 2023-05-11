@@ -105,32 +105,22 @@ After you run the above setup procedures, you will have a file named `danceable_
 class DanceableLyrics(PluginV2):
     """Concrete implementation of an AyxPlugin."""
 
+    @staticmethod
+    def _validate_datasets_dir(datasets_dir: Path) -> None:
+        # truncated code
+
     def __init__(self, provider: AMPProviderV2) -> None:
         self.provider = provider
         # truncated code
 
     def on_incoming_connection_complete(self, anchor: namedtuple) -> None:
-        # truncated code
+        raise NotImplementedError("Input tools don't receive batches.")
 
-    def on_record_batch(self, batch: "Table", anchor: namedtuple) -> None:
-        # truncated code
+    def on_record_batch(self, batch: "pa.Table", anchor: namedtuple) -> None:
+        raise NotImplementedError("Input tools don't receive batches.")
 
     def on_complete(self) -> None:
-        import pandas as pd
-        import pyarrow as pa
-
-        df = pd.DataFrame(
-            {
-                "x": [1, 2, 3],
-                "y": ["hello", "world", "from ayx_python_sdk!"],
-                "z": [self.config_value, self.config_value, self.config_value],
-            }
-        )
-
-        packet = pa.Table.from_pandas(df)
-
-        self.provider.write_to_anchor("Output", packet)
-        self.provider.io.info("DanceableLyrics tool done.")
+        # truncated code
 ```
 
 ## Write a Plugin
@@ -190,16 +180,22 @@ It's probably a good idea to validate this path and ensure 1) that it exists, 2)
             "tracks.csv",
             "r_track_artist.csv",
             "genius_song_lyrics.csv",
-            "audio_features.csv"
+            "audio_features.csv",
         ]
-        nonexistent_files = list(
-            filter(lambda filepath: not filepath.is_file(), map(lambda filename: (datasets_dir / filename), filenames))
+        nonexistent_files = ",".join(
+            map(
+                str,
+                list(
+                    filter(
+                        lambda filepath: not filepath.is_file(),
+                        map(lambda filename: (datasets_dir / filename), filenames),
+                    )
+                ),
+            )
         )
 
-        if len(nonexistent_files) != 0:
-            raise WorkflowRuntimeError(
-                f"Expected files not found: {','.join(map(str, nonexistent_files))}")
-
+        if nonexistent_files:
+            raise WorkflowRuntimeError(f"Expected files not found: {nonexistent_files}")
 ```
 
 and then call this method like so:
@@ -214,18 +210,18 @@ and then call this method like so:
 Next, let's tell downstream tools what our plugin's metadata looks like. That is, what fields and their data types the plugin will output:
 
 ```python
-        self.provider.push_outgoing_metadata(
-            "Output",
-            create_schema(
-                {
-                    "artist_name": {"type": FieldType.v_wstring},
-                    "track_name": {"type": FieldType.v_wstring},
-                    "danceability": {"type": FieldType.float},
-                    "energy": {"type": FieldType.float},
-                    "track_id": {"type": FieldType.v_wstring},
-                }
-            ),
-        )
+    self.provider.push_outgoing_metadata(
+        "Output",
+        create_schema(
+            {
+                "artist_name": {"type": FieldType.v_wstring},
+                "track_name": {"type": FieldType.v_wstring},
+                "danceability": {"type": FieldType.float},
+                "energy": {"type": FieldType.float},
+                "track_id": {"type": FieldType.v_wstring},
+            }
+        ),
+    )
 ```
 
 Now Designer and downstream tools will know exactly what kind of data to expect from our plugin.
@@ -233,14 +229,14 @@ Now Designer and downstream tools will know exactly what kind of data to expect 
 Since we want to find the "most danceable" songs based on particular lyrics, let's provide some terms or phrases. Our tool will then gather songs (or "tracks") that contain lyrics with these terms.
 
 ```python
-        self.LYRICS_TERMS = [
-            "star wars",
-            "star trek",
-            "luke skywalker",
-            "captain kirk",
-            "spock",
-            "yoda",
-        ]
+    self.LYRICS_TERMS = [
+        "star wars",
+        "star trek",
+        "luke skywalker",
+        "captain kirk",
+        "spock",
+        "yoda",
+    ]
 ```
 
 > :warning: Be aware that these datasets are *not* filtered in any way, and songs or titles might contain explicit content!
@@ -248,74 +244,54 @@ Since we want to find the "most danceable" songs based on particular lyrics, let
 Finally, let's add some additional criteria for our analysis and an output message to display when the plugin is initialized. Feel free to play around with these values!
 
 ```python
-        self.DANCEABILITY_RANGE = [0.45, 0.99]
-        self.ENERGY_RANGE = [0.45, 0.75]
-        self.TEMPO_RANGE = [110.0, 140.0]
-        self.MIN_VIEWS = 1000
+    self.DANCEABILITY_RANGE = [0.45, 0.99]
+    self.ENERGY_RANGE = [0.45, 0.75]
+    self.TEMPO_RANGE = [110.0, 140.0]
+    self.MIN_VIEWS = 1000
 
-        self.provider.io.info(f"{self.name} initialized.")
+    self.provider.io.info(f"{self.name} initialized.")
 ```
 
 When you have completed the above steps, your `__init__` should look something like this:
 
 ```python
-    @staticmethod
-    def _validate_datasets_dir(datasets_dir: Path) -> None:
-        if not datasets_dir.is_dir():
-            raise WorkflowRuntimeError("Bad path")
+def __init__(self, provider: AMPProviderV2) -> None:
+    """Construct a plugin."""
+    self.provider = provider
+    self.name = "DanceableLyrics"
 
-        filenames = [
-            "artists.csv",
-            "tracks.csv",
-            "r_track_artist.csv",
-            "genius_song_lyrics.csv",
-            "audio_features.csv"
-        ]
-        nonexistent_files = list(
-            filter(lambda filepath: not filepath.is_file(), map(lambda filename: (datasets_dir / filename), filenames))
-        )
+    # Point this variable to your extracted datasets directory:
+    self.DATASETS_BASE = Path("c:/users/alteryx/DanceableLyricsData/")
 
-        if len(nonexistent_files) != 0:
-            raise WorkflowRuntimeError(
-                f"Expected files not found: {','.join(map(str, nonexistent_files))}")
+    self._validate_datasets_dir(self.DATASETS_BASE)
 
-    def __init__(self, provider: AMPProviderV2) -> None:
-        """Construct a plugin."""
-        self.provider = provider
-        self.name = "DanceableLyrics"
+    self.provider.push_outgoing_metadata(
+        "Output",
+        create_schema(
+            {
+                "artist_name": {"type": FieldType.v_wstring},
+                "track_name": {"type": FieldType.v_wstring},
+                "danceability": {"type": FieldType.float},
+                "energy": {"type": FieldType.float},
+                "track_id": {"type": FieldType.v_wstring},
+            }
+        ),
+    )
 
-        # Point this variable to your extracted datasets directory:
-        self.DATASETS_BASE = Path("c:/users/alteryx/DanceableLyricsData/")
+    self.LYRICS_TERMS = [
+        "star wars",
+        "star trek",
+        "luke skywalker",
+        "captain kirk",
+        "spock",
+        "yoda",
+    ]
+    self.DANCEABILITY_RANGE = [0.45, 0.99]
+    self.ENERGY_RANGE = [0.45, 0.75]
+    self.TEMPO_RANGE = [110.0, 140.0]
+    self.MIN_VIEWS = 1000
 
-        self._validate_datasets_dir(self.DATASETS_BASE)
-
-        self.provider.push_outgoing_metadata(
-            "Output",
-            create_schema(
-                {
-                    "artist_name": {"type": FieldType.v_wstring},
-                    "track_name": {"type": FieldType.v_wstring},
-                    "danceability": {"type": FieldType.float},
-                    "energy": {"type": FieldType.float},
-                    "track_id": {"type": FieldType.v_wstring},
-                }
-            ),
-        )
-
-        self.LYRICS_TERMS = [
-            "star wars",
-            "star trek",
-            "luke skywalker",
-            "captain kirk",
-            "spock",
-            "yoda",
-        ]
-        self.DANCEABILITY_RANGE = [0.45, 0.99]
-        self.ENERGY_RANGE = [0.45, 0.75]
-        self.TEMPO_RANGE = [110.0, 140.0]
-        self.MIN_VIEWS = 1000
-
-        self.provider.io.info(f"{self.name} initialized.")
+    self.provider.io.info(f"{self.name} initialized.")
 ```
 
 > :information_source: To make your Input plugin more dynamic, you can use the [Alteryx UI-SDK](https://github.com/alteryx/dev-harness) and have a user supply many of the variables above.
@@ -326,12 +302,12 @@ Now it's time to process some data! Since we don't currently attempt incoming da
 Our first data input is from the `genius_song_lyrics.csv` file, where we will discover songs with lyrics that contain our search terms:
 
 ```python
-    def on_complete(self) -> None:
+def on_complete(self) -> None:
 
     self.provider.io.info(f"{self.name} building sample lyrics query...")
 
     sample = (
-        pl.scan_csv(self.DATASETS_BASE + "genius_song_lyrics.csv")
+        pl.scan_csv(self.DATASETS_BASE / "genius_song_lyrics.csv")
         .select(
             pl.col("title").str.to_lowercase().alias("track_name"),
             pl.col("artist").str.to_lowercase().alias("artist_name"),
@@ -361,13 +337,13 @@ The next section of code reads from multiple input files and joins them into a s
         f"{self.name} building danceable track information query..."
     )
 
-    artists = pl.scan_csv(self.DATASETS_BASE + "artists.csv").select(
-                pl.col("name").str.to_lowercase().alias("artist_name"),
+    artists = pl.scan_csv(self.DATASETS_BASE / "artists.csv").select(
+        pl.col("name").str.to_lowercase().alias("artist_name"),
         pl.col("id").alias("artist_id"),
     )
 
     tracks = (
-        pl.scan_csv(self.DATASETS_BASE + "tracks.csv")
+        pl.scan_csv(self.DATASETS_BASE / "tracks.csv")
         .select(
             pl.col("name").str.to_lowercase().alias("track_name"),
             pl.col("id").alias("track_id"),
@@ -377,7 +353,7 @@ The next section of code reads from multiple input files and joins them into a s
     )
 
     audio_features = (
-        pl.scan_csv(self.DATASETS_BASE + "audio_features.csv")
+        pl.scan_csv(self.DATASETS_BASE / "audio_features.csv")
         .select(pl.col("id").alias("track_id"), "danceability", "energy", "tempo",)
         .filter(
             (pl.col("danceability").is_between(*self.DANCEABILITY_RANGE))
@@ -387,7 +363,7 @@ The next section of code reads from multiple input files and joins them into a s
     )
 
     track_artists = (
-        pl.scan_csv(self.DATASETS_BASE + "r_track_artist.csv")
+        pl.scan_csv(self.DATASETS_BASE / "r_track_artist.csv")
         .select("track_id", "artist_id")
         .join(artists, on="artist_id")
         .join(tracks, on="track_id")
@@ -435,11 +411,11 @@ The above code joins `danceability_tracks` with the entries in `sample`. The res
 Now that we have our `matches`, let's output them to Designer!
 
 ```python
-        self.provider.write_to_anchor(
-            "Output", pa.Table.from_pandas(matches.to_pandas())
-        )
+    self.provider.write_to_anchor(
+        "Output", pa.Table.from_pandas(matches.to_pandas())
+    )
 
-        self.provider.io.info(f"{self.name} finished.")
+    self.provider.io.info(f"{self.name} finished.")
 ```
 
 > :information_source: You might notice something a bit odd here. We are constructing a PyArrow table (`pa.Table`) from a Pandas frame converted from Polars. This is because the current version of Polars `to_arrow()` produces unexpected results. Perhaps newer versions won't require this workaround.
@@ -455,7 +431,7 @@ def on_complete(self) -> None:
     self.provider.io.info(f"{self.name} building sample lyrics query...")
 
     sample = (
-        pl.scan_csv(self.DATASETS_BASE + "genius_song_lyrics.csv")
+        pl.scan_csv(self.DATASETS_BASE / "genius_song_lyrics.csv")
         .select(
             pl.col("title").str.to_lowercase().alias("track_name"),
             pl.col("artist").str.to_lowercase().alias("artist_name"),
@@ -479,24 +455,24 @@ def on_complete(self) -> None:
         f"{self.name} building danceable track information query..."
     )
 
-    artists = pl.scan_csv(self.DATASETS_BASE + "artists.csv").select(
+    artists = pl.scan_csv(self.DATASETS_BASE / "artists.csv").select(
         pl.col("name").str.to_lowercase().alias("artist_name"),
         pl.col("id").alias("artist_id"),
     )
 
-        tracks = (
-            pl.scan_csv(self.DATASETS_BASE / "tracks.csv")
-            .select(
-                pl.col("name").str.to_lowercase().alias("track_name"),
-                pl.col("id").alias("track_id"),
-                "explicit",
-            )
-            .filter(pl.col("explicit") == 0)
+    tracks = (
+        pl.scan_csv(self.DATASETS_BASE / "tracks.csv")
+        .select(
+            pl.col("name").str.to_lowercase().alias("track_name"),
+            pl.col("id").alias("track_id"),
+            "explicit",
         )
+        .filter(pl.col("explicit") == 0)
+    )
 
-        audio_features = (
-            pl.scan_csv(self.DATASETS_BASE / "audio_features.csv")
-            .select(pl.col("id").alias("track_id"), "danceability", "energy", "tempo",)
+    audio_features = (
+        pl.scan_csv(self.DATASETS_BASE / "audio_features.csv")
+        .select(pl.col("id").alias("track_id"), "danceability", "energy", "tempo",)
         .filter(
             (pl.col("danceability").is_between(*self.DANCEABILITY_RANGE))
             & (pl.col("energy").is_between(*self.ENERGY_RANGE))
@@ -505,7 +481,7 @@ def on_complete(self) -> None:
     )
 
     track_artists = (
-        pl.scan_csv(self.DATASETS_BASE + "r_track_artist.csv")
+        pl.scan_csv(self.DATASETS_BASE / "r_track_artist.csv")
         .select("track_id", "artist_id")
         .join(artists, on="artist_id")
         .join(tracks, on="track_id")
