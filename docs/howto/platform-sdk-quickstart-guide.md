@@ -4,8 +4,8 @@
 
 Version 2 of AYX Python SDK is now available. For the best experience,
 and to ensure compatibility with the most recent versions of Designer,
-please use [v2 of AYX Python
-SDK](https://help.alteryx.com/developer-help/ayx-python-sdk-v2)
+please use v2 of [AYX Python
+SDK.](https://help.alteryx.com/developer-help/ayx-python-sdk-v2)
 
 -   To learn more about v2 of the AYX Python SDK, go to [Changes and
     Improvements to Python SDK in
@@ -84,7 +84,7 @@ location of your workspace and view the files that were created for the
 new plugin.
 
 For more information about the CLI, please visit the [reference
-documents](https://help.alteryx.com/developer-help/ayx-plugin-cli-overview)
+documents](https://help.alteryx.com/developer-help/ayx-plugin-cli-overview).
 
 ### UI SDK
 
@@ -100,9 +100,7 @@ The UI SDK consists of 2 pieces.
     off a tool. These are also the values that are available to the
     engine (back end) of your tool.
 
-For the real-time Dev Harness that assists in developing a tool UI,
-check
-out [this](https://github.com/alteryx/dev-harness)
+For the real-time Dev Harness that assists in tool UI development, refer to [Dev Harness.](https://github.com/alteryx/dev-harness)
 
 Follow these steps to get started with the UI SDK:
 
@@ -125,7 +123,7 @@ Follow these steps to get started with the UI SDK:
     \
     `npm run start`
 7.  To view your tool in Alteryx Designer, run this command from the
-    root workspace director. This command builds and installs your
+    root workspace directory. This command builds and installs your
     plugin into Designer.\
     \
     `ayx_plugin_cli designer-install`

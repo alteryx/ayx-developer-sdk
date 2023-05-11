@@ -4,10 +4,8 @@ Getting Started Guide
 Prerequisites
 -------------
 
-To get started with the Alteryx Core SDK, you need a valid installation
-of [Alteryx Designer](https://www.alteryx.com/).
-
-Python version 3.8.5 is required for Alteryx Designer plugins.
+- To get started with the Alteryx Platform SDK, you need a valid installation of [Alteryx Designer](https://www.alteryx.com/).
+- Python version 3.8.5 is required for Alteryx Designer plugins.
 
 Set Up the Development Environment
 ----------------------------------
@@ -30,7 +28,7 @@ Documentation](https://docs.anaconda.com/anaconda/user-guide/getting-started/).
 ### Install the Package
 
 After you create and activate your virtual environment, pip install the
-Alteryx Core SDK pip package. For more information on pip, visit the
+Alteryx Platform SDK pip package. For more information on pip, visit the
 [pip website](https://pypi.org/).
 
 Use this command to install the SDK:
@@ -45,8 +43,7 @@ install the CLI:
 ### Create the Ayx Plugin Workspace
 
 Now that the Alteryx Python SDK is installed in your virtual environment
-packages, we\'ll create a new [Plugin Tool
-Workspace](https://extensibility.pages.git.alteryx.com/ayx-sdks/getting_started.html#glossary)
+packages, create a new [Plugin Tool Workspace](#Glossary)
 with default files ready to go.
 
 Use this command to create the workspace:
@@ -59,10 +56,10 @@ To create a new tool, use the `create-ayx-plugin` command.
 
 The `create-ayx-plugin` command takes these parameters:
 
- -   `--tool-name`: (Required) The name of the new Plugin tool
+ -   `--tool-name`: (Required) The name of the new Plugin tool.
  -   `--tool-type`: The type of tool to create.
 
-For this example we\'ll name our new tool `MyFirstTool`. We\'ll use the
+For this example, name your new tool `MyFirstTool`. Use the
 tool-type `single-input-single-output` parameter to create the new tool
 with default input and output anchors.
 
@@ -72,26 +69,26 @@ Use this command:
 
 ### Workspace Configuration
 
-When a workspace is created, a `ayx_workspace.json` file is generated
+When a workspace is created, an `ayx_workspace.json` file is generated
 inside of your workspace directory. This file tracks metadata related to
-your workspace. By default, you do not need to worry about this file
-because it is managed and updated by the CLI commands.
+your workspace. By default, you don't need to worry about this file
+because the CLI commands manage and update it.
 
 ### Create Your Production Installer
 
-After you have implemented and tested your new Ayx Plugin Tool, you
+After you implement and test your new Ayx Plugin Tool, you
 might want to distribute it to others. In order to do this, you must
-create a YXI installer. The Core SDK CLI provides a command for
-packaging your workspace and tools into an installer.
+create a YXI installer. The Core SDK CLI provides a command to
+package your workspace and tools into an installer.
 
 Run the `create-yxi` command to generate a YXI installer that is ready
 for distribution.
 
-By default, the name of the YXI produced is based on the Ayx Plugin
+By default, the name of the YXI is based on the Ayx Plugin
 Workspace directory name, but you can override the default with the
 `--yxi-name` flag. Alternatively, you can modify the `yxi_name` field in
-the `ayx_workspace.json` file. (See the [Workspace
-Configurations](https://extensibility.pages.git.alteryx.com/ayx-sdks/python-sdk/getting_started.html#workspace-configurations)
+the `ayx_workspace.json` file. (Refer to the [Workspace
+Configurations ](#Glossary)
 section for details).
 
 ### Build the Ayx Plugin Tool
@@ -101,7 +98,7 @@ structure with a `backends` folder, `ui` folder, and `configuration`
 folder. These folders have all the files necessary for Alteryx Designer
 to integrate with your plugin.
 
-Next we\'re going to build your new Ayx Plugin Tool into Designer, where
+Next, you can build your new Ayx Plugin Tool into Designer, where
 you can drag it onto the canvas and connect it to other Designer tools.
 To build `MyFirstTool` into the Designer application, use the
 `designer-install` command.
@@ -110,15 +107,13 @@ Use this command to build MyFirstTool into Designer:
 
 `ayx_plugin_cli designer-install`
 
-**Congratulations!**
-
 You just created your first Alteryx Plugin Tool! You can now open
 Alteryx Designer and find your new tool in the Tool Palette.
 
 ### Ayx Plugin Tool Execution in Designer
 
 When Designer runs a tool, it must look for an engine to use. In the
-case of our MyFirstTool Python tool, the engine is itself the *Python
+case of the MyFirstTool Python tool, the engine is itself the *Python
 interpreter*. The interpreter is built out of Anaconda and includes all
 of the packages indicated in `requirements.txt`.
 
@@ -136,24 +131,24 @@ that contains a class definition that inherits from `Plugin`. This file
 can be changed at any time to any Python file as long as it contains a
 `Plugin` class that registers with the Alteryx Core SDK.
 
--   For a detailed explanation of the Config.xml file, see [Tool
-    Configurations](https://extensibility.pages.git.alteryx.com/ayx-sdks/python-sdk/config_xml.html).
--   For information on the `main.py` file within your Ayx Plugin Tool,
-    see [Plugin Code
-    Overview](https://extensibility.pages.git.alteryx.com/ayx-sdks/python-sdk/plugin_code.html).
+-   For a detailed explanation of the Config.xml file, go to [Tool
+	Configurations.](https://extensibility.pages.git.alteryx.com/ayx-sdks/python-sdk/config_xml.html).
+-   For information on the main.py file within your Ayx Plugin Tool,
+	go to [Plugin Code
+	Overview.](https://extensibility.pages.git.alteryx.com/ayx-sdks/python-sdk/plugin_code.html).
 
-### The Configuration Panel GUI
+### Configuration Panel GUI
 
 The Alteryx Core SDK examples provide basic Configuration Panel GUIs,
-however, the Core SDK *only* executes the engine (the Python side of the
-code). Therefore this Getting Started Guide does not cover Alteryx UI
+however, the Core SDK only executes the engine (the Python side of the
+code). Therefore this Getting Started Guide doesn't cover Alteryx UI
 development. For more information on Configuration Panel GUI
-development, see [Alteryx UI
+development, go to [Alteryx UI
 SDK](https://help.alteryx.com/developer-help/ayx-ui-sdk).
 
 ------------------------------------------------------------------------
 
-Glossary
+### Glossary
 --------
 
 -   `Ayx Plugin Workspace`: YXI development workspace with
