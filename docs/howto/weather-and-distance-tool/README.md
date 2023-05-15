@@ -40,7 +40,7 @@ You can generate an API key from the Credentials tab on the [GCP API's and Servi
 Before you proceed, please ensure you have this basic setup:
 
 1. [Create a Workspace](../create-a-workspace.md) to house your plugin.
-2. [Add a new plugin](./.create-a-plugin.md).
+2. [Add a new plugin](../create-a-plugin.md).
     1. When prompted choose the single-input-single-output (default) plugin type.
     2. To match what is found in this guide, choose **WeatherDistance** as the plugin name.
 
