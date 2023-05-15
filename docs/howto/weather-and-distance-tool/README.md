@@ -10,7 +10,7 @@ We use the `requests` package to make HTTP requests to both of both of these API
 Parsing JSON in Python is relatively straightforward but can become quite verbose with deeply nested objects. To alleviate this, we use the [jsonpath-rw-ext](https://pypi.org/project/jsonpath-rw-ext/) package, which allows you to parse JSON with a regular expression style syntax.
 
 ## Table of Contents
-* [Get WeatherAPI key](#get-weatherapi-key)
+* [Get WeatherAPI Key](#get-weatherapi-key)
 * [Get Google Maps API Key](#get-google-maps-api-key)
 * [Basic Plugin Setup](#basic-plugin-setup)
 * [Write a Plugin](#write-a-plugin)
@@ -119,7 +119,7 @@ def __init__(self, provider: AMPProviderV2):
     
     self.provider.io.info(f"{self.name} tool started")
 ```
-> :information_source: Protect your API keys! They are included here for ease of use and the assumption is that nobody will look at your version of the code. If you need to check your code int into version control, make sure to remove your keys!
+> :information_source: Protect your API keys! They are included here for ease of use and the assumption is that nobody will look at your version of the code. If you need to check your code into version control, make sure to remove your keys!
 
 ### Weather API Function
 To keep our code clean, we will write a function called `_get_weather` that takes a destination city, and calculates the distance from our origin which we set in the intialization step.
@@ -163,7 +163,7 @@ A very truncated example response might look like this:
 ```
 You can see the entire response in [forecast.json](./assets/forecast.json).
 
-Notice how the values we want, `daily_chance_of_rain`, `maxwind_mph`, etc, are several levels deep in the JSON response. In Python can access this value with:
+Notice how the values we want, `daily_chance_of_rain`, `maxwind_mph`, etc., are several levels deep in the JSON response. In Python, you can access this value with:
 
 ```python
 return json["forecast"]["forecastday"][0]["day"]["daily_chance_of_rain"]
@@ -176,8 +176,8 @@ We can also do a check for `None` for each key or index until we reach the key w
 A better solution is to use the `jsonpath_ext_rw` library, as shown in the code below.
 
 The function does the following:
-* Initializes the dictionary it will return
-* Makes the GET request using the requests libray.
+* Initializes the dictionary it will return.
+* Makes the GET request using the requests library.
 * Checks that request's return code was successful.
 * Populates the JSON returned from the GET request to a Dictionary.
 * For each `dayKey`, gets the desired values from the response body and puts them in the return dictionary.
@@ -253,14 +253,14 @@ The code looks like this:
 ### Data Processing
 Now it's time to get to the core of the plugin. We accept input that has a `City` column and use each city as a destination. We then call `_get_weather` and `_get_distance` for each city.
 
-We store an array of tuples consisting of each
+We store an array of tuples consisting of each:
 * Destination
 * Chance of Rain
-* Precipitation in inches
+* Precipitation in Inches
 * Minimum Temperature
 * Maximum Tempurature
 * Maximum Wind Speed
-* Distance from the Origin. 
+* Distance from the Origin
 
 First, we initalize the array we will store the tuples in, then:
 
