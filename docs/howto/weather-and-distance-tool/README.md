@@ -122,7 +122,7 @@ def __init__(self, provider: AMPProviderV2):
 > :information_source: Protect your API keys! They are included here for ease of use and the assumption is that nobody will look at your version of the code. If you need to check your code into version control, make sure to remove your keys!
 
 ### Weather API Function
-To keep our code clean, we will write a function called `_get_weather` that takes a destination city, and calculates the distance from our origin which we set in the intialization step.
+To keep our code clean, we will write a function called `_get_weather` that takes a destination city and returns a dictionary which contains parts of the weather forecast we are interested in.
 
 We first use the `requests` library to make a GET request to the `WeatherAPI` REST endpoint, passing our destination, the number of days we're interested in (1), and our key as parameters. 
 
