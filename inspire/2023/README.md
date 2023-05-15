@@ -6,3 +6,4 @@
 
 ## New Guides
 * [Danceable Lyrics Input Tool](../../docs/howto/danceable-lyrics-input-tool/README.md)
+* [Weather and Distance Tool](../../docs/howto/weather-and-distance-tool/README.md)
