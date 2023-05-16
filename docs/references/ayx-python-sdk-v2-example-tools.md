@@ -3,7 +3,7 @@
 ### Example Tools
 
 These are example tools created using version 2 the [AYX Python
-SDK](./ayx-python-sdk-v2.md). When the tools are installed, they display in the SDK
+SDK](./platform-sdk.md). When the tools are installed, they display in the SDK
 Examples tool category in Alteryx Designer.
 
 

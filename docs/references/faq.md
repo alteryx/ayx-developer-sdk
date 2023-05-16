@@ -176,7 +176,7 @@ The requirements for each package are:
 
 The original [Python Engine
 SDK](https://help.alteryx.com/developer-help/python-engine-sdk) is complex, runs in-process, and can be slow. The [AYX
-Python SDK](./ayx-python-sdk-v2.md) design solves these issues. It runs
+Python SDK](./platform-sdk.md) design solves these issues. It runs
 out-of-process using gRPC to communicate. It also simplifies the
 development process of new tools to 4 function calls, abstracting away a
 lot of the previous SDK function calls.
