@@ -40,7 +40,7 @@ You can generate an API key from the Credentials tab on the [GCP API's and Servi
 Before you proceed, please ensure you have this basic setup:
 
 1. [Create a Workspace](../create-a-workspace.md) to house your plugin.
-2. [Add a new plugin](./.create-a-plugin.md).
+2. [Add a new plugin](../create-a-plugin.md).
     1. When prompted choose the single-input-single-output (default) plugin type.
     2. To match what is found in this guide, choose **WeatherDistance** as the plugin name.
 
@@ -122,7 +122,7 @@ def __init__(self, provider: AMPProviderV2):
 > :information_source: Protect your API keys! They are included here for ease of use and the assumption is that nobody will look at your version of the code. If you need to check your code into version control, make sure to remove your keys!
 
 ### Weather API Function
-To keep our code clean, we will write a function called `_get_weather` that takes a destination city, and calculates the distance from our origin which we set in the intialization step.
+To keep our code clean, we will write a function called `_get_weather` that takes a destination city and returns a dictionary which contains parts of the weather forecast we are interested in.
 
 We first use the `requests` library to make a GET request to the `WeatherAPI` REST endpoint, passing our destination, the number of days we're interested in (1), and our key as parameters. 
 
@@ -195,7 +195,7 @@ The function does the following:
         r = requests.get(self.forecast_endpoint, params)
 
         if r.status_code != 200:
-            self.provider.io.warn("_get_weather(%s) received error response %d" % (q, r.status_code))
+            self.provider.io.warn("_get_weather(%s) received error response %d" % (destination, r.status_code))
             for key in dayKeys:
                 ret[key] = None
             return ret
