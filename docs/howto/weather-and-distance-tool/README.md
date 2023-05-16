@@ -29,7 +29,7 @@ Parsing JSON in Python is relatively straightforward but can become quite verbos
 * [Run in Designer](#run-in-designer)
 
 ## Get WeatherAPI Key
-[WeatherAPI](weatherapi.com) offers weather data via a JSON RESTful API. While it is free, it does require an API key to make requests. Sign up to get an API key which will be used in this demo.
+[WeatherAPI](https://www.weatherapi.com/) offers weather data via a JSON RESTful API. While it is free, it does require an API key to make requests. Sign up to get an API key which will be used in this demo.
 
 ## Get Google Maps API Key
 The [Google Maps Distance Matrix API](https://developers.google.com/maps/documentation/distance-matrix/overview) also requires an API key, which requires a Google billing account. While it's technically not a free API, there is an automatic credit of \$200 applied each month. For non GCP users, there is a trial in which \$300 worth of API calls can be consumed, without charge. With the first 100,000 API calls running $0.005, this will be quite hard to breach. 
