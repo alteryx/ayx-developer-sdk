@@ -195,7 +195,7 @@ The function does the following:
         r = requests.get(self.forecast_endpoint, params)
 
         if r.status_code != 200:
-            self.provider.io.warn("_get_weather(%s) received error response %d" % (q, r.status_code))
+            self.provider.io.warn("_get_weather(%s) received error response %d" % (destination, r.status_code))
             for key in dayKeys:
                 ret[key] = None
             return ret
