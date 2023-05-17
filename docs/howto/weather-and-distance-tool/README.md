@@ -339,7 +339,7 @@ At this point, we have all the data we need to publish the records. To do so we.
         self.provider.write_to_anchor("Output", batch)  
 ```
 
-###7. Putting It All Together
+### Putting It All Together
 The final code is available [here](./WeatherDistance/backend/weather_distance.py).
 
 ## Packaging into a YXI
