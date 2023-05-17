@@ -360,9 +360,6 @@ Now that the code is ready, we can package it into a portable YXI archive via th
 [Creating YXI] finished
 ```
 
-## Run the Test Client
-[TODO]
-
 ## Install in Designer
 In this section, we review the 2 ways to install the plugin into Designer.
 
