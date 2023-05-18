@@ -5,8 +5,8 @@
 * [Training Sessions Required Installations](./Training%20Sessions%20Required%20Installations.pdf) (PDF)
 
 ## Guides for Training Walkthrough 
-* [Weather and Distance Tool](../../docs/howto/weather-and-distance-tool/README.md)
-* [Danceable Lyrics Input Tool](../../docs/howto/danceable-lyrics-input-tool/README.md)
+* Walkthrough 1: [Weather and Distance Tool](../../docs/howto/weather-and-distance-tool/README.md)
+* Walkthrough 2: [Danceable Lyrics Input Tool](../../docs/howto/danceable-lyrics-input-tool/README.md)
 
 ## Additional Required Materials 
 
