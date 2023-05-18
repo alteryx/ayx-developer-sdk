@@ -14,13 +14,13 @@ Parsing JSON in Python is relatively straightforward but can become quite verbos
 * [Get Google Maps API Key](#get-google-maps-api-key)
 * [Basic Plugin Setup](#basic-plugin-setup)
 * [Write a Plugin](#write-a-plugin)
-    * [Dependencies](dependencies)
-    * [Imports](imports)
-    * [Initialization](initialization)
-    * [Weather API Function](weather-api-function)
-    * [Distance Matrix API Function](distance-matrix-api-function)
-    * [Data Processing](data-processing)
-    * [Putting It All Together](putting-it-all-together)
+    * [Dependencies](#dependencies)
+    * [Imports](#imports)
+    * [Initialization](#initialization)
+    * [Weather API Function](#weather-api-function)
+    * [Distance Matrix API Function](#distance-matrix-api-function)
+    * [Data Processing](#data-processing)
+    * [Putting It All Together](#putting-it-all-together)
 * [Packaging into a YXI](#packaging-into-a-yxi)
 * [Run the Test Client](#run-the-test-client)
 * [Install in Designer](#install-in-designer)
@@ -29,7 +29,7 @@ Parsing JSON in Python is relatively straightforward but can become quite verbos
 * [Run in Designer](#run-in-designer)
 
 ## Get WeatherAPI Key
-[WeatherAPI](weatherapi.com) offers weather data via a JSON RESTful API. While it is free, it does require an API key to make requests. Sign up to get an API key which will be used in this demo.
+[WeatherAPI](https://www.weatherapi.com/) offers weather data via a JSON RESTful API. While it is free, it does require an API key to make requests. Sign up to get an API key which will be used in this demo.
 
 ## Get Google Maps API Key
 The [Google Maps Distance Matrix API](https://developers.google.com/maps/documentation/distance-matrix/overview) also requires an API key, which requires a Google billing account. While it's technically not a free API, there is an automatic credit of \$200 applied each month. For non GCP users, there is a trial in which \$300 worth of API calls can be consumed, without charge. With the first 100,000 API calls running $0.005, this will be quite hard to breach. 
@@ -339,7 +339,7 @@ At this point, we have all the data we need to publish the records. To do so we.
         self.provider.write_to_anchor("Output", batch)  
 ```
 
-###7. Putting It All Together
+### Putting It All Together
 The final code is available [here](./WeatherDistance/backend/weather_distance.py).
 
 ## Packaging into a YXI
@@ -359,9 +359,6 @@ Now that the code is ready, we can package it into a portable YXI archive via th
 [Creating YXI] .  create_yxi:create_yxi
 [Creating YXI] finished
 ```
-
-## Run the Test Client
-[TODO]
 
 ## Install in Designer
 In this section, we review the 2 ways to install the plugin into Designer.

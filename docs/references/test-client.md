@@ -192,10 +192,6 @@ This doesn\'t require a schema:
         --output :csv@Output4
         --output :csv@Output5
 
-
-
-## Command Reference 
-Go to [Test Client Command Reference](./test-client.md) for detailed information.
 # Test Client Command Reference
 
 ## Using Help
@@ -347,9 +343,6 @@ from the plugin in stdout, including responses. Writes any outputs to
 the specified outputs given.
 
 `ayx-sdk-cli.exe plugin run [WORKSPACE_PATH]::[PLUGIN_NAME] --input <[SOURCE][:TYPE[:OPTIONS]][@ANCHOR]> --output <[DESTINATION][:TYPE[:OPTIONS]][@ANCHOR]> --runtime-command`
-
-For more information, go to [Test
-Client](./test-client.md).
 
 ### Self
 
