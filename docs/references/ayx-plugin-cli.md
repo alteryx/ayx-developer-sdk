@@ -79,8 +79,7 @@ YXIs.
 
 # AYX Plugin CLI Commands
 
-Explore the [AYX Plugin
-CLI](./ayx-plugin-cli.md) commands and parameters.
+Explore the AYX Plugin CLI commands and parameters.
 
 ## sdk-workspace-init
 
