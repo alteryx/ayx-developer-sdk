@@ -4,6 +4,11 @@
 * [Introduction to Alteryx Platform SDK](./Introduction%20to%20Alteryx%20Platform%20SDK.pdf) (PDF)
 * [Training Sessions Required Installations](./Training%20Sessions%20Required%20Installations.pdf) (PDF)
 
-## New Guides
-* [Danceable Lyrics Input Tool](../../docs/howto/danceable-lyrics-input-tool/README.md)
+## Guides for Training Walkthrough 
 * [Weather and Distance Tool](../../docs/howto/weather-and-distance-tool/README.md)
+* [Danceable Lyrics Input Tool](../../docs/howto/danceable-lyrics-input-tool/README.md)
+
+## Additional Require Materials 
+
+* Required Material for Walkthrough 1: [Download Temporary Keys](https://drop.alteryx.com/public/file/-jRU-r26SE6VAkFSvU69HA/Inspire23_Temp_Training_Material_Demo1.docx) (Note: This is password protected. The password will be provided during Training)
+* Required Material for Walkthrough 2: [Download Input Data](https://drop.alteryx.com/public/file/yHv77vLzKkCXHj8-OWVg0Q/Danceable_Lyrics_demo_data-Inspire-(Truncated)-2023.7z).
