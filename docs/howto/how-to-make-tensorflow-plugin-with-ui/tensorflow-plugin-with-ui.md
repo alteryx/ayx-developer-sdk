@@ -1,35 +1,75 @@
-# 1. Create a Basic Text Classifier Neural Network with TensorFlow
+# Create a Basic Text Classifier Neural Network with TensorFlow
 
 In this guide, we use the [Alteryx Python SDK](https://pypi.org/project/ayx-python-sdk/), [Alteryx UI-SDK](https://github.com/alteryx/dev-harness), and [Alteryx Plugin CLI](https://pypi.org/project/ayx-plugin-cli/) to illustrate how to create, train, and call a Tensorflow Keras Neural Network model in a workflow.
-To achieve this, We'll reference Tensorflow's [official tutorial](https://www.tensorflow.org/tutorials/keras/text_classification) and recreate the Basic Text Classifier as a workflow tool!
+To achieve this, we reference Tensorflow's [official tutorial](https://www.tensorflow.org/tutorials/keras/text_classification) and recreate the Basic Text Classifier as a workflow tool!
 
-Upon completing this guide, you will know how to:
-- Develop using the Python and UI SDKs
-- Exchange data between UI and Python SDK processes; during both `UPDATE` and `RUN` modes
-- Use metaprogramming, Python SDK, and the UI SDK to create an editable configuration and dynamic behavior between or during workflow runs
+The goal of this guide is to teach you to:
+- Develop using Python and UI SDKs
+- Exchange data between UI SDK and Python SDK processes during both `UPDATE` and `RUN` modes
+- Use metaprogramming, Python SDK, and the UI SDK to create an editable configuration and dynamic behavior between (or during) workflow runs.
 - Package and use 3rd party libraries from `npm` and `pypi` in a tool
 - Develop "ready to use" Keras models from scratch, including models for deploying into production workflows.
 
-- [1. Create a Basic Text Classifier Neural Network with Tensorflow](#1-create-a-basic-text-classifier-nueral-network-with-tensorflow)
-  - [1.1. Prerequisites](#11-prerequisites)
-  - [1.2. Overview](#12-overview)
-    - [1.2.1. Data](#121-data)
-    - [1.2.2. Preview](#122-preview)
-    - [1.2.3. TRAIN](#123-train)
-    - [1.2.4. Predict](#124-predict)
-    - [1.2.5. Create a Plugin](#125-create-a-plugin)
-      - [1.2.5.1. UI/TextClassifier/src/index.tsx](#1251-uitextclassifiersrcindextsx)
-      - [1.2.5.2. backend/ayx\_plugins/text\_classifier.py](#1252-backendayx_pluginstext_classifierpy)
-  - [1.3. Backend: A Naive Tensorflow Text Classifier](#13-backend-a-naive-tensorflow-text-classifier)
-    - [1.3.1. Data Mode](#131-data-mode)
+- [Create a Basic Text Classifier Neural Network with TensorFlow](#create-a-basic-text-classifier-neural-network-with-tensorflow)
+  - [Prerequisites](#prerequisites)
+  - [Overview](#overview)
+    - [DATA](#data)
+    - [PREVIEW](#preview)
+    - [TRAIN](#train)
+    - [PREDICT](#predict)
+  - [Create a Workspace](#create-a-workspace)
+  - [Create a Plugin](#create-a-plugin)
+      - [ui/TextClassifier/src/index.tsx](#uitextclassifiersrcindextsx)
+      - [backend/ayx\_plugins/text\_classifier.py](#backendayx_pluginstext_classifierpy)
+  - [Backend: A Naive Tensorflow Text Classifier](#backend-a-naive-tensorflow-text-classifier)
+    - [Data Mode](#data-mode)
       - [Supplemental: Error Handling in the SDK](#supplemental-error-handling-in-the-sdk)
       - [Adding a custom method: `setup_data()`](#adding-a-custom-method-setup_data)
-    - [](#)
+    - [`PREVIEW` mode](#preview-mode)
+      - [Function: `send_preview_data`](#function-send_preview_data)
+      - [Function: `self.get_token_translation`](#function-selfget_token_translation)
+      - [Function: `self.get_token_translation`](#function-selfget_token_translation-1)
+    - [`TRAIN` mode](#train-mode)
+      - [Function: `create_and_save_model`](#function-create_and_save_model)
+      - [Function: `get_model_args()`](#function-get_model_args)
+      - [Function (Update): `__init__`](#function-update-__init__)
+    - [Function (Update): `on_complete`](#function-update-on_complete)
+    - [`PREDICT`](#predict-1)
+      - [Function: `on_record_batch`](#function-on_record_batch)
+  - [Writing the Frontend: UI SDK](#writing-the-frontend-ui-sdk)
+    - [Module: `./index.tsx`](#module-indextsx)
+    - [Module: `./src/constants.tsx`](#module-srcconstantstsx)
+    - [Module:  `./src/components/*`](#module--srccomponents)
+      - [Component(s): `config-inputs.tsx`](#components-config-inputstsx)
+      - [Component(s): `DataInfo.tsx`, `DataInputSection.tsx`](#components-datainfotsx-datainputsectiontsx)
+        - [`DataInfo.tsx`](#datainfotsx)
+        - [DataInputSection](#datainputsection)
+      - [Component(s): `model-views.tsx`, `ModelSection`, `TokenTranslation`](#components-model-viewstsx-modelsection-tokentranslation)
+        - [`model-views.tsx`](#model-viewstsx)
+        - [`TokenTranslation.tsx`](#tokentranslationtsx)
+        - [`ModelSection.tsx`](#modelsectiontsx)
+      - [Component(s): `./src/components/charting/line-plots.tsx`](#components-srccomponentschartingline-plotstsx)
+  - [Testing End to End](#testing-end-to-end)
+      - [Figure: Tool GUI](#figure-tool-gui)
+  - [Package into a YXI](#package-into-a-yxi)
+    - [Python Dependencies](#python-dependencies)
+    - [React dependencies](#react-dependencies)
+    - [CLI packaging command](#cli-packaging-command)
+  - [Install and Run in Designer](#install-and-run-in-designer)
+    - [Method 1](#method-1)
+    - [Method 2](#method-2)
+      - [Figure: `DATA` mode:](#figure-data-mode)
+      - [Figure: `PREVIEW` mode:](#figure-preview-mode)
+      - [Figure: `TRAIN` mode:](#figure-train-mode)
+      - [Figure: `PREDICT` mode:](#figure-predict-mode)
+  - [Congratulations!](#congratulations)
+    - [Exercises](#exercises)
 
 
-## 1.1. Prerequisites
+## Prerequisites
 
-While we do our best to provide enough information here for anyone with general scripting experience to follow along, the recommended prereqs are provided below for general debugging and troubleshooting knowledge outside of the scope possible here:
+This guide aims to provide enough information anyone with general coding experience to follow along.
+We recommend these prerequisites for general debugging and troubleshooting outside of the scope of this guide:
 
 * Tensorflow
   * Keras
@@ -37,44 +77,43 @@ While we do our best to provide enough information here for anyone with general 
 * React and Typescript
 * General understanding or knowledge of Neural Networks and AI/ML algorithms.
 
-## 1.2. Overview
+## Overview
 
-The tool we create will allow a user to generate a Text Classifier NN(Neural Network) from scratch, train it using User-defined datasets, evaluate training, and then predict with a "production" version of said model.
-As mentioned, we'll aim to recreate Tensorflow's Official tutorial model as a workflow tool. If you run into TensorFlow related issues, we recommend you review and cross-check the code provided in the tutorial.
+The tool we create allows a user to generate a Text Classifier Neural Network (NN) from scratch, train it with user-defined datasets, evaluate training, and then predict with a "production" version of the model.
+As mentioned, we'll aim to recreate Tensorflow's official tutorial model as a workflow tool.
+If you run into TensorFlow related issues, we recommend you review and cross-check the code provided in the tutorial.
 
-With that in mind, we create a "naive" version of our text classifier tool.
-That is, a tool without any UI to ensure critical functions are running as intended.
-To achieve this, we also mock data and relevant calls to represent what will come from the UI SDK to the Python backend and what the backend will send to the UI SDK via `save_config()` (link to docs here). 
-Next, we build our front end using the UI SDK using its provided `dev-harness`.
+With that in mind, we create a "naive" version of our text classifier tool--that is, a tool without any UI to go over the Tensorflow code and how to convert it for the provider API.
+Next, we use the UI SDK and its provided `dev-haress` to build our front end.
 Once the back and front ends are complete, we then bundle and deploy using the CLI to do end-to-end testing.
-Finally, we package our dependencies and source for deployment using `create-yxi`.
+Finally, use `create-yxi` to package our dependencies and source for deployment.
 
-The tool will have 4 "modes": `DATA`, `PREVIEW`, `TRAIN`, and `PREDICT`. 
+The tool has 4 "modes": `DATA`, `PREVIEW`, `TRAIN`, and `PREDICT`. 
 
-### 1.2.1. Data
+### DATA
 
-In `DATA` mode, our tool will pull down and prep whatever data the User provides via input fields we'll define.
-It will then save the data as a TensorFlow dataset, ready for the next mode.
+In `DATA` mode, our tool will pull down and preps whatever data the user provides via input fields we define.
+It then saves the data as a TensorFlow dataset, ready for the next mode.
 
-### 1.2.2. Preview
+### PREVIEW
 
-In `PREVIEW` mode, our tool will then use the data provided and any available model information to show a "snapshot" of our data and how we will feed it to the model.
-This snapshot will include dynamically populated text classifier information like token translations for our classifier when available.
+In `PREVIEW` mode, our tool uses the data provided and any available model information to show a "snapshot" of the data and how it is fed into the model.
+This snapshot includes dynamically populated text classifier information like token translations for our classifier, when available.
 
-### 1.2.3. TRAIN
+### TRAIN
 
-This mode will take the prepped data and call the model's training function.
-Additionally, the User may use the supplied fields to adjust model parameters, train using an existing model, or create an entirely new one.
-Finally, the tool will return a training results report to the UI and export a "production" version of the model.
+The `TRAIN` mode takes the prepped data and calls the model's training function.
+Additionally, the user can use the supplied fields to adjust model parameters, train using an existing model, or create an entirely new one.
+Finally, the tool returns a training results report to the UI and export a "production" version of the model.
 
-### 1.2.4. Predict
+### PREDICT
 
-In `PREDICT` mode, the tool will take text input via the input anchor, then run predictions on them and output those results to its output anchor.
+In `PREDICT` mode, the tool will take text input via the input anchor, then run predictions on the input and outputs the results to its output anchor.
 
 
 ## Create a Workspace
 
-Run the following, responding as prompted.
+Run this code and respond to the prompts.
 
 ```powershell
 $ mkdir tensorflow-ui-examples
@@ -95,10 +134,10 @@ Backend Language (python): python
 [Generating config files] finished
 ```
 Once the above is complete, we recommend you create your Python environment with `venv` or other supported virtual environment modules.
-This venv will allow you to develop on your machine while deploying with "prod" requirements. We'll also briefly cover how to do that later in the guide.
+This venv allows you to develop on your machine while deploying with "prod" requirements. We'll also briefly cover how to do that later in the guide.
 
 
-## 1.2.5. Create a Plugin
+## Create a Plugin
 Next, use the `create-ayx-plugin` command and reply to the prompts to generate our tool template code. For this tool, we want to use the `single-input-single-output`. (may switch to optional*)
 
 ```powershell
@@ -119,7 +158,7 @@ Creating single-input-single-output plugin: Filter UI Tool
 
 After the command finishes, you should have template files similar to below at the named locations for your UI and python SDK.
 
-#### 1.2.5.1. ui/TextClassifier/src/index.tsx
+#### ui/TextClassifier/src/index.tsx
 ```jsx
 const App = () => {
   const classes = useStyles();
@@ -161,7 +200,7 @@ ReactDOM.render(
 );
 ```
 
-#### 1.2.5.2. backend/ayx_plugins/text_classifier.py
+#### backend/ayx_plugins/text_classifier.py
 ```python
 class TextClassifier(PluginV2):
     """A sample Plugin that passes data from an input connection to an output connection."""
@@ -182,7 +221,7 @@ class TextClassifier(PluginV2):
         # truncated code
 ```
 
-## 1.3. Backend: A Naive Tensorflow Text Classifier
+## Backend: A Naive Tensorflow Text Classifier
 
 Here, we use the term naive to describe a tool that assumes perfect input in a known structure. 
 Later we will add input fields that accept arbitrary values. But we can start with controlled, known values first to simplify testing.
@@ -193,7 +232,7 @@ We update our tool by "mode" (recall our modes are: `DATA, PREVIEW, TRAIN, PREDI
 Considering we need to test building the model in that order anyway, this will make reasoning about our code more straightforward.
 
 
-### 1.3.1. Data Mode
+### Data Mode
 
 For this guide, we'll be using the [imdb movie review dataset](https://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz).
 This archive is a dataset of movie reviews and their labels for classification.
@@ -361,7 +400,7 @@ There are more insights regarding TensorFlow specifics, but it's too much to cov
 
 Now that our data can be retrieved and loaded, we will need some way to prepare it for our model and training.
 
-### 1.3.2 `PREVIEW` mode
+### `PREVIEW` mode
 
 First, we put in our new `PREVIEW` mode code and functionality.
 To better understand TensorFlow usage, please recheck the companion piece for a more detailed explanation of each line.
