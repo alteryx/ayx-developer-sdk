@@ -29,8 +29,8 @@ We use [Polars](https://www.pola.rs/) for data processing. Polars has many benef
 ## Download Input Data
 Download and extract the required dataset files. You will reference them later in this guide. We provide 2 datasets—the full dataset and a smaller, truncated version.
 
-* The full version expands to around 11 GB of data. You can [download it here](https://drop.alteryx.com/public/file/SAlShV5VqkOI5_Jyx1me3w/Danceable_Lyrics_demo_data-Inspire-2023.7z).
-* The truncated version expands to around 5.7 GB of data. You can [download it here](https://drop.alteryx.com/public/file/yHv77vLzKkCXHj8-OWVg0Q/Danceable_Lyrics_demo_data-Inspire-(Truncated)-2023.7z).
+* The full version expands to around 11 GB of data. You can [download it here](https://drop.alteryx.com/public/file/kM81cQhvykuw5XEvPjMSLQ/Danceable_Lyrics_demo_data-Inspire-2023.7z).
+* The truncated version expands to around 5.7 GB of data. You can [download it here](https://drop.alteryx.com/public/file/H1qBoxXdYk6WqGXVPhVPog/Danceable_Lyrics_demo_data-Inspire-(Truncated)-2023.7z).
 
 Go to the `README.md` files within the respective archives for source information.
 
