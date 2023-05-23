@@ -24,44 +24,44 @@ The goal of this guide is to teach you to:
   - [Backend: A Naive Tensorflow Text Classifier](#backend-a-naive-tensorflow-text-classifier)
     - [Data Mode](#data-mode)
       - [Supplemental: Error Handling in the SDK](#supplemental-error-handling-in-the-sdk)
-      - [Adding a custom method: `setup_data()`](#adding-a-custom-method-setup_data)
-    - [`PREVIEW` mode](#preview-mode)
+      - [Adding a Custom Method: `setup_data()`](#adding-a-custom-method-setup_data)
+    - [`PREVIEW` Mode](#preview-mode)
       - [Function: `send_preview_data`](#function-send_preview_data)
       - [Function: `self.get_token_translation`](#function-selfget_token_translation)
       - [Function: `self.get_token_translation`](#function-selfget_token_translation-1)
-    - [`TRAIN` mode](#train-mode)
+    - [`TRAIN` Mode](#train-mode)
       - [Function: `create_and_save_model`](#function-create_and_save_model)
       - [Function: `get_model_args()`](#function-get_model_args)
       - [Function (Update): `__init__`](#function-update-__init__)
     - [Function (Update): `on_complete`](#function-update-on_complete)
-    - [`PREDICT`](#predict-1)
+    - [`PREDICT` Mode](#predict-mode)
       - [Function: `on_record_batch`](#function-on_record_batch)
   - [Writing the Frontend: UI SDK](#writing-the-frontend-ui-sdk)
     - [Module: `./index.tsx`](#module-indextsx)
     - [Module: `./src/constants.tsx`](#module-srcconstantstsx)
     - [Module:  `./src/components/*`](#module--srccomponents)
-      - [Component(s): `config-inputs.tsx`](#components-config-inputstsx)
-      - [Component(s): `DataInfo.tsx`, `DataInputSection.tsx`](#components-datainfotsx-datainputsectiontsx)
+      - [Components: `config-inputs.tsx`](#components-config-inputstsx)
+      - [Components: `DataInfo.tsx`, `DataInputSection.tsx`](#components-datainfotsx-datainputsectiontsx)
         - [`DataInfo.tsx`](#datainfotsx)
         - [DataInputSection](#datainputsection)
-      - [Component(s): `model-views.tsx`, `ModelSection`, `TokenTranslation`](#components-model-viewstsx-modelsection-tokentranslation)
+      - [Components: `model-views.tsx`, `ModelSection`, `TokenTranslation`](#components-model-viewstsx-modelsection-tokentranslation)
         - [`model-views.tsx`](#model-viewstsx)
         - [`TokenTranslation.tsx`](#tokentranslationtsx)
         - [`ModelSection.tsx`](#modelsectiontsx)
-      - [Component(s): `./src/components/charting/line-plots.tsx`](#components-srccomponentschartingline-plotstsx)
+      - [Components: `./src/components/charting/line-plots.tsx`](#components-srccomponentschartingline-plotstsx)
   - [Testing End to End](#testing-end-to-end)
       - [Figure: Tool GUI](#figure-tool-gui)
   - [Package into a YXI](#package-into-a-yxi)
     - [Python Dependencies](#python-dependencies)
-    - [React dependencies](#react-dependencies)
-    - [CLI packaging command](#cli-packaging-command)
+    - [React Dependencies](#react-dependencies)
+    - [CLI Packaging Command](#cli-packaging-command)
   - [Install and Run in Designer](#install-and-run-in-designer)
     - [Method 1](#method-1)
     - [Method 2](#method-2)
-      - [Figure: `DATA` mode:](#figure-data-mode)
-      - [Figure: `PREVIEW` mode:](#figure-preview-mode)
-      - [Figure: `TRAIN` mode:](#figure-train-mode)
-      - [Figure: `PREDICT` mode:](#figure-predict-mode)
+      - [Figure: `DATA` Mode:](#figure-data-mode)
+      - [Figure: `PREVIEW` Mode:](#figure-preview-mode)
+      - [Figure: `TRAIN` Mode:](#figure-train-mode)
+      - [Figure: `PREDICT` Mode:](#figure-predict-mode)
   - [Congratulations!](#congratulations)
     - [Exercises](#exercises)
 
@@ -773,10 +773,10 @@ Then, start up the UI SDK's [dev-harness](https://alteryx.github.io/alteryx-ui/)
 You should be able to run `npm install` and then `npm start` as expected in a React/node app.
 If you encounter an issue, we recommend that you refer to the supplementary guide or other troubleshooting tips in detail on the `alteryx-ui` documentation.
 
-In addition, the depth of React App optimization and how-tos are deep. 
-We keep our usage here functional (in the application and user sense of the word) and will explain less in-depth than our TensorFlow backend - as that is what this guide chooses to focus on.
+In addition, the depth of React App optimization and how-to content is immense. 
+We keep our usage here functional (in the application and user sense of the word) and explain it less in-depth than the TensorFlow backend--as that is what this guide focuses on.
 
-Update `./ui/TextClassifier/src` to reflect the following, taking care to read any notes provided:
+Update `./ui/TextClassifier/src` to reflect the following. Take care to read any notes provided:
 
 ### Module: `./index.tsx`
 
@@ -792,7 +792,6 @@ import _ from "lodash";
 
 const Explorer = () => {
   const [model, handleUpdateModel] = useContext(UiSdkContext);
-  // (E-Note: Believe we can import and use our text input component here too)
   const onHandleTextChange = (event, configType, key) => {
     const newModel = _.cloneDeep(model);
     newModel.Configuration[configType][key] = event.target.value;
@@ -936,7 +935,7 @@ ReactDOM.render(
   document.getElementById('app')
 );
 ```
-While it has an impressive line count by default, our only non-boilerplate additions are skeleton frames in our return statement and default configuration defined and detailed by the `alteryx-ui` API and docs.
+While it has an impressive line count by default, the only non-boilerplate additions are skeleton frames in the return statement and default configuration defined and detailed by the `alteryx-ui` API and docs.
 
 ### Module: `./src/constants.tsx`
 
@@ -946,8 +945,8 @@ export const MDL_CONFIG = 'modelConfig'
 export const EVAL_CONFIG = 'modelEvaluation'
 ```
 
-Next, we need a directory to store our components. In addition, a subdirectory for our charting component.
-You should now have
+Next, we need a directory to store the components. In addition, a subdirectory for our charting component.
+You should now have...
 
 ```txt
 |- src/
@@ -960,11 +959,12 @@ You should now have
 ```
 
 ### Module:  `./src/components/*`
-We can now add the following to our `components` directory.
-**Note**: We are again, but for the _frontend_ SDK, creating **reusable** components we could import or place into other tools we or others develop (_depending on a publisher's license and availability_) using your components and vice-versa!
-In other words, when we create our first file below, `config-inputs.tsx`, we are creating a component to sprinkle about different places and avoid copying, pasting, and in turn, propagating stale code causing all sorts of sneaky bugs in the near (or even scarier... **FAR** future!!) future.
 
-#### Component(s): `config-inputs.tsx`
+We can now add the following to the `components` directory.
+**Note**: We are again, but this time for the _frontend_ SDK, creating **reusable** components we can import or place into other tools we or others develop (_depending on a publisher's license and availability_) using these components and vice-versa!
+In other words, when we create our first file below, `config-inputs.tsx`, we are creating a component to sprinkle about different places and avoid the need to copy, paste, and in turn, propagate stale code that causes all sorts of sneaky bugs in the near (or even scarier, far) future.
+
+#### Components: `config-inputs.tsx`
 
 ```jsx
 import React, { useContext } from 'react';
@@ -995,10 +995,10 @@ const ConfigTextInput = ({value, configType, vKey, elId, label, inputType="strin
 export {ConfigTextInput};  
 ```
 
-**Important Note**: One of the few things we will explicitly call out here for the UI SDK, as it is so critical to developing.
-React's state model will _not_ "properly" update nested lists (as seen in our defaultConfig) or objects due to how it tracks changes.
-Therefore, we use `lodash` as the `alteryx-ui` docs recommended to ensure our `model` stays up to date without stale or redundant data.
-A common symptom of this issue is self-replicating lists, i.e.:
+Important Note: This is one of the few things we explicitly call out here for the UI SDK because it is so critical to developing.
+React's state model does _not_ properly update nested lists (as seen in our defaultConfig) or objects due to how it tracks changes.
+Therefore, we use `lodash` (as the `alteryx-ui` docs recommend) to ensure the `model` stays up to date without stale or redundant data.
+A common symptom of this issue is self-replicating lists, in other words:
 
 ```js
 // where model will = {someValue: [1], valueToUpdate: 5}
@@ -1008,14 +1008,14 @@ a = model;
 
 a.valueToUpdate = 8;
 // then use `handleUpdateModel` call
-// ... promise resovles and..
+// ... promise resolves and..
 >> 'a: {someValue: [1, 1], valueToUpdate: 8}'
 ```
 
-Overall, this simple reusable component allows text input field values to be stored and updated via a given key and value within our config.
-You could add other inputs and fields like `FileInput` in this module.
+Overall, this simple reusable component allows text input field values to be stored and updated via a given key and value within the config.
+You can add other inputs and fields like `FileInput` in this module.
 
-#### Component(s): `DataInfo.tsx`, `DataInputSection.tsx`
+#### Components: `DataInfo.tsx`, `DataInputSection.tsx`
 
 ##### `DataInfo.tsx`
 
@@ -1075,7 +1075,7 @@ export const DataInfo = () => {
 }
 ```
 
-A data table that accepts `tableRows` to preview samples of our test data as it feeds into our model. Additionally, some vectorization sampling and token samples, as we've defined them in our backend.
+A data table that accepts `tableRows` to preview samples of the test data as it feeds into the model. Additionally, some vectorization sampling and token samples, as we've defined them in the backend.
 
 ##### DataInputSection
 
@@ -1125,12 +1125,12 @@ const DataInputSection = () => {
 export default DataInputSection;
 ```
 
-We define the attributes and key-value pairs for several config text inputs using our earlier defined `ConfigTextInput`.
-Then, we bundle them into a grid to neatly display the inputs. You may have noticed, but note the `key` values and `labels and how they match our `provider.tool_config` values we mocked earlier.
-As we've discussed, these will be how the User (s) define their data options.
-There will also be similar additions for other values in the coming src.
+We define the attributes and key-value pairs for several config text inputs using the earlier defined `ConfigTextInput`.
+Then, we bundle them into a grid to neatly display the inputs. You might have already noticed, but note the `key` values and `labels` and how they match the `provider.tool_config` values we setup earlier in backend.
+As we've discussed, this is how users define their data options.
+There are similar additions for other values in the coming src.
 
-#### Component(s): `model-views.tsx`, `ModelSection`, `TokenTranslation`
+#### Components: `model-views.tsx`, `ModelSection`, `TokenTranslation`
 
 
 ##### `model-views.tsx`
@@ -1365,7 +1365,7 @@ const ModelSection = () => {
 export default ModelSection;
 ```
 
-#### Component(s): `./src/components/charting/line-plots.tsx`
+#### Components: `./src/components/charting/line-plots.tsx`
 
 
 ```jsx
@@ -1439,17 +1439,18 @@ Now, you should see a GUI that looks like the below (E-Note: will add screencap 
 
 ## Package into a YXI
 
-First, we should ensure we have all our dependencies for the front and backend. Then, we run `create-yxi` to package each of these into a deployable using their respective package managers.
+First, we should ensure we have all the dependencies for the front and back ends.
+Then, we run `create-yxi` to package each of these into a deployable using their respective package managers.
 
 ### Python Dependencies
 
 Add `tensorflow==2.12.0` to your tool's `requirements-third-party.txt`.
 
-### React dependencies
+### React Dependencies
 
 Run `npm install --save lodash chart.js`
 
-### CLI packaging command
+### CLI Packaging Command
 
 Run the `ayx_plugin_cli create-yxi` command, which bundles all the plugins in the workspace into a `.yxi` archive. It should look something like this:
 
@@ -1490,11 +1491,11 @@ Drag it into your workflow. Using the recommended dataset (need a reference list
 
 Outputs should resemble the following:
 
-#### Figure: `DATA` mode:
+#### Figure: `DATA` Mode:
 
 [New SS]
 
-#### Figure: `PREVIEW` mode:
+#### Figure: `PREVIEW` Mode:
 
 [New SS]
 
@@ -1502,7 +1503,7 @@ Outputs should resemble the following:
 
 [New SS]
 
-#### Figure: `PREDICT` mode:
+#### Figure: `PREDICT` Mode:
 
 [New SS]
 
@@ -1511,10 +1512,9 @@ Outputs should resemble the following:
 You have successfully created your first Tensorflow Keras NN model, from scratch, in a workflow! If you're up to the challenge, we recommend the following exercises to test your new skills!
 
 ### Exercises
-
 1. Create a second plugin for your production model.
-   1. Try locally using your production model by referencing it on your hard drive.
-   2. Convert the above to use a production model included in the yxi as a standalone deployable. (See the Pythons packaging module for idiomatic ways to include your model!)
-2. Add a FileExplorer to our text input fields for more intuitive data source input.
+   - Try using your production model locally by referencing it on your hard drive.
+   - Convert the above to use a production model included in the yxi as a standalone deployable. Refer to the Python packaging module for idiomatic ways to include your model.
+2. Add a FileExplorer to the text input fields for more intuitive data source input.
 3. Add an option to _continue_ training a model rather than overwriting each time.
 4. Convert the Tensorflow companion piece exercises.
