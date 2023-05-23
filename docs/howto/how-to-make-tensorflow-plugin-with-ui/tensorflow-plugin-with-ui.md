@@ -147,7 +147,7 @@ Tool Type (input, multiple-inputs, multiple-outputs, optional, output, single-in
 Description []: Create, train, deploy, and use a Tensorflow based text classifier!
 Tool Version [1.0]:
 DCM Namespace []:
-Creating single-input-single-output plugin: Filter UI Tool
+Creating single-input-single-output plugin: TextClassifier
 [Create plugin] started
 [Create plugin] .  Create plugin
 [Create plugin] Installing UI components via npm
@@ -156,7 +156,7 @@ Creating single-input-single-output plugin: Filter UI Tool
 [Generating test files for FilterUITool] finished
 ```
 
-After the command finishes, you should have template files similar to below at the named locations for your UI and python SDK.
+After the command finishes, you should have template files similar to those below at the named locations for your UI SDK and python SDK.
 
 #### ui/TextClassifier/src/index.tsx
 ```jsx
@@ -225,30 +225,29 @@ class TextClassifier(PluginV2):
 
 Here, we use the term naive to describe a tool that assumes perfect input in a known structure. 
 Later we will add input fields that accept arbitrary values. But we can start with controlled, known values first to simplify testing.
-To further simplify the transition to User populated or arbitrary data, we can also create a constants.py file.
-For now, leave it blank. We'll need it later to create static values for our tests.
+To further simplify the transition to user-populated or arbitrary data, we can also create a constants.py file.
+For now, leave it blank. We'll need it later for our static values.
 
-We update our tool by "mode" (recall our modes are: `DATA, PREVIEW, TRAIN, PREDICT`).
-Considering we need to test building the model in that order anyway, this will make reasoning about our code more straightforward.
+We update our tool by mode (recall our modes are: `DATA, PREVIEW, TRAIN, PREDICT`).
+Considering we need to test building the model in that order anyway, this makes reasoning about our code more straightforward.
 
 
 ### Data Mode
 
-For this guide, we'll be using the [imdb movie review dataset](https://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz).
+For this guide, we use the [imdb movie review dataset](https://ai.stanford.edu/~amaas/data/sentiment/aclImdb_v1.tar.gz).
 This archive is a dataset of movie reviews and their labels for classification.
-The labels are binary positive or negative reviews.
-The reviews are scrapped from the IMDb website and then appropriately labeled.
-You may download it now or during the plugin runtime.
+The labels are binary positive or negative reviews--scrapped from the IMDb website and then appropriately labeled.
+You can download it now or during the plugin runtime.
 Here we download it and reference it locally.
-Note that we get this in `.tar.gz` format, so you need to decompress this before using the data.
+Note that the dataset is in `.tar.gz` format, so you need to decompress it before you use the data.
 Once you decompress, note the location as a constant in the `constants.py` module we created earlier.
 Something like this will do:
 
 `DATA_SRC = '/path/to/archive/aclImdb_v1.tar/'`
 
-Next, open up `backend/ayx_plugins/text_classifier.py`. It's finally time to add some functional code!
+Next, open `backend/ayx_plugins/text_classifier.py`. It's finally time to add some functional code!
 
-Update the `__init__` method to the below:
+Update the `__init__` method to this:
 
 ```python
     def __init__(self, provider: "AMPProviderV2") -> None:
@@ -269,20 +268,11 @@ Update the `__init__` method to the below:
         self.provider.io.info("Plugin initialized.")
 ```
 
-Where:
+Where `self.MODE = "DATA"` is our tool's "run mode," as described earlier in [link to section], and `self.data_url = self.provider.tool_config["datasetConfig"]["datasetTargetDir"]`(and the lines below it) utilize the `tool_config` dict to access data and tool configuration sent by the UI SDK.
 
-`self.MODE = "DATA"`
- is our tool's "run mode," as described earlier in [link to section].
-
-And:
-
- `self.data_url = self.provider.tool_config["datasetConfig"]["datasetTargetDir"]` 
-
- And the lines below it utilize the `tool_config` dict (link to tool_config in docs) to access data and tool configuration sent by the UI SDK.
-
-You may have already noticed, but `tool_config` will contain the values we said we'd mock before deploying to Designer.
-Once we have developed our frontend, a user can populate these fields.
-Until then, you can safely use constants for testing. (better phrasing?)
+You may have already noticed, but `tool_config` contains the values we said we'd mock before we deploy to Alteryx Designer.
+Once we develop our frontend, a user can populate these fields.
+Until then, you can safely use constants for testing.
 
 Next, add the following to the `on_complete` method:
 
@@ -296,10 +286,10 @@ except Exception as e:
 ```
 #### Supplemental: Error Handling in the SDK
 
-There are two crucial pieces to note here. If you already understand the concepts below, feel free to skip to the next section!
+There are 2 crucial pieces to note here. If you already understand the concepts below, feel free to skip to the next section.
 
 First, the first Python sdk tool runs as a separate (python) process from Designer's process.
-While this provides many benefits (such as arbitrary Python tool requirements like TensorFlow here), this means *designer* cannot directly access the exceptions the Python process throws.
+While this provides many benefits (such as arbitrary Python tool requirements like TensorFlow here), this means Designer cannot directly access the exceptions the Python process throws.
 The SDK does its best to capture generic errors, but the scope of edge cases is impossibly large. 
 It is possible to try and catch the "wrong" error type in Python and unintentionally let an exception pass silently. (See Python docs for details)
 As such, we have seen user cases where tricky exceptions slip off the stack uncaught.
@@ -314,8 +304,8 @@ except KeyError as e:
   logger.error(f"An error occured: \n{repr(e)}")
 ```
 
-This code will catch _an_ error; here, a `TypeError`. However, it will _not_ run our `except` we intend. Here, a couple more lines of code will go a long way for debugging.
-Your understanding of how the below items function would be best so you can efficiently debug your tool.
+This code will catch _an_ error, a `TypeError`. However, it does _not_ run our `except` we intend. Here, a couple more lines of code will go a long way for debugging.
+Your understanding of how the below items function will help you efficiently debug your tool.
 If unsure, check out the [official Python docs](https://docs.python.org/3.8/tutorial/errors.html).
 
 ```python
@@ -334,26 +324,29 @@ finally:
   logger.error(f"Key {EXPECTED_KEY} was not present: \n {repr(e)}")
 ```
 
-Whether you know already or know now, we recommend the above pattern (Note to reviewers: "when developing for designer" ?) with at least: 
-* `try/except` with a general case
-* A **log**\* statement logging the exception at the appropriate log level: `logger.INFO`, `logger.WARN`, etc
-* A `self.provider.io` **message**\* to notify the User an exception occurred and where to look
-  * NOTE: `self.provider.io.error(msg)` will immediately terminate the process! So ensure you log in and send any messages _before_ then or in your `finally` block if using one!
+We recommend the above pattern with at least: 
 
-\* Note the distinction here as well. A _log_ statement will automatically send your output to `PythonSdk.log`. A _message_ (read: `self.provider.io.[info | warn | error]`) will send your data output to Designer's IO.
+* `try/except` with a general case.
+* A **log**\* statement that logs the exception at the appropriate log level: `logger.INFO`, `logger.WARN`, etc.
+* A `self.provider.io` **message**\* to notify the User an exception occurred and where to look.
+  * NOTE: `self.provider.io.error(msg)` immediately terminates the process! So ensure you log and send any messages _before_ then or in your `finally` block if you use one!
 
-If you have multiple distinct sorts of errors or want to use your Exception derivatives, we recommend defining [decorators](https://pythonguide.readthedocs.io/en/latest/python/decorator.html) to make your exception handling **short, simple, and reusable across any tool you develop as a python module!**
+\* Note the distinction here as well.
+A _log_ statement sends your output to `PythonSdk.log`.
+A _message_ (read: `self.provider.io.[info | warn | error]`) sends your data output to Designer's IO.
+
+If you have multiple distinct error types or want to use your Exception derivatives, we recommend you define [decorators](https://pythonguide.readthedocs.io/en/latest/python/decorator.html) to make your exception handling short, simple, and reusable across any tool you develop as a Python module.
 
 #### Adding a custom method: `setup_data()`
 
-Now we will add our first custom method to our plugin, `setup_data(self)`.
-It may be tempting to write your `DATA` mode code exactly where it will execute.
-**However** we strongly encourage following general coding best practices.
-Think, "How would I do this **in Python**?"
+Now we add the first custom method to the plugin, `setup_data(self)`.
+It might be tempting to write your `DATA` mode code exactly where it will execute.
+However we strongly encourage following general coding best practices.
+Think, "How would I do this in Python?"
 Rather than, "How do I do this in the `ayx_python_sdk`?"
-When developing with the SDK, we encourage developers to use Python to its fullest potential.
-Therefore, we place our `DATA` mode code in its function, `setup_data(self)`.
-Separating your steps into functions naturally helps isolate problem areas in your code, makes debugging much easier, and (like mentioned above) makes even **more** of your code reusable! 
+When you develop with the SDK, we encourage developers to use Python to its fullest potential.
+Therefore, place the `DATA` mode code in its function, `setup_data(self)`. 
+When you separate your steps into functions, it naturally helps isolate problem areas in your code, makes debugging much easier, and makes even more of your code reusable! 
 
 ```python
   def setup_data(self):
