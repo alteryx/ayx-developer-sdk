@@ -1,7 +1,7 @@
 # Inspire 2023 Resources
 
 ## Required Survey
-* Please answer questions in [required survey](https://www.surveymonkey.com/r/J9PTRBT)
+* Please answer questions in [required survey](https://www.surveymonkey.com/r/J9PTRBT).
 
 ## Training Documentation
 * [Introduction to Alteryx Platform SDK](./Introduction%20to%20Alteryx%20Platform%20SDK.pdf) (PDF)
