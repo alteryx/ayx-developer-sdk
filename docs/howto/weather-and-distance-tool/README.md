@@ -211,7 +211,7 @@ The function does the following:
 ```
 ### Distance Matrix API Function
 
-The `_get_distance` function does the same steps as the `_get_chance_of_rain` function. The main difference is we set the return value to -1.0 and of course make the request to Google Maps.
+The `_get_distance` function does the same steps as the `_get_weather` function. The main difference is we set the return value to -1.0 and of course make the request to Google Maps.
 
 Also note that the distance values returned in this API are "8 mi", "12.5 mi", etc. So we use a regular expression to extract only the numeric value and convert it from a string to a float. 
 
