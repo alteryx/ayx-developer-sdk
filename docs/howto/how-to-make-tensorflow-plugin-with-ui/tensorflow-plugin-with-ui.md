@@ -138,7 +138,7 @@ This venv allows you to develop on your machine while deploying with "prod" requ
 
 
 ## Create a Plugin
-Next, use the `create-ayx-plugin` command and reply to the prompts to generate our tool template code. For this tool, we want to use the `single-input-single-output`. (may switch to optional*)
+Next, use the `create-ayx-plugin --use-ui` command and reply to the prompts to generate our tool template code. For this tool, we want to use the `optional` option.
 
 ```powershell
 tensorflow-ui-examples $ ayx_plugin_cli create-ayx-plugin
@@ -337,7 +337,7 @@ A _message_ (read: `self.provider.io.[info | warn | error]`) sends your data out
 
 If you have multiple distinct error types or want to use your Exception derivatives, we recommend you define [decorators](https://pythonguide.readthedocs.io/en/latest/python/decorator.html) to make your exception handling short, simple, and reusable across any tool you develop as a Python module.
 
-#### Adding a custom method: `setup_data()`
+#### Adding a Custom Method: `setup_data()`
 
 Now we add the first custom method to the plugin, `setup_data(self)`.
 It might be tempting to write your `DATA` mode code exactly where it will execute.
@@ -381,23 +381,22 @@ When you separate your steps into functions, it naturally helps isolate problem 
       except Exception as e:
         logger.error(repr(e))
 ```
-We know already `self.provider.tool_config` is simply a Python dict.
-Note, though, we have to call `int` on some values. We do this simply because we get all `tool_config` as `string` types from the UI SDK.
-So, we need to convert this to their expected types or even serialize more complex data. (that is enough for its step-by-step guide)
+We know already `self.provider.tool_config` is a Python dict.
+Note, though, we have to call `int` on some values. We do this because we get all `tool_config` as `string` types from the UI SDK.
+So, we need to convert this to their expected types or even serialize more complex data.
 
 We retrieve and parse these values and use them in `tf.keras.utils.text_dataset_from_directory(...)`. 
-This function loads our raw data into a dataset to be used by TensorFlow.
-Once we've successfully loaded them _as_ a `tf.Dataset`, we `.save(...)` them at distinct locations for our learning setup. Saving them as datasets allows us to use our data in a format optimized for TensorFlow and its training/execution.
+This function loads the raw data into a dataset to be used by TensorFlow.
+Once we successfully load them _as_ a `tf.Dataset`, we `.save(...)` them at distinct locations for our learning setup. Saving them as datasets allows for the use of the data in a format optimized for TensorFlow and its training/execution.
 As previously mentioned, we recommend the [companion piece](https://www.tensorflow.org/tutorials/keras/text_classification) provided by TensorFlow for details regarding TensorFlow's API.
 There are more insights regarding TensorFlow specifics, but it's too much to cover here.
 
-Now that our data can be retrieved and loaded, we will need some way to prepare it for our model and training.
+Now that we can retrieve and load the data, we need a way to prepare it for the model and training.
 
-### `PREVIEW` mode
+### `PREVIEW` Mode
 
-First, we put in our new `PREVIEW` mode code and functionality.
+First, we enter the new `PREVIEW` mode code and functionality.
 To better understand TensorFlow usage, please recheck the companion piece for a more detailed explanation of each line.
-_(NOTE: we will assume the reader is doing this or understands `keras` and `tensorflow` moving forward)_
 ****
 
 #### Function: `send_preview_data`
@@ -423,8 +422,8 @@ def send_preview_data(self):
     self.provider.save_full_config(conf)
 ```
 
-In brief, we load our `tf.data.Dataset` as defined previously in our `DATA` mode. Then, make some sample formats to send to our UI, or "frontend".
-Note it also calls two(2) other utility functions called...
+In brief, we load the `tf.data.Dataset` as defined previously in the `DATA` mode. Then, make some sample formats to send to the UI, or "frontend".
+Note it also calls 2 other utility functions called:
 
 #### Function: `self.get_token_translation`
 
@@ -450,11 +449,11 @@ def get_token_translation(self, translationVal):
 
 `model = tf.keras.saving.load_model(f'{self.provider.tool_config["modelConfig"]["modelName"]}-exported', custom_objects={'custom_standardization': custom_standardization})`
 
-Here we load a model that(soon) will contain a `TextVectorization` TensorFlow layer at `model.layers[0]` where `translational` is a comma-separated value of integer token values to be "translated" to their original string representations as mapped by said `model.layers[0]` layer.
+Here we load a model that will soon contain a `TextVectorization` TensorFlow layer at `model.layers[0]` where `translational` is a comma-separated value of integer token values to be "translated" to their original string representations, as mapped by said `model.layers[0]` layer.
 
 
-For now, we won't have any `translationVal`s, so this won't be relevant until later sections.
-Then, we log in to `self.info` as defined below:
+For now, we don't have any `translationVal`s, so this isn't relevant until later sections.
+Then, we log in to `self.info` as defined here:
 
 #### Function: `self.get_token_translation`
 
@@ -465,14 +464,14 @@ def info(self, s: str):
   self.provider.io.info(s)
 ```
 
-While the method is relatively straightforward, it includes(spellcheck) a notable point: there is a distinct difference between **logging** and **messaging**.
-We chose this for many reasons, a large one being that the tool _User_ rarely needs, and even less so *wants*, to see the debugging output.
-Do not use the above as a crunch or without consideration; logging is cheap, but _messaging_ is expensive!
-A good rule of thumb is to keep your `self.provider.io` calls to a minimum, only sending what your USER needs to see.
-You can leverage `logging` more freely, especially when paired with the available debugging flag (NOTE: reference needed here).
+While the method is relatively straightforward, it includes a notable point: there is a distinct difference between **logging** and **messaging**.
+We chose this for many reasons, a large one being that the tool _user_ rarely needs, and even less so wants, to see the debugging output.
+Don't not use the above as a cruch or without consideration. Logging is cheap, but _messaging_ is expensive!
+A good rule of thumb is to keep your `self.provider.io` calls to a minimum, and only send what your user needs to see.
+You can leverage `logging` more freely, especially when paired with the available debugging flag AYX_SDK_VERBOSE.
 Use sparingly, or you will risk slowing your tool with expensive IO! _(A very important consideration in ML)_
 
-Finally, update `on_complete` to call our `send_preview_data()` function:
+Finally, update `on_complete` to call the `send_preview_data()` function:
 
 ```python
 self.provider = provider
@@ -484,24 +483,24 @@ elif self.MODE == 'PREVIEW':
   self.send_preview_data()
 ```
 
-Now, that we have data and a way to feed it as input into our model we are ready to move on to the next mode.
+Now that we have data and a way to feed it as input into the model, we are ready to move on to the next mode.
 
-### `TRAIN` mode
+### `TRAIN` Mode
 
-Now so far, we've:
-* Created custom methods to support TensorFlow API calls
-* Added `DATA` mode, a way for a user to input and load a data source as a dataset
-* Added `PREVIEW` mode, a way for a user to request preview data from the backend for feedback during data prepping
-* Mocked out (actual tests needed) our frontend UI object and tested to verify functionality
-  
-In our third mode, `MODEL`, a user(NOTE: change to this phrasing in earlier paragraphs?) will input:
+So far, we've...
 
-* Where to store their generated and trained text classifier NN
-* What to name the model
-* Various tunable model training parameters
-* a TextVectorization option
+* Created custom methods to support TensorFlow API calls.
+* Added `DATA` mode--a way for a user to input and load a data source as a dataset.
+* Added `PREVIEW` mode--a way for a user to request preview data from the backend for feedback during data prep.
 
-Then, we will collect the reporting data TensorFlow provides for training and send it to the UI SDK (frontend) for the User to see dynamically generated visual feedback and data from the training session(s).
+In the third mode, `MODEL`, we input...
+
+* Where to store their generated and trained Text Classifier NN.
+* What to name the model.
+* Various tunable model training parameters.
+* a TextVectorization option.
+
+Then, we will collect the reporting data TensorFlow provides for training and send it to the UI SDK (frontend) for the user to see dynamically generated visual feedback and data from the training sessions.
 
 
 #### Function: `create_and_save_model`
@@ -583,22 +582,23 @@ Then, we will collect the reporting data TensorFlow provides for training and se
             raise e
 ```
 
-While this method may be intimidating, don't let it scare you! It is simply the core code of our companion piece, gently refactored to fit into our tool's (and the PythonSdk's) runtime and lifecycle.
+While this method might be intimidating, don't let it scare you! It's simply the core code of our companion piece, gently refactored to fit into the tool's (and the PythonSdk's) runtime and lifecycle.
 
-In this method we:
-  * load our dataset `tf.data.Dataset.save's sibling
-  * create and adapt our `vectorize_layer: tensorflow.keras.layers.TextVectorization` as recommended by TensorFlow
-  * cache our datasets (now loading data as `Datasets` begins to pay off!)
-  * init, compile, evaluate, and save our base model.]
-  * generate  data for our previews
+In this method we...
 
-You may have noticed we use a decorator here as well `static method`.
-We do this to allow us to call this using `Multiprocessing`  to train our model without blocking our Python sdk service process. We also add in a multiprocessing queue to quickly retrieve the results and send them to the front end before ending.
-Lastly, note that we catch a generalized exception and explicitly raise it for this method. Doing that allows us to throw in a controlled way such that the Designer can report but log it _before_ the process terminates, as we discussed early on in this section of the guide.
+  * Load the dataset `tf.data.Dataset.save`'s sibling.
+  * Create and adapt the `vectorize_layer: tensorflow.keras.layers.TextVectorization` as recommended by TensorFlow.
+  * Cache the datasets (now loading data as `Datasets` begins to pay off!)
+  * Init, compile, evaluate, and save the base model.
+  * Generate data for the previews.
+
+You might have noticed we use a decorator here as well: `staticmethod`.
+We do this so that we can call this using `Multiprocessing` to train the model without blocking the Python SDK service process. We also add a multiprocessing queue to quickly retrieve the results and send them to the frontend before ending.
+Lastly, note that we catch a generalized exception and explicitly raise it for this method. As a result, we can throw in a controlled way that Designer can report but log it _before_ the process terminates, as we discussed early on in this section of the guide.
 
 As you might have noticed, we currently have a non-trivial amount of arguments.
-Since we collect these via IPC (**Read:** InterProcess Communication: N processes running separately; think to Excel and tablue with a linked spreadsheet.), these will also be more difficult to keep in sync.
-As such, we want a function to extract these that we can wrap in a try/catch block to explicitly capture and report `KeyErrors` or similarly common exceptions in this context.
+Since we collect these via IPC, these are also more difficult to keep in sync.
+As such, we want a function to extract these that we can wrap in a try/catch block to explicitly capture and report `KeyErrors` (or similarly common exceptions in this context).
 
 
 #### Function: `get_model_args()`
@@ -626,9 +626,9 @@ def get_model_args(self):
   )
 ```
 
-The method above should be pretty straightforward now; good ol' dictionary access. (E-Note: Idiom safe?)
+The method above should be pretty straightforward now, standard dictionary access.
 Otherwise, carefully note what we do and do not cast.
-Consider why this may be relative to the subsequent code updates in `init` and `on_complete`.
+Consider why this might be relevant to the subsequent code updates in `init` and `on_complete`.
 
 #### Function (Update): `__init__`
 
@@ -693,7 +693,7 @@ In this method, a Plugin designer should perform any cleanup for their plugin.
 
 
 The majority of the above speaks for itself at this point in the guide.
-Our most notable (conceptual) addition is likely the `MultiProcessing` section:  
+The most notable (conceptual) addition is likely the `MultiProcessing` section:  
 
 ```python
 q = Queue()
@@ -703,23 +703,25 @@ history = q.get()
 p.join()
 ```
 
-Note that this is "just enough" to prevent blocking. An incredible amount of resources are available online and on Python's official documentation. For our purposes, know we're using the `Process(...)` to wrap up our expensive compute task - allowing us to avoid blocking the Python server IO.
+Note that this is just enough to prevent blocking. An incredible amount of resources are available online and on Python's official documentation.
+For these purposes, know we use the `Process(...)` to wrap up our expensive compute task--this allows us to avoid blocking the Python server IO.
 
-Now the backend can generate, train, and deploy/export a new model! All that's left now is our final step, allowing the User to use the "production" model to predict data in a workflow!
+Now the backend can generate, train, and deploy a new model! All that's left now is the final step, allowing the user to use the "production" model to predict data in a workflow!
 
 
-### `PREDICT`
+### `PREDICT` Mode
 
-In our last mode, we must update our `on_record_batch` function to call `model.predict(...)` on values passed to us in the workflow. In our case, we will eventually use a text input for testing.
-**NOTE** However, this could be _any_ sort of record batch, as long as it can connect to our anchor and with the appropriate code updates!
-In other words, allow Users to use our "production" version for predictions.
+In this last mode, we must update the `on_record_batch` function to call `model.predict(...)` on values passed in the workflow. In this case, we eventually use a Text Input for testing.
+**NOTE**, however, this can be _any_ sort of record batch, as long as it can connect to the anchor and with the appropriate code updates!
+In other words, allow users to use the "production" version for predictions.
 
-Some examples of why one might do this include:
-* a tool developer can ship a trained model that exemplifies expected behavior alongside "starter" training data for new user-generated and trained models.
-* A tool developer may ship a "base" model, which the User may then tune and train further in their workflow.
-* With additional UI, users may choose how/where/when to deploy models in other workflows or jobs.
-* Workflows running on Server may do **any of the above to generate serious, performant, and production-grade models**, which also
-* Empowers tool **developers AND users** to create production-grade TensorFlow AI/ML pipelines!
+Some examples of why this might be done:
+
+* A tool developer can ship a trained model that exemplifies expected behavior alongside starter training data for new user-generated and trained models.
+* A tool developer might ship a base model, which the user might then tune and train further in their workflow.
+* With additional UI, users might choose how, where, and when to deploy models in other workflows or jobs.
+* Workflows running on Server might do **any of the above to generate serious, performant, and production-grade models**, which also...
+* Empowers tool developers **and** users to create production-grade TensorFlow AI/ML pipelines!
 
 #### Function: `on_record_batch`
 
@@ -754,24 +756,22 @@ Some examples of why one might do this include:
             self.provider.write_to_anchor("Output", batch_to_send)
             self.info("TextClassifier tool done.")
 ```
-Here, we load our model with `keras. saving.load_model(...)`. Note that we append `-exported' to differentiate our training and "production" models. 
-As you develop more serious tools, you can create custom methods to deploy and store model deployment and storage. Here, we note the ability to do so!
+Here, we load a model with `keras.saving.load_model(...)`. Note that we append `-exported` to differentiate our training and "production" models. 
+As you develop more serious tools, you can create custom methods to define model deployment and storage. Here, we note the ability to do so!
 
-Then, we call `model.predict(...)` on our loaded model, take the results, and write them to our output anchor for use in the workflow.
+Then, we call `model.predict(...)` on the loaded model, take the results, and write them to the output anchor for use in the workflow.
 
-Now, this is all of our backend code! Since our (soon-to-exist) tests are passing, we'll move on to our front end and enable these mocked values to be dynamically set by the User!
+Now, this is all of the backend code!
 
 
 ## Writing the Frontend: UI SDK
 
-_Please Note: if you are unfamiliar with React and the UI SDK, we recommend the (tbd link)[Getting Started with UI SDK and PythonSDK] guide first or as a supplementary, as you may need to reference the above guide for detailed steps._
+_Please Note: if you are unfamiliar with React and the UI SDK, we recommend the [Create a Simple Filter Tool with a UI](https://community.alteryx.com/t5/Alteryx-IO-Resources/Create-a-Simple-Filter-Tool-with-a-UI/ta-p/1127558) guide first or as a supplementary piece, as you may need to reference the above guide for detailed steps._
 
-As some quick prep work, let's make sure you set up your front end. As of (E-Note: version num of "no UI" option?)], if you did not initialize a UI as described in the guide linked above, you might not have one by default. No problem! Run:
-`ayx_plugin_cli generate-ui` (E-Note: Correct command?)
-Then you should then have your tool's UI files under `workspace-dir/ui/ToolName`. 
-Next, we want to start up the UI SDK's [dev-harness](https://alteryx.github.io/alteryx-ui/).
+First, enter your workspace's `ui` directory, and ensure you have your tool's UI files under `workspace-dir/ui/ToolName`. 
+Then, start up the UI SDK's [dev-harness](https://alteryx.github.io/alteryx-ui/).
 You should be able to run `npm install` and then `npm start` as expected in a React/node app.
-If you hit an issue, we recommend referring to the recommended supplementary or other troubleshooting tips in detail on the `alteryx-ui` documentation.
+If you encounter an issue, we recommend that you refer to the supplementary guide or other troubleshooting tips in detail on the `alteryx-ui` documentation.
 
 In addition, the depth of React App optimization and how-tos are deep. 
 We keep our usage here functional (in the application and user sense of the word) and will explain less in-depth than our TensorFlow backend - as that is what this guide chooses to focus on.
@@ -1498,7 +1498,7 @@ Outputs should resemble the following:
 
 [New SS]
 
-#### Figure: `TRAIN` mode:
+#### Figure: `TRAIN` Mode:
 
 [New SS]
 
