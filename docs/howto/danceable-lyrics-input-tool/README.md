@@ -165,7 +165,7 @@ Now, let's update the plugin's `__init__` method and set up some basic variables
         self.name = "DanceableLyrics"
 
         # Point this variable to your extracted datasets directory:
-        self.DATASETS_BASE = Path("c:/users/alteryx/DanceableLyricsData/").  # please change this to the un-zipped location.
+        self.DATASETS_BASE = Path("c:/users/alteryx/DanceableLyricsData/").  # Please change this to your local un-zipped folder location
 ```
 It's probably a good idea to validate this path and ensure 1) that it exists, 2) that it is a directory, and 3) that it contains all the files we need. We can do that like so:
 
