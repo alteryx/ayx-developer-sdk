@@ -11,7 +11,7 @@ Designer. These interactions are mediated by the Providers, which
 provide simplified interfaces for Designer functionality and drive the
 execution of the Ayx Plugin Tools. For more information on the execution
 flow, see [Plugin
-Lifecycle](../references/plugin_lifecycle_markdown.md).
+Lifecycle](../references/plugin-lifecycle-markdown.md).
 
 Register the Plugin
 -------------------

@@ -54,7 +54,7 @@ etc.).
 Refer to this sequence diagram for a visual representation of this
 lifecycle:
 
-![Workflow Run Sequence Diagram](assets/workflow_run.png)
+![Workflow Run Sequence Diagram](assets/workflow-run.png)
 
 Update Only Run
 ---------------
@@ -85,4 +85,4 @@ processing in this method, since a fast update makes users happy.
 Refer to the sequence diagram for a visual representation of this
 lifecycle:
 
-![Update Only Sequence Diagram](assets/update_only.png)
+![Update Only Sequence Diagram](assets/update-only.png)

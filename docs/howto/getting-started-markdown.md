@@ -132,10 +132,10 @@ can be changed at any time to any Python file as long as it contains a
 `Plugin` class that registers with the Alteryx Core SDK.
 
 -   For a detailed explanation of the Config.xml file, go to [Tool
-	Configurations.](../references/config_xml_markdown.md).
+	Configurations.](../references/config-xml-markdown.md).
 -   For information on the main.py file within your Ayx Plugin Tool,
 	go to [Plugin Code
-	Overview.](../references/plugin_code_markdown.md).
+	Overview.](../references/plugin-code-markdown.md).
 
 ### Configuration Panel GUI
 
@@ -152,15 +152,14 @@ SDK](https://help.alteryx.com/developer-help/ayx-ui-sdk).
 
 The steps below illustrate how to use the latest developer tools to
 create a custom plugin or tool for use in Alteryx. For more information
-about new SDKs and their usage within Alteryx, please visit [Platform
-SDK](../references/platform-sdk.md).
+about new SDKs and their usage within Alteryx, please visit [Platform SDK](../references/platform-sdk.md).
 
 ### Requirements and Prerequisites
 
 Before you get started, make sure that these items are installed on your
 machine:
 
--   Microsoft Windows 7 or Later (64-bit)
+-   Microsoft Windows 7 or later (64-bit)
 -   Alteryx Designer Version 2021.2\*
 -   Python Version 3.8.5
 -   [pip](https://pypi.org/) (automatically installed with Python 3.8.5)
@@ -176,49 +175,7 @@ The AYX Plugin CLI provides you with a set of utilities to manage your
 plugin and is a great starting point for building a tool. AYX Python SDK
 installation is also covered in this section.
 
-Follow these steps to get started with the CLI:
-
-1.  Run this command to install the AYX Plugin CLI:\
-    \
-    `pip install ayx-plugin-cli`\
-     
-2.  To verify that you installed the CLI properly, run this command:\
-    \
-    `ayx_plugin_cli version`\
-    \
-    If the installation was successful the above command returns the
-    version number. If the CLI was not installed properly, the
-    `ayx_plugin_cli` command is not recognized in the terminal, and your
-    terminal reflects that.\
-     
-3.  Run this command to install the AYX Python SDK:\
-    \
-    `pip install ayx-python-sdk`\
-    \
-    *(Optional) Create a new directory to house all of your workspaces
-    and plugins, and continue the steps in this guide from the new
-    directory. This helps keep your folder structure clean.*\
-     
-4.  Once the installation is successful, run this command to create a
-    workspace:\
-    \
-    `ayx_plugin_cli sdk-workspace-init`\
-    \
-    The command asks you to provide information about your workspace
-    through a series of prompts.\
-     
-5.  Once you have stepped through the above command, run this command to
-    create a custom tool or plugin:\
-    \
-    `ayx_plugin_cli create-ayx-plugin`\
-    \
-    The command asks you to provide information about your tool or
-    plugin through a series of prompts. Note that this operation can
-    take a minute to complete.
-
-Once you have stepped through the above command, you can go to the
-location of your workspace and view the files that were created for the
-new plugin.
+[Follow these steps to get started with the CLI.](#install-the-package).
 
 For more information about the CLI, please visit the [reference
 documents](../references/ayx-plugin-cli.md).

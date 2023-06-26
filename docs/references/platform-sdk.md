@@ -68,7 +68,7 @@ please use v2 of AYX Python SDK.
 
 -   To learn more about v2 of the AYX Python SDK, go to [Changes and
     Improvements to Python SDK in
-    v2.0.0](./differences_with_original_sdk_markdown.md).
+    v2.0.0](./differences-with-original-sdk-markdown.md).
 -   If you need to access v1 documentation, you can [download the
     content](https://help.alteryx.com/sites/default/files/2022-02/1.0_0.zip).
 

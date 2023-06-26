@@ -15,11 +15,11 @@ For example, one way to do this is in the Windows Environment dialog. Windows 10
 
 If you encounter this error (as shown below) _"This tool is only supported in the AMP Engine. Please enable AMP to use this tool."_:
 
-![Error (use AMP)](assets/tool_is_only_supported_in_amp.png)
+![Error (use AMP)](assets/tool-is-only-supported-in-amp.png)
  
 Check that the AMP engine is enabled. In Designer's Workflow Configuration window, select the Runtime tab and ensure the Use AMP Engine check box is checked.
 
-![Toggle AMP](assets/use_amp.png)
+![Toggle AMP](assets/use-amp.png)
  
 If you still encounter the error with the correct configuration, make sure the plugin was produced with version 2+ of the SDK.
 
@@ -34,7 +34,7 @@ ayx_python_sdk==2.1.2
 
 When you encounter a "…Failed to read port assignment…" (below) error message, the cause is almost always a mismatch of versions. That is, you use a V1 plugin in Designer version 2021.4+ that requires a V2 plugin.
 
-![Use Port](assets/failed_to_read_port.png)
+![Use Port](assets/failed-to-read-port.png)
 
 Another cause might be incorrect plugin code. You can diagnose the issue [here](#can-i-run-plugins-outside-of-designer).
 
@@ -69,7 +69,7 @@ We no longer require the use of Pandas and DataFrames for record IO. If your too
 
 ## _"Can I use Python’s multiprocessing and/or threads?"_
 
-Yes, but only if you really need to. Before you do, please read our [Extensibility Best Practices](./best_practices.md).
+Yes, but only if you really need to. Before you do, please read our [Extensibility Best Practices](./best-practices.md).
 
 ## _"Can I run Plugins outside of Designer?"_
 
