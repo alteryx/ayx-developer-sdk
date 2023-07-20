@@ -7,17 +7,18 @@ Now that you've built your first SDK Tool, you want to confirm that it's properl
 2. After installing `.yxi`
 3. After running in Designer
 4. Running the plugin at Command Line
+5. Simple ways to print/check values
 
 
 ## 1. After `create-yxi`
 After creating the yxi, there will be a new folder in your workspace called `build`. Navigate to `~/your_tool_workspace/build/yxi/workspace_name.yxi` and rename the `.yxi` to a `.zip` archive. 
 
-Inside the archive, navigate to `<TOOL_NAME>/site-packages/ayx_plugins/<tool_name>.py`. When opening this file, you should expect to see the exact same code as the plugin code in your tool workspace (`~/your_tool_workspace/backend/ayx_plugins/<tool_name>.py`). If you make some changes to your code in your workspace, all updates should also propogate to this file that's in the `.yxi` that you build.  
+Inside the archive, navigate to `<TOOL_NAME>/site-packages/ayx_plugins/<tool_name>.py`. When opening this file, you should expect to see the exact same code as the plugin code in your tool workspace (`~/your_tool_workspace/backend/ayx_plugins/<tool_name>.py`). If you make some changes to your code in your workspace, all updates should also propogate to this file that's in the `.yxi` that you build. This step is used to confirm that the `.yxi` is being built with the correct code and dependencies. You can verify that the other plugin dependencies are also being correctly built by simply searching for that dependency in the `site-packages` folder of the archive. 
 
 ## 2. After installing `.yxi`
-After installing the `.yxi`, there will be a new folder created that can be found in `~/%APPDATA%/Roaming/Alteryx/Tools/<TOOL_NAME>` directory for user installs. For admin installs, please check your Alteryx system installation folder. 
+After installing the `.yxi`, there will be a new folder created that can be found in `~/%APPDATA%/Roaming/Alteryx/Tools/<TOOL_NAME>` directory for user installs. (For admin installs, please check your Alteryx system installation folder) 
 
-In the created tool folder, navigate to `/site-packages/ayx_plugins/<tool_name>.py`. When opening this file, you should expect to see the exact same code as the plugin code in your tool workspace (`~/your_tool_workspace/backend/ayx_plugins/<tool_name>.py`). Again, when you make some changes to your code in your workspace, all updates should also propogate to this file that's in the `.yxi` that you build, and thus to the installed tool folder as well.
+In the created tool folder, navigate to `/site-packages/ayx_plugins/<tool_name>.py`. When opening this file, you should expect to see the exact same code as the plugin code in your tool workspace (`~/your_tool_workspace/backend/ayx_plugins/<tool_name>.py`). To reiterate, when you make some changes to your code in your workspace, recreate and install the `.yxi`, you should expect the same changes to also propogate to this file in the installed tool folder. These checks will confirm that the installation process is working correctly.
 
 ## 3. After running in Designer
 If, after you've run the plugin in Designer, the tool does not yield expected results, you can check the logs following this method:
@@ -31,6 +32,9 @@ Checking for PythonSDK.log and enabling Debug logging:
 For example, one way to do this is in the Windows Environment dialog. Windows 10+ users, go to [How Do I Set System Environment Variables in Windows 10](https://superuser.com/questions/949560/how-do-i-set-system-environment-variables-in-windows-10_E) for more information.
 
 For more, please see the [FAQ](https://github.com/alteryx/ayx-developer-sdk/blob/main/docs/references/faq.md#where-are-the-debug-logs-located)
+
+By checking the logs, you will see what is happening during execution time and be able to check your expectations of what you think should be happening with what is actually happening. 
+
 
 ## 4. Running the plugin at command line
 If you see an error message that looks like `Internal error: Failed to read port assignment`, you can try to run the `main.pyz` from your tool workspace using the command line to diagnose the error that's preventing the port assignment. Navigate to your tool workspace and run the following command:
@@ -73,3 +77,6 @@ Traceback (most recent call last):
     badcode
 NameError: name 'badcode' is not defined
 ```
+
+## 5. Simple ways to print/check values
+In your plugin code, use the `self.provider.io.info("")` method to add output to your tool that will show up in Designer. This is an easy and simple way to look at order in which your code is executing in live runs of the plugin. Using this method is a bit more convenient than using python's `println()` method since you would have to check the `PythonSDK.log` to see those print statements. 
