@@ -1,5 +1,5 @@
 # Debugging SDK Tools
-Now that you've built your first SDK Tool, you want to confirm that it's properly installed and that the code you've written is being executed.
+Now that you've built your first SDK Tool, you want to confirm that it's properly installed and that the code you've written is being executed. This guide will show you places to check for correctness and how to verify that your plugin is being correctly built and executed. It is recommended to follow these steps when behavior is not acting as expected, and to always rebuild using the `create-yxi` command to iterate and ensure that changes are being made to your plugin code.  
 
 
 ## Table of Contents
