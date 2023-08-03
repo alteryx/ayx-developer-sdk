@@ -282,7 +282,7 @@ error\...
 
 ## _"My plugin doesn't need UI"_
 
-Just simply delete the UI folder. For new plugins, [use --omit-ui](ayx-plugin-cli.md#omit-ui-create-ayx-plugin-omit-ui)
+Just simply delete the UI folder. For new plugins, [use --omit-ui](ayx-plugin-cli.md#create-ayx-plugin)
 
 ## _"I built my plugin without UI, but change my mind"_
 
@@ -290,8 +290,8 @@ You can [create a UI for a given workspace or specific plugin](ayx-plugin-cli#ge
 
 ## _"I don't want to keep rebuilding UI components when creating a yxi"_
 
-You can do this by using [-omit-u in create-yxi](ayx-plugin-cli#omit-ui-create-yxi-omit-ui)
+You can do this by using [-omit-u in create-yxi](ayx-plugin-cli#create)
 
 ## _"I don't want to keep rebuilding UI components installing a yxi through the CLI"_
 
-You can do this by using [-omit-u in designer-install](ayx-plugin-cli#omit-ui-designer-install-omit-ui)
+You can do this by using [-omit-u in designer-install](ayx-plugin-cli#designer-install)

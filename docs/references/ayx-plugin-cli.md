@@ -215,7 +215,7 @@ The plugin version.
 -   Type: String
 -   Permissible Values: Any
 
-#### \--omit-ui {#create-ayx-plugin-omit-ui}
+#### \--omit-ui
 
 Do not generate UI artifacts for this plugin. UI artifacts can be generated later by using `generate-ui` command.
 
@@ -227,7 +227,7 @@ Designer. The resulting YXI is located under `build/yxi/`.
 
 ### Parameters
 
-#### \--omit-ui {#create-yxi-omit-ui}
+#### \--omit-ui
 
 Do not build any UI artifacts for the plugins in the workspace.
 
@@ -289,9 +289,9 @@ Note that admin installation requires admin access.
 -   Permissible Values: user, admin
 -   Default: user
 
-#### \--omit-ui {#designer-install-omit-ui}
+#### \--omit-ui
 
-see [`--omit-ui`](#omit-ui-create-yxi-omit-ui) for [--create-yxi](#create-yxi)
+see [`--omit-ui` for --create-yxi](#create-yxi)
 
 ## generate-config-files
 
