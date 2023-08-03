@@ -215,6 +215,11 @@ The plugin version.
 -   Type: String
 -   Permissible Values: Any
 
+#### \--omit-ui {#create-ayx-plugin-omit-ui}
+
+Do not generate UI artifacts for this plugin. UI artifacts can be generated later by using `generate-ui` command.
+
+
 ## create-yxi
 
 This command packages a workspace into a YXI that can be installed into
@@ -222,7 +227,13 @@ Designer. The resulting YXI is located under `build/yxi/`.
 
 ### Parameters
 
-This command takes no parameters.
+#### \--omit-ui {#create-yxi-omit-ui}
+
+Do not build any UI artifacts for the plugins in the workspace.
+
+- If a plugin does not have any UI artifacts, nothing will happen.
+- If a plugin has UI artifacts but it was never built, nothing will happen.
+- If a plugin has UI artifacts that was previously built, the previous build result will be packaged.
 
 ## install-yxi
 
@@ -278,6 +289,10 @@ Note that admin installation requires admin access.
 -   Permissible Values: user, admin
 -   Default: user
 
+#### \--omit-ui {#designer-install-omit-ui}
+
+see [`--omit-ui`](#omit-ui-create-yxi-omit-ui) for [--create-yxi](#create-yxi)
+
 ## generate-config-files
 
 This command generates and updates the workspace config XML, individual
@@ -286,6 +301,17 @@ tool config XMLs, and the tool's `manifest.json` file.
 ### Parameters
 
 This command takes no parameters.
+
+## generate-ui
+
+This command generates the UI artifacts for the workspace, or a specific plugin.
+
+### Parameters
+
+#### \--tool-name
+
+Generate UI artifacts for a specific plugin.
+
 
 ## Sample ayx_workspace.json
 
@@ -416,6 +442,9 @@ to define these items:
 -   Tool Version: Defaults to 1.0. This allows you to maintain multiple
     versions of a tool so that users can choose to upgrade to a new
     version or use the previous one inside of any Alteryx workflows.
+
+:information_source:
+Use `--omit-ui` argument if this plugin will not have UI. UI can be generated later by using the [generate-ui](#generate-ui) command.
 
 #### Generate YXI
 
