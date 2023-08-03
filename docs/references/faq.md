@@ -290,7 +290,7 @@ You can [create a UI for a given workspace or specific plugin](ayx-plugin-cli#ge
 
 ## _"I don't want to keep rebuilding UI components when creating a yxi"_
 
-You can do this by using [-omit-u in create-yxi](ayx-plugin-cli#create)
+You can do this by using [-omit-u in create-yxi](ayx-plugin-cli#create-yxi)
 
 ## _"I don't want to keep rebuilding UI components installing a yxi through the CLI"_
 
