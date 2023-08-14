@@ -15,7 +15,7 @@ If, after you run the plugin in Designer, the tool does not yield the expected r
 
 > Check for PythonSDK.log and enable Debug logging:
 
-> - Tool logs are written to a file called PythonSDK.log located in Local AppData. For example, `%LOCALAPPDATA%\Alteryx\Log\PythonSDK.log`.
+> - Tool logs are written to a file called PythonSDK.log located in `LOCALAPPDATA`. For example, `%LOCALAPPDATA%\Alteryx\Log\PythonSDK.log`.
 
 > - Ensure you launch the plugin with the environment variable 
 `AYX_SDK_VERBOSE=1`.
