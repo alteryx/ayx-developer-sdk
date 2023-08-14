@@ -280,18 +280,18 @@ error\...
     **requirements-thirdparty.txt** file: `protobuf==3.20.1`.
 3.  Rebuild the plugin.
 
-## _"My plugin doesn't need UI"_
+## _"My plugin doesn't need UI."_
 
-Just simply delete the UI folder. For new plugins, [use --omit-ui](ayx-plugin-cli.md#create-ayx-plugin)
+If your plugin doesn't need a UI, you can simply delete the UI folder. For new plugins, use [--omit-ui](ayx-plugin-cli.md#create-ayx-plugin).
 
-## _"I built my plugin without UI, but change my mind"_
+## _"I built my plugin without a UI but change my mind."_
 
-You can [create a UI for a given workspace or specific plugin](ayx-plugin-cli#generate-ui)
+You can [create a UI for a given workspace or specific plugin](ayx-plugin-cli#generate-ui).
 
-## _"I don't want to keep rebuilding UI components when creating a yxi"_
+## _"I don't want to rebuild UI components when creating a YXI."_
 
-You can do this by using [-omit-u in create-yxi](ayx-plugin-cli#create-yxi)
+To address this, use [-omit-u in create-yxi](ayx-plugin-cli#create-yxi).
 
-## _"I don't want to keep rebuilding UI components installing a yxi through the CLI"_
+## _"I don't want to rebuild UI components when installing a YXI through the CLI."_
 
-You can do this by using [-omit-u in designer-install](ayx-plugin-cli#designer-install)
+To address this, use [-omit-u in designer-install](ayx-plugin-cli#designer-install).

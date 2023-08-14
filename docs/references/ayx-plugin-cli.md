@@ -217,8 +217,7 @@ The plugin version.
 
 #### \--omit-ui
 
-Do not generate UI artifacts for this plugin. UI artifacts can be generated later by using `generate-ui` command.
-
+Don't generate UI artifacts for this plugin. You can generate UI artifacts later with the `generate-ui` command.
 
 ## create-yxi
 
@@ -229,11 +228,11 @@ Designer. The resulting YXI is located under `build/yxi/`.
 
 #### \--omit-ui
 
-Do not build any UI artifacts for the plugins in the workspace.
+Don't build any UI artifacts for the plugins in the workspace.
 
-- If a plugin does not have any UI artifacts, nothing will happen.
-- If a plugin has UI artifacts but it was never built, nothing will happen.
-- If a plugin has UI artifacts that was previously built, the previous build result will be packaged.
+- If a plugin doesn't have any UI artifacts, nothing happens.
+- If a plugin has UI artifacts, but it was never built, nothing happens.
+- If a plugin has UI artifacts and was previously built, the previous build result is packaged.
 
 ## install-yxi
 
@@ -291,7 +290,7 @@ Note that admin installation requires admin access.
 
 #### \--omit-ui
 
-see [`--omit-ui` for --create-yxi](#create-yxi)
+Go to [`to --omit-ui`` for --create-yxi](#create-yxi).
 
 ## generate-config-files
 
@@ -444,7 +443,8 @@ to define these items:
     version or use the previous one inside of any Alteryx workflows.
 
 :information_source:
-Use `--omit-ui` argument if this plugin will not have UI. UI can be generated later by using the [generate-ui](#generate-ui) command.
+
+Use the `--omit-ui` argument if this plugin doesn't have a UI. You can generate the UI later with the [generate-ui](#generate-ui) command.
 
 #### Generate YXI
 
