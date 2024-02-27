@@ -306,11 +306,11 @@ There are a few options to install YXIs.
 
 For Alteryx Server: Repeat the installation steps on all nodes or copy the folders to other nodes. You must install the Tool on all worker nodes. The Tool folder is all Server needs to use the connector so you can copy the folder between the nodes to install.
   
-2. Double the the YXI.
+2. Double-click the YXI.
    1. A pop-up will appear and you will be asked to confirm installation. Follow steps from pop-up.
-4. Drag the YXI into Designer Desktop Canvas
+3. Drag the YXI into Designer Desktop Canvas
    1. A pop-up will appear and you will be asked to confirm installation. Follow steps from pop-up.
-6. From the `ayx-plugin-cli` CLI, use the `designer-install` command.
+4. From the `ayx-plugin-cli` CLI, use the `install-yxi` (Works on arbitrary YXIs) or `designer-install` (Only works from a workspace) command.
 
  
 
