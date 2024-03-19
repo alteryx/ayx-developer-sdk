@@ -38,7 +38,7 @@ class ConstantsTestTool(PluginV2):
         anchor
             NamedTuple containing anchor.name and anchor.connection.
         """
-        raise NotImplementedError("Input tools don't receive batches.")
+        raise NotImplementedError("Input tools don't receive incoming connections.")
 
     def on_record_batch(self, batch: "Table", anchor: namedtuple) -> None:
         """
