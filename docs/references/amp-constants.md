@@ -15,7 +15,7 @@ Here is a list of constants passed from the engine to the tool:
     - **Engine.Type** the type of engine
 
 ## Usage
-Acessing the constanants is simple:
+Accessing the constants is simple:
 
     def on_complete(self) -> None:
         desired_constant = self.provider.environment.*constant*
