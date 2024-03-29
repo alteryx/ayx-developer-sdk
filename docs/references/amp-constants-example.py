@@ -20,12 +20,14 @@ from ayx_python_sdk.providers.amp_provider.amp_provider_v2 import AMPProviderV2
 from pyarrow import Table
 
 
-class ConstantsTestTool(PluginV2):
+class ConstantsExample(PluginV2):
     """Concrete implementation of an AyxPlugin."""
 
     def __init__(self, provider: AMPProviderV2) -> None:
         """Construct a plugin."""
         self.provider = provider
+        self.config_value = 0.42
+        self.provider.io.info("Plugin initialized.")
 
     def on_incoming_connection_complete(self, anchor: namedtuple) -> None:
         """
@@ -38,7 +40,7 @@ class ConstantsTestTool(PluginV2):
         anchor
             NamedTuple containing anchor.name and anchor.connection.
         """
-        raise NotImplementedError("Input tools don't receive incoming connections.")
+        raise NotImplementedError("Input tools don't receive batches.")
 
     def on_record_batch(self, batch: "Table", anchor: namedtuple) -> None:
         """
@@ -70,12 +72,25 @@ class ConstantsTestTool(PluginV2):
         Note: A tool with an optional input anchor and no incoming connections should
         also write any records to output anchors here.
         """
+        import pandas as pd
         import pyarrow as pa
 
-        constants_to_test = ["Engine.WorkflowFileName", "Engine.Type"]
-        table = pa.Table.from_arrays(
-            list(zip(*[[k, v] for k, v in sorted(
-                self.provider.environment.raw_constants.items(), key=lambda k: k
-            ) if k in constants_to_test])), names=["key", "value"]
+        self.provider.io.info("Raw constants: ")
+
+        for k, v in self.provider.environment.raw_constants.items():
+            self.provider.io.info(f"{k}: {v}")
+
+        df = pd.DataFrame(
+            {
+                "Designer Version": [self.provider.environment.designer_version],
+                "Alteryx Install Directory": [str(self.provider.environment.alteryx_install_dir)],
+                "Workflow Directory": [str(self.provider.environment.workflow_dir)],
+                "Workflow ID": [self.provider.environment.workflow_id],
+                "Temp Directory": [str(self.provider.environment.temp_dir)],
+                "Tool ID": [self.provider.environment.tool_id],
+            }
         )
-        self.provider.write_to_anchor("Output", table)
+
+        packet = pa.Table.from_pandas(df)
+
+        self.provider.write_to_anchor("Output", packet)
