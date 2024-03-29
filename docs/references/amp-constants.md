@@ -50,10 +50,8 @@ Here is a list of constants passed from the engine to the tool:
 ## Usage
 Accessing the constants is simple:
 
-    def on_complete(self) -> None:
-        desired_constant = self.provider.environment.*constant*
+    desired_constant = self.provider.environment.*constant*
 
 To access the constants stored in the **_raw_constants** simply do the following:
 
-    def on_complete(self) -> None:
-        desired_constant = self.provider.environment._raw_constants[Engine.*constant*]
+    desired_constant = self.provider.environment._raw_constants[Engine.*constant*]
