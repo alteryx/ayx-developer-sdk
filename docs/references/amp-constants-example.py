@@ -11,7 +11,7 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-"""Example input tool."""
+"""Example Input Tool"""
 from collections import namedtuple
 
 from ayx_python_sdk.core import PluginV2
@@ -21,7 +21,7 @@ from pyarrow import Table
 
 
 class ConstantsExample(PluginV2):
-    """Concrete implementation of an AyxPlugin."""
+    """Concrete Implementation of an AyxPlugin"""
 
     def __init__(self, provider: AMPProviderV2) -> None:
         """Construct a plugin."""
@@ -33,12 +33,12 @@ class ConstantsExample(PluginV2):
         """
         Call when an incoming connection is done sending data including when no data is sent on an optional input anchor.
 
-        This method IS NOT called during update-only mode.
+        This method is not called during update-only mode.
 
         Parameters
         ----------
         anchor
-            NamedTuple containing anchor.name and anchor.connection.
+            NamedTuple contains anchor.name and anchor.connection.
         """
         raise NotImplementedError("Input tools don't receive incoming connections.")
 
@@ -48,14 +48,14 @@ class ConstantsExample(PluginV2):
 
         The method that gets called whenever the plugin receives a record batch on an input.
 
-        This method IS NOT called during update-only mode.
+        This method is not called during update-only mode.
 
         Parameters
         ----------
         batch
-            A pyarrow Table containing the received batch.
+            A pyarrow Table that contains the received batch.
         anchor
-            A namedtuple('Anchor', ['name', 'connection_name']) containing input connection identifiers.
+            A namedtuple('Anchor', ['name', 'connection_name']) that contains input connection identifiers.
         """
         raise NotImplementedError("Input tools don't receive batches.")
 
@@ -65,7 +65,7 @@ class ConstantsExample(PluginV2):
 
         This method gets called when all other plugin processing is complete.
 
-        In this method, a Plugin designer should perform any cleanup for their plugin.
+        In this method, you should perform any cleanup for your plugin.
         However, if the plugin is an input-type tool (it has no incoming connections),
         processing (record generation) should occur here.
 
