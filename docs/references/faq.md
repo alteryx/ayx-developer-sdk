@@ -295,3 +295,22 @@ To address this, use [-omit-ui in create-yxi](./ayx-plugin-cli#create-yxi).
 ## _"I don't want to rebuild UI components when installing a YXI through the CLI."_
 
 To address this, use [-omit-ui in designer-install](./ayx-plugin-cli#designer-install).
+
+## _"How do you install YXI packages into Alteryx Designer Desktop?"_
+
+There are a few options to install YXIs.
+
+1. Right-click the Designer icon and select Run As Administrator. (Important Note: If you don’t "Run as Administrator" or "Elevated" (run explorer with elevated permissions), the file won’t install to the correct folder)
+   1. In Designer, go to File > Open Workflow > Browse and select the downloaded YXI file.
+   2. Select Install for all users. (The files install to `C:\ProgramData\Alteryx\Tools`.)
+
+For Alteryx Server: Repeat the installation steps on all nodes or copy the folders to other nodes. You must install the Tool on all worker nodes. The tool folder is all Server needs to use the connector so you can copy the folder between the nodes to install.
+  
+2. Double-click the YXI.
+   1. A pop-up will appear and you will be asked to confirm installation. Follow steps from pop-up.
+3. Drag the YXI into Designer Desktop Canvas
+   1. A pop-up will appear and you will be asked to confirm installation. Follow steps from pop-up.
+4. From the `ayx-plugin-cli` CLI, use the `install-yxi` (Works on arbitrary YXIs) or `designer-install` (Only works from a workspace) command.
+5. Manually extract the YXI and copy the folders to their respective homes. That can be %ProgramData% or %AppData%.
+
+Note: You can install any mix and any number of tools/samples/extensions/etc together in a single yxi file.
