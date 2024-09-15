@@ -21,7 +21,7 @@ Getting Started
 Getting started in the old SDK typically means looking at an example
 plugin, copying the code and file structure, and then modifying it to
 suit your own needs. The new SDK provides a command-line interface (CLI)
-that takes care of all of this project setup. Go to the [documentation](../howto/platform-sdk-quickstart-guide.md) for more information.
+that takes care of all of this project setup. Go to the [documentation](../howto/getting_started_markdown.md) for more information.
 
 Development
 -----------
@@ -61,5 +61,5 @@ the YXI file format. You can find the instructions for packaging a YXI in the
 original SDK at [Package a Tool](https://help.alteryx.com/current/developer-help/package-tool).
 This packaging process was significantly simplified by the new
 SDK CLI, described in the [Getting
-Started](../howto/platform-sdk-quickstart-guide.md)
+Started](../howto/getting_started_markdown.md)
 guide.

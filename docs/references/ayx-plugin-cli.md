@@ -33,8 +33,7 @@ these commands:
 
 This creates an isolated development environment that minimizes the risk
 of creating a package that Alteryx Designer and other users won\'t be
-able to use. It does this by keeping the dependencies required by
-different projects separate.
+able to use. It keeps the dependencies that different projects require separate.
 
 ### Installation
 
@@ -99,7 +98,7 @@ the current directory, and throw an exception otherwise.
 ### Parameters
 
 Note: If a parameter is not passed in as part of the CLI call, the CLI
-will wait for standard input for the ignored parameters, even if they're
+waits for standard input for the ignored parameters, even if they're
 optional.
 
 #### \--package-name
@@ -174,12 +173,13 @@ these, follow these steps:
 ### Parameters
 
 Note: If a parameter is not passed in as part of the CLI call, the CLI
-will wait for standard input for the ignored parameters, even if they're
+waits for standard input for the ignored parameters, even if they're
 optional.
 
 #### \--tool-name
 
-This parameter becomes the name of the tool. Spaces are allowed but are cleaned into underscores and Pascal case. For example, for a Python
+This parameter becomes the name of the tool. Spaces are allowed but are cleaned into underscores and Pascal
+case. For example, for a Python
 plugin named "A Test Tool", the filename is `a_test_tool.py`, and the
 `class/ui/config` name is `ATestTool`.
 
