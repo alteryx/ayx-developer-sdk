@@ -54,7 +54,7 @@ Traceback (most recent call last):
     plugin_class = load_plugin_class(plugins_package, tool_name)
   File "c:\users\orion.ou\sdks\ayx-core\ayxsdk\ayxpythonsdk\ayx_python_sdk\providers\amp_provider\plugin_class_loader.py", line 62, in load_plugin_class
     plugins_module = importlib.import_module(plugins_package)
-  File "C:\Users\orion.ou\Miniconda3\envs\dev\lib\importlib\__init__.py", line 127, in import_module
+  File "C:\Users\orion.ou\venvs\dev\lib\importlib\__init__.py", line 127, in import_module
     return _bootstrap._gcd_import(name[level:], package, level)
   File "<frozen importlib._bootstrap>", line 1014, in _gcd_import
   File "<frozen importlib._bootstrap>", line 991, in _find_and_load

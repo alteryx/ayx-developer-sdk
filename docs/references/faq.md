@@ -76,7 +76,7 @@ Yes, but only if you really need to. Before you do, please read our [Extensibili
 Yes!
 One way is to run directly with Python from the terminal. For example:
 ```cmd
-C:\Users\Your.Name\AppData\Local\Alteryx\bin\Python\python-3.8.5-embed-amd64\python.exe main.pyz start-sdk-tool-service ayx_plugins Input
+C:\Users\Your.Name\AppData\Local\Alteryx\bin\Python\python-3.13.14-embed-amd64\python.exe main.pyz start-sdk-tool-service ayx_plugins Input
 ```
 
 Recently, we released the [Test Client CLI](./test-client.md).

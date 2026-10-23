@@ -14,22 +14,19 @@ installed on your machine:
 
 -   Microsoft Windows 7 or Later (64-bit)
 -   Alteryx Designer Version 2021.2 and Later
--   Python Version 3.8.5
+-   Python Version 3.13
 -   [pip](=https://pypi.org/)
-    (automatically installed with Python 3.8.5)
+    (automatically installed with Python 3.13)
 
 Each SDK also has its own requirements, which are listed on each
 respective help page.
 
 We highly recommend that you develop your custom tools inside of a
-virtual environment (for example,
-[Miniconda](https://docs.conda.io/en/latest/miniconda.html).
-With Miniconda, you can create and activate a virtual environment with
-these commands:
-
-`conda create -n SDKEnv python=3.8.5`
-
-`conda activate SDKEnv`
+virtual environment. You can create and activate one with Python's
+built-in `venv` module. See [Virtual
+Environments](virtual_environments_markdown.md) for the creation
+command and activation steps for the command line, VSCode, and
+PyCharm.
 
 This creates an isolated development environment that minimizes the risk
 of creating a package that Alteryx Designer and other users won\'t be
@@ -325,7 +322,7 @@ Generate UI artifacts for a specific plugin.
 		"ayx_cli_version": "0.1b2.dev0",
 		"backend_language": "python",
 		"backend_language_settings": {
-			"python_version": "3.8",
+			"python_version": "3.13",
 			"requirements_local_path": "tool_backends\\requirements-local.txt",
 			"requirements_thirdparty_path": "tool_backends\\requirements-thirdparty.txt"
 		},

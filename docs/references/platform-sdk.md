@@ -48,8 +48,8 @@ installed on your machine:
 
 -   Microsoft Windows 7 or Later (64-bit)
 -   Alteryx Designer Version 2021.2
--   Python Version 3.8.5
--   [pip](https://pypi.org/) (automatically installed with Python 3.8.5)
+-   Python Version 3.13
+-   [pip](https://pypi.org/) (automatically installed with Python 3.13)
 
 Each SDK also has its own requirements, which are listed on each
 respective help page below.

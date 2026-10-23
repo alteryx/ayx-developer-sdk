@@ -13,9 +13,55 @@ required by different projects separate.
 Workspace Setup
 ---------------
 
-Make sure to create a new virtual environment with Python version 3.8
-before you initialize your SDK workspace. With Conda, the command is
-`conda create --name <env_name>`.
+Make sure to create a new virtual environment with Python version 3.13
+before you initialize your SDK workspace. Install [Python
+3.13](https://www.python.org/downloads/) if you haven't already. Create
+and activate the environment (named `<env_name>`) using one of these
+methods:
+
+-   **Command line:**
+    -   Verify that `python` resolves to a 3.13.x installation:
+        `python --version`.
+    -   If you have multiple Python versions installed and the
+        default `python` isn't 3.13.x, run `where python` to list
+        every installation on your `PATH`, then run
+        `<path>\python.exe --version` on each until you find the one
+        reporting 3.13.x.
+    -   Create the environment with that interpreter:
+        `python -m venv <env_name>` (or
+        `"<path-to-python3.13>\python.exe" -m venv <env_name>` if you
+        had to disambiguate above).
+    -   Activate it with `<env_name>\Scripts\activate`.
+-   **VSCode:**
+    -   Open the Command Palette (`Ctrl+Shift+P`/`Cmd+Shift+P`), and
+        run **Python: Create Environment**.
+    -   Select **Venv**, and choose your Python 3.13 interpreter from
+        the list (VSCode shows the version next to each interpreter,
+        so this works even with multiple installs).
+    -   VSCode creates the environment and activates it as the
+        workspace interpreter.
+    -   To activate an existing environment instead of creating a new
+        one, open the Command Palette, run **Python: Select
+        Interpreter**, and choose the venv's `python.exe` (for
+        example, `<env_name>\Scripts\python.exe`).
+-   **PyCharm:**
+    -   If you're starting a new PyCharm project, you can create the
+        environment directly from the **New Project** screen: set
+        **Interpreter type** to **Project venv**, choose your Python
+        3.13 version from the dropdown, and click **Create**. PyCharm
+        creates the venv in the project root and sets it as the
+        project interpreter.
+    -   For an existing project, go to **Settings** \> **Project** \>
+        **Python Interpreter** \> **Add Interpreter** \> **Add Local
+        Interpreter** \> **Virtualenv Environment** (New).
+    -   Choose your Python 3.13 interpreter as the base (PyCharm lists
+        the version for each), and confirm.
+    -   PyCharm creates the environment and sets it as the project
+        interpreter.
+    -   To activate an existing environment instead, use **Add
+        Interpreter** \> **Add Local Interpreter** \> **Virtualenv
+        Environment** \> **Existing**, and select the `python`
+        executable inside it.
 
 3rd-party Packages
 ------------------

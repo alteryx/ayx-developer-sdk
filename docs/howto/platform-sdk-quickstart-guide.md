@@ -14,8 +14,8 @@ machine:
 
 -   Microsoft Windows 7 or Later (64-bit)
 -   Alteryx Designer Version 2021.2\*
--   Python Version 3.8.5
--   [pip](https://pypi.org/) (automatically installed with Python 3.8.5)
+-   Python Version 3.13
+-   [pip](https://pypi.org/) (automatically installed with Python 3.13)
 -   [node](https://nodejs.org/en/download/) [14](https://nodejs.org/en/blog/release/v14.17.3/)
 -   [Git](https://git-scm.com/downloads)
 

@@ -5,7 +5,7 @@ Prerequisites
 -------------
 
 - To get started with the Alteryx Platform SDK, you need a valid installation of [Alteryx Designer](https://www.alteryx.com/).
-- Python version 3.8.5 is required for Alteryx Designer plugins.
+- Python version 3.13 is required for Alteryx Designer plugins.
 
 Set Up the Development Environment
 ----------------------------------
@@ -16,14 +16,56 @@ Follow these steps to configure your development environment.
 
 To get started\...
 
-1.  Install [Miniconda3](https://docs.conda.io/en/latest/miniconda.html)
-    for your system.
-2.  Once the install is done, open an Anaconda Prompt and create a new
-    virtual environment: `conda create -n ayx_python_sdk python=3.8.5`.
-3.  Next, activate it: `conda activate ayx_python_sdk`.
+1.  Install [Python 3.13](https://www.python.org/downloads/) for
+    Windows if you haven't already.
+2.  Create and activate a virtual environment named `ayx_python_sdk`
+    using one of these methods:
+    -   **Command line:**
+        - Verify that `python` resolves to a 3.13.x installation:
+          `python --version`.
+        - If you have multiple Python versions installed and the
+          default `python` isn't 3.13.x, run `where python` to list
+          every installation on your `PATH`, then run
+          `<path>\python.exe --version` on each until you find the one
+          reporting 3.13.x.
+        - Create the environment with that interpreter:
+          `python -m venv ayx_python_sdk` (or
+          `"<path-to-python3.13>\python.exe" -m venv ayx_python_sdk`
+          if you had to disambiguate above).
+        - Activate it with `ayx_python_sdk\Scripts\activate`.
+    -   **VSCode:**
+        - Open the Command Palette (`Ctrl+Shift+P`/`Cmd+Shift+P`),
+          and run **Python: Create Environment**.
+        - Select **Venv**, and choose your Python 3.13 interpreter
+          from the list (VSCode shows the version next to each
+          interpreter, so this works even with multiple installs).
+        - VSCode creates the environment and activates it as
+          the workspace interpreter.
+        - To activate an existing environment instead of creating a
+          new one, open the Command Palette, run **Python: Select
+          Interpreter**, and choose the venv's `python.exe` (for
+          example, `ayx_python_sdk\Scripts\python.exe`).
+    -   **PyCharm:**
+        - If you're starting a new PyCharm project, you can create the
+          environment directly from the **New Project** screen: set
+          **Interpreter type** to **Project venv**, choose your Python
+          3.13 version from the dropdown, and click **Create**.
+          PyCharm creates the venv in the project root and sets it as
+          the project interpreter.
+        - For an existing project, go to **Settings** \> **Project**
+          \> **Python Interpreter** \> **Add Interpreter** \> **Add
+          Local Interpreter** \> **Virtualenv Environment** (New).
+        - Choose your Python 3.13 interpreter as the base (PyCharm
+          lists the version for each), and confirm.
+        - PyCharm creates the environment and sets it as the project
+          interpreter.
+        - To activate an existing environment instead, use **Add
+          Interpreter** \> **Add Local Interpreter** \> **Virtualenv
+          Environment** \> **Existing**, and select the `python`
+          executable inside it.
 
-If you are not familiar with Anaconda/Miniconda, visit [Anaconda
-Documentation](https://docs.anaconda.com/anaconda/user-guide/getting-started/).
+For more information on `venv`, visit the [Python venv
+documentation](https://docs.python.org/3/library/venv.html).
 
 ### Install the Package
 
@@ -114,8 +156,9 @@ Alteryx Designer and find your new tool in the Tool Palette.
 
 When Designer runs a tool, it must look for an engine to use. In the
 case of the MyFirstTool Python tool, the engine is itself the *Python
-interpreter*. The interpreter is built out of Anaconda and includes all
-of the packages indicated in `requirements.txt`.
+interpreter*. The interpreter is built out of Designer's embedded
+Python distribution and includes all of the packages indicated in
+`requirements.txt`.
 
 The ToolFamily defined in the Config.xml file within the Ayx Plugin
 Workspace defines the name of the virtual environment created for all of

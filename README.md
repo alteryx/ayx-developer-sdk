@@ -18,20 +18,33 @@ Expand-Archive -Path latest-sdk.zip -DestinationPath C:\SDKs\Alteryx\
 ```
 
 ## Dependencies
-Python version 3.8.5 is currently required to use `ayx-sdk-cli.exe plugin run`. It is recommended to install this in a [Miniconda environment](#creating-a-miniconda-python-environment).
+Python version 3.13 is currently required to use `ayx-sdk-cli.exe plugin run`. It is recommended to install this in a [Python virtual environment](#creating-a-python-virtual-environment).
 
-### Creating a Miniconda Python Environment
-1. Follow the [Miniconda installation](https://docs.conda.io/en/latest/miniconda.html) instructions.
-2. From a terminal, create a new environment with Python 3.8.5:
+### Creating a Python Virtual Environment
+1. Install [Python 3.13](https://www.python.org/downloads/) if you haven't already.
+2. Create and activate a virtual environment named `MyEnvName` using one of these methods:
+   - **Command line:**
+     - Verify that `python` resolves to a 3.13.x installation: `python --version`.
+     - If you have multiple Python versions installed and the default `python` isn't 3.13.x, run `where python` to list every installation on your `PATH`, then run `<path>\python.exe --version` on each until you find the one reporting 3.13.x.
+     - Create the environment with that interpreter:
+       ```powershell
+       python -m venv MyEnvName
+       ```
+       (or `"<path-to-python3.13>\python.exe" -m venv MyEnvName` if you had to disambiguate above).
+     - Activate it with `MyEnvName\Scripts\activate`.
+   - **VSCode:**
+     - Open the Command Palette (`Ctrl+Shift+P`/`Cmd+Shift+P`), and run **Python: Create Environment**.
+     - Select **Venv**, and choose your Python 3.13 interpreter from the list (VSCode shows the version next to each interpreter, so this works even with multiple installs).
+     - VSCode creates the environment and activates it as the workspace interpreter.
+     - To activate an existing environment instead of creating a new one, open the Command Palette, run **Python: Select Interpreter**, and choose the venv's `python.exe` (for example, `MyEnvName\Scripts\python.exe`).
+   - **PyCharm:**
+     - If you're starting a new PyCharm project, you can create the environment directly from the **New Project** screen: set **Interpreter type** to **Project venv**, choose your Python 3.13 version from the dropdown, and click **Create**. PyCharm creates the venv in the project root and sets it as the project interpreter.
+     - For an existing project, go to **Settings** > **Project** > **Python Interpreter** > **Add Interpreter** > **Add Local Interpreter** > **Virtualenv Environment** (New).
+     - Choose your Python 3.13 interpreter as the base (PyCharm lists the version for each), and confirm.
+     - PyCharm creates the environment and sets it as the project interpreter.
+     - To activate an existing environment instead, use **Add Interpreter** > **Add Local Interpreter** > **Virtualenv Environment** > **Existing**, and select the `python` executable inside it.
 
-```powershell
-conda create -n MyEnvName python=3.8.5
-```
-
-> :information_source: Note that if you are using the same Conda environment for use with `ayx_plugin_cli`, you may wish to also install Node.js v14.x and `doit` as seen below:
-```powershell
-conda create -n MyEnvName python=3.8.5 nodejs=14 doit
-```
+> :information_source: Note that if you are using the same virtual environment for use with `ayx_plugin_cli`, you may wish to also install Node.js v14.x separately and `doit` via `pip install doit`.
 
 Please refer to the [AYX Python SDK v2](https://help.alteryx.com/developer-help/ayx-python-sdk-v2) documentation for more information on `ayx_plugin_cli` and Python SDK v2 tool development.
 
