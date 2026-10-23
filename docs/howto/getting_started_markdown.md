@@ -5,7 +5,7 @@ Prerequisites
 -------------
 
 - To get started with the Alteryx Platform SDK, you need a valid installation of [Alteryx Designer](https://www.alteryx.com/).
-- Python version 3.8.5 is required for Alteryx Designer plugins.
+- Python version 3.13 is required for Alteryx Designer plugins.
 
 Set Up the Development Environment
 ----------------------------------
@@ -16,14 +16,30 @@ Follow these steps to configure your development environment.
 
 To get started\...
 
-1.  Install [Miniconda3](https://docs.conda.io/en/latest/miniconda.html)
-    for your system.
-2.  Once the install is done, open an Anaconda Prompt and create a new
-    virtual environment: `conda create -n ayx_python_sdk python=3.8.5`.
-3.  Next, activate it: `conda activate ayx_python_sdk`.
+1.  Install [Python 3.13](https://www.python.org/downloads/) for
+    Windows if you haven't already. The installer registers with the
+    [Python Launcher for Windows](https://docs.python.org/3/using/windows.html#python-launcher-for-windows)
+    (`py`).
+2.  Create a new virtual environment pinned to Python 3.13 using the
+    `py` launcher: `py -3.13 -m venv ayx_python_sdk`.
+    > :information_source: The `py` launcher resolves to the latest
+    > 3.13.x release installed on your machine. To confirm the exact
+    > patch version inside the environment, activate it and run
+    > `python --version`.
+3.  Activate the environment:
+    -   **Command line:** `ayx_python_sdk\Scripts\activate`
+    -   **VSCode:** Open the Command Palette
+        (`Ctrl+Shift+P`/`Cmd+Shift+P`), run **Python: Select
+        Interpreter**, and choose the interpreter inside
+        `ayx_python_sdk` (for example,
+        `ayx_python_sdk\Scripts\python.exe`).
+    -   **PyCharm:** Go to **Settings** \> **Project** \> **Python
+        Interpreter** \> **Add Interpreter** \> **Add Local
+        Interpreter** \> **Existing**, and select the `python` executable
+        inside your `ayx_python_sdk` virtual environment.
 
-If you are not familiar with Anaconda/Miniconda, visit [Anaconda
-Documentation](https://docs.anaconda.com/anaconda/user-guide/getting-started/).
+For more information on `venv`, visit the [Python venv
+documentation](https://docs.python.org/3/library/venv.html).
 
 ### Install the Package
 
@@ -114,8 +130,9 @@ Alteryx Designer and find your new tool in the Tool Palette.
 
 When Designer runs a tool, it must look for an engine to use. In the
 case of the MyFirstTool Python tool, the engine is itself the *Python
-interpreter*. The interpreter is built out of Anaconda and includes all
-of the packages indicated in `requirements.txt`.
+interpreter*. The interpreter is built out of Designer's embedded
+Python distribution and includes all of the packages indicated in
+`requirements.txt`.
 
 The ToolFamily defined in the Config.xml file within the Ayx Plugin
 Workspace defines the name of the virtual environment created for all of

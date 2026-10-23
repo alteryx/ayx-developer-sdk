@@ -13,9 +13,28 @@ required by different projects separate.
 Workspace Setup
 ---------------
 
-Make sure to create a new virtual environment with Python version 3.8
-before you initialize your SDK workspace. With Conda, the command is
-`conda create --name <env_name>`.
+Make sure to create a new virtual environment with Python version 3.13
+before you initialize your SDK workspace. Install [Python
+3.13](https://www.python.org/downloads/) if you haven't already (the
+installer registers with the [Python Launcher for
+Windows](https://docs.python.org/3/using/windows.html#python-launcher-for-windows),
+`py`), then create the environment pinned to that version:
+`py -3.13 -m venv <env_name>`.
+
+> :information_source: The `py` launcher resolves to the latest 3.13.x
+> release installed on your machine. To confirm the exact patch version
+> inside the environment, activate it and run `python --version`.
+
+Activate the environment:
+
+-   **Command line:** `<env_name>\Scripts\activate`
+-   **VSCode:** Open the Command Palette (`Ctrl+Shift+P`/`Cmd+Shift+P`),
+    run **Python: Select Interpreter**, and choose the interpreter
+    inside `<env_name>` (for example, `<env_name>\Scripts\python.exe`).
+-   **PyCharm:** Go to **Settings** \> **Project** \> **Python
+    Interpreter** \> **Add Interpreter** \> **Add Local Interpreter**
+    \> **Existing**, and select the `python` executable inside your
+    `<env_name>` virtual environment.
 
 3rd-party Packages
 ------------------

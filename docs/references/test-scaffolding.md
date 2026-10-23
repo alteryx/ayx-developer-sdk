@@ -65,7 +65,7 @@ discovered tests should populate in that window.
 
 If test discovery fails, and the error message given is an import error,
 this could be due to an environment issue. Check the bottom-right corner
-of the IDE to make sure it\'s set to the conda environment where your
+of the IDE to make sure it\'s set to the virtual environment where your
 `ayx_python_sdk` and `ayx_plugin_cli` are installed.
 
 You can set breakpoints in both IDEs in roughly the same way. Hover over

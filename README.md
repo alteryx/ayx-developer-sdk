@@ -18,20 +18,24 @@ Expand-Archive -Path latest-sdk.zip -DestinationPath C:\SDKs\Alteryx\
 ```
 
 ## Dependencies
-Python version 3.8.5 is currently required to use `ayx-sdk-cli.exe plugin run`. It is recommended to install this in a [Miniconda environment](#creating-a-miniconda-python-environment).
+Python version 3.13 is currently required to use `ayx-sdk-cli.exe plugin run`. It is recommended to install this in a [Python virtual environment](#creating-a-python-virtual-environment).
 
-### Creating a Miniconda Python Environment
-1. Follow the [Miniconda installation](https://docs.conda.io/en/latest/miniconda.html) instructions.
-2. From a terminal, create a new environment with Python 3.8.5:
+### Creating a Python Virtual Environment
+1. Install [Python 3.13](https://www.python.org/downloads/) if you haven't already. The installer registers with the [Python Launcher for Windows](https://docs.python.org/3/using/windows.html#python-launcher-for-windows) (`py`).
+2. From a terminal, create a new virtual environment pinned to Python 3.13:
 
 ```powershell
-conda create -n MyEnvName python=3.8.5
+py -3.13 -m venv MyEnvName
 ```
 
-> :information_source: Note that if you are using the same Conda environment for use with `ayx_plugin_cli`, you may wish to also install Node.js v14.x and `doit` as seen below:
-```powershell
-conda create -n MyEnvName python=3.8.5 nodejs=14 doit
-```
+> :information_source: The `py` launcher resolves to the latest 3.13.x release installed on your machine. To confirm the exact patch version inside the environment, activate it and run `python --version`.
+
+3. Activate the environment:
+   * **Command line:** `MyEnvName\Scripts\activate`
+   * **VSCode:** Open the Command Palette (`Ctrl+Shift+P`/`Cmd+Shift+P`), run **Python: Select Interpreter**, and choose the interpreter inside `MyEnvName` (for example, `MyEnvName\Scripts\python.exe`).
+   * **PyCharm:** Go to **Settings** > **Project** > **Python Interpreter** > **Add Interpreter** > **Add Local Interpreter** > **Existing**, and select the `python` executable inside your `MyEnvName` virtual environment.
+
+> :information_source: Note that if you are using the same virtual environment for use with `ayx_plugin_cli`, you may wish to also install Node.js v14.x separately and `doit` via `pip install doit`.
 
 Please refer to the [AYX Python SDK v2](https://help.alteryx.com/developer-help/ayx-python-sdk-v2) documentation for more information on `ayx_plugin_cli` and Python SDK v2 tool development.
 

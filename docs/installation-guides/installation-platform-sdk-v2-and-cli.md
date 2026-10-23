@@ -8,16 +8,17 @@ This page describes how to install the Alteryx Platform SDK and Alteryx Plugin C
 
 ## Set Up the Development Environment
 ####  Dev Environment Setup
-* Download and install [Miniconda](https://docs.conda.io/en/latest/miniconda.html).
-* Open an Anaconda Prompt to create a new virutal environment:
+* Install [Python 3.13](https://www.python.org/downloads/) if you haven't already. The installer registers with the [Python Launcher for Windows](https://docs.python.org/3/using/windows.html#python-launcher-for-windows) (`py`).
+* Create a new virtual environment pinned to Python 3.13:
 ```
-conda create -n MyEnvName python=3.8.5 nodejs=14 doit
+py -3.13 -m venv MyEnvName
 ```
+> :information_source: The `py` launcher resolves to the latest 3.13.x release installed on your machine. To confirm the exact patch version inside the environment, activate it and run `python --version`.
 * Activate the environment:
-```
-conda activate MyEnvName
-```
-Go to [Anaconda Documentation](https://docs.anaconda.com/anaconda/user-guide/getting-started/) for more details.
+  * **Command line:** `MyEnvName\Scripts\activate`
+  * **VSCode:** Open the Command Palette (`Ctrl+Shift+P`/`Cmd+Shift+P`), run **Python: Select Interpreter**, and choose the interpreter inside `MyEnvName` (for example, `MyEnvName\Scripts\python.exe`).
+  * **PyCharm:** Go to **Settings** > **Project** > **Python Interpreter** > **Add Interpreter** > **Add Local Interpreter** > **Existing**, and select the `python` executable inside your `MyEnvName` virtual environment.
+* With the environment activated, install [Node 14](https://nodejs.org/dist/v14.9.0/) separately (it's not a pip package), and install `doit` with `pip install doit`.
 
 #### Install the Alteryx Platform SDK and Alteryx Plugin CLI
 In the activated virtual environment, pip install the Alteryx Platform SDK and Alteryx Plugin CLI with these commands:

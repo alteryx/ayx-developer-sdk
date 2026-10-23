@@ -31,7 +31,7 @@ To get started with the AYX Python SDK, you need these items installed
 on your machine:
 
 -   Microsoft Windows 7 or Later (64-bit)
--   Python Version 3.8.5
+-   Python Version 3.13
 -   Alteryx Designer Version 2021.4
 
 ### Installation
