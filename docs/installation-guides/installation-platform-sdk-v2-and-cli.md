@@ -8,16 +8,28 @@ This page describes how to install the Alteryx Platform SDK and Alteryx Plugin C
 
 ## Set Up the Development Environment
 ####  Dev Environment Setup
-* Install [Python 3.13](https://www.python.org/downloads/) if you haven't already. The installer registers with the [Python Launcher for Windows](https://docs.python.org/3/using/windows.html#python-launcher-for-windows) (`py`).
-* Create a new virtual environment pinned to Python 3.13:
-```
-py -3.13 -m venv MyEnvName
-```
-> :information_source: The `py` launcher resolves to the latest 3.13.x release installed on your machine. To confirm the exact patch version inside the environment, activate it and run `python --version`.
-* Activate the environment:
-  * **Command line:** `MyEnvName\Scripts\activate`
-  * **VSCode:** Open the Command Palette (`Ctrl+Shift+P`/`Cmd+Shift+P`), run **Python: Select Interpreter**, and choose the interpreter inside `MyEnvName` (for example, `MyEnvName\Scripts\python.exe`).
-  * **PyCharm:** Go to **Settings** > **Project** > **Python Interpreter** > **Add Interpreter** > **Add Local Interpreter** > **Existing**, and select the `python` executable inside your `MyEnvName` virtual environment.
+* Install [Python 3.13](https://www.python.org/downloads/) if you haven't already.
+* Create and activate a virtual environment named `MyEnvName` using one of these methods:
+  * **Command line:**
+    * Verify that `python` resolves to a 3.13.x installation: `python --version`.
+    * If you have multiple Python versions installed and the default `python` isn't 3.13.x, run `where python` to list every installation on your `PATH`, then run `<path>\python.exe --version` on each until you find the one reporting 3.13.x.
+    * Create the environment with that interpreter:
+      ```
+      python -m venv MyEnvName
+      ```
+      (or `"<path-to-python3.13>\python.exe" -m venv MyEnvName` if you had to disambiguate above).
+    * Activate it with `MyEnvName\Scripts\activate`.
+  * **VSCode:**
+    * Open the Command Palette (`Ctrl+Shift+P`/`Cmd+Shift+P`), and run **Python: Create Environment**.
+    * Select **Venv**, and choose your Python 3.13 interpreter from the list (VSCode shows the version next to each interpreter, so this works even with multiple installs).
+    * VSCode creates the environment and activates it as the workspace interpreter.
+    * To activate an existing environment instead of creating a new one, open the Command Palette, run **Python: Select Interpreter**, and choose the venv's `python.exe` (for example, `MyEnvName\Scripts\python.exe`).
+  * **PyCharm:**
+    * If you're starting a new PyCharm project, you can create the environment directly from the **New Project** screen: set **Interpreter type** to **Project venv**, choose your Python 3.13 version from the dropdown, and click **Create**. PyCharm creates the venv in the project root and sets it as the project interpreter.
+    * For an existing project, go to **Settings** > **Project** > **Python Interpreter** > **Add Interpreter** > **Add Local Interpreter** > **Virtualenv Environment** (New).
+    * Choose your Python 3.13 interpreter as the base (PyCharm lists the version for each), and confirm.
+    * PyCharm creates the environment and sets it as the project interpreter.
+    * To activate an existing environment instead, use **Add Interpreter** > **Add Local Interpreter** > **Virtualenv Environment** > **Existing**, and select the `python` executable inside it.
 * With the environment activated, install [Node 14](https://nodejs.org/dist/v14.9.0/) separately (it's not a pip package), and install `doit` with `pip install doit`.
 
 #### Install the Alteryx Platform SDK and Alteryx Plugin CLI
